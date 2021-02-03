@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
-
+<script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>
+<script type="text/javascript" src="Scripts/ProvinceInteractions.js"> </script>
 <style>
 polygon{
 		fill:#FFE7AB;stroke:black;stroke-width:1;
@@ -12,7 +13,7 @@ polygon{
 </style>
 
 <title>
-Tauresium - Main Page
+Tauresium - Game Page
 </title>
 </head>
 <body>
@@ -21,36 +22,53 @@ Tauresium - Main Page
 <font style="font-family:Romanus;font-size:80px;"> Tauresium </font>
 </div>
 
-<div id="MenuBar" style="background-color:#FAFAFA;width:100%;height:40px;"> 
+<div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;"> 
 	<button style="float:right;" class="menuButton" onclick="document.location='index.html'">Logout</button>
 	<button class="menuButton">World Information</button>
 	<button class="menuButton">My Country</button>
 	<button class="menuButton">Events</button>
 </div>
 
+<div id="InformationContainer" style="background-color:grey;width:100%;height:5vh;display:flex">
+	<table style="width:100%;table-layout:fixed;overflow:hidden;">
+	<tr>
+	<td>
+		Name
+	</td>
+	<td>
+	Current Influence
+	</td>
+	<td>
+	Culture Influence
+	</td>
+	<td>
+	Economic Influence
+	</td>
+	<td>
+	Military Influence
+	<td>
+	</td>
+	<td>
+	Time until next event
+	</td>
+	</tr>
+	</table>
+</div>
+
 <div style="background-color:lightgrey;height:570px;overflow:auto;">
 	<table style="width:100%;table-layout:fixed;overflow:auto;">
 	<tr>
-	<th style="width:25%;background-color:lightgrey;vertical-align:top;">
-	My Nation:
-	<br>
-	Name
+	<td style="width:400px;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 10px solid lightgrey;border-radius:15px;vertical-align:top;position:relative;">
+	<h2 id="SelectedRegionID" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
+	<i style="font-family: Romanus;font-size:20px;">Capital City</i>
+	<br><br><br>
+	<font id="ProvinceInfo">This is where the information about the province would appear </font>
 	<br><br>
-	<br><br>
-	Current Influence
-	<br><br>
-	Culture Influence
-	<br><br>
-	Economic Influence
-	<br><br>
-	Military Influence
-	<br><br>
-	Time until next event
-	<br><br>
-	<br><br>
-	Recent changes:
-	</th>
-	<th style="background-color:white;">
+	<font id="InfluenceCosts"> This is where influence costs would be recorded </font>
+	<br><br><br><br>
+	<img id="ProvinceImage" src="Assets/OceanProvince.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
+	</td>
+	<td style="background-color:white;">
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;">
 		
 			<!-- Plotted by 100505349 (Assignment requires anonymous marking). Regions included in this document are not to be taken as real borders, they are simply triangles
@@ -515,24 +533,7 @@ Tauresium - Main Page
 			<polygon id="Australia_NewZealandCanterbury" points="904,476 874,495 876,482"/>
 			<polygon id="Australia_NewZealandFiordland" points="859,496 874,495 876,482"/>
 		</svg>
-	</th>
-	</table>
-</div>
-
-<div id="InformationContainer" style="background-color:grey;width:100%;height:10vh;display:flex">
-	<table style="width:100%;table-layout:fixed;overflow:hidden;">
-	<tr>
-	<th style="width:75%">
-		<b> Selected Region: </b>
-		<i id="SelectedRegionID"> Ocean </i>
-	</th>
-	</tr> 
-	<tr>
-	<th> This is where the primary city of the province would appear </th>
-	</tr>
-	<tr>
-	<th> This is where the information about the province would appear </th>
-	<th> This is where influence costs would be recorded </th>
+	</td>
 	</tr>
 	</table>
 </div>
@@ -544,37 +545,6 @@ Tauresium - Main Page
 	The map constructed in this application was made by hand by 100505349 - using image references to properly plot the coordinates </p>
 		
 </div>
-
-<script>
-	
-	//Ocean acts as the "No province found" region
-	var selectedRegion = "Ocean" 
-	var ImageID = Math.floor((Math.random() * 5));
-	var Images = ["Volcano.png","Arabia.png","Artemis.png","Morocco.png","Lilypad.png"];
-	document.getElementById("LogoDiv").style.backgroundImage ="linear-gradient(to left, rgba(226, 225, 225, 0.2), rgba(226, 225, 225, 1)),url('Backgroundimages/" + Images[ImageID] + "')";
-	
-	function _clickEvent(evt) 
-	{
-		
-		if (selectedRegion != "Ocean")
-		{
-			document.getElementById(selectedRegion).style.fill = "#FFE7AB";
-		}
-		
-		if(event.srcElement.id == "")
-		{
-			selectedRegion = "Ocean";
-			document.getElementById("SelectedRegionID").textContent = selectedRegion;
-		}
-		else
-		{
-			selectedRegion = event.srcElement.id;
-			document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
-			document.getElementById("SelectedRegionID").textContent = selectedRegion;
-		}
-	}
-	
-</script>
 
 </body>
 </html>

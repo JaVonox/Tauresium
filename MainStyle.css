@@ -16,6 +16,12 @@
 	font-family:'Helvetica';
 	float:left;
 }
+
+.menuButton:Hover{
+	background-color:green;
+	color: white;
+}
+
 .InformationText{
 	font-family:'Tahoma';
 }
