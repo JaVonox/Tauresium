@@ -12,6 +12,7 @@ function _clickEvent(evt)
 		selectedRegion = "Ocean";
 		document.getElementById("SelectedRegionID").textContent = selectedRegion;
 		document.getElementById("ProvinceImage").src = "Assets/OceanProvince.png";
+		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/OceanBackdrop.png')";
 	}
 	else
 	{
@@ -19,5 +20,6 @@ function _clickEvent(evt)
 		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
 		document.getElementById("SelectedRegionID").textContent = selectedRegion;
 		document.getElementById("ProvinceImage").src = "Assets/Field.png";
+		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/GrasslandBackdrop.png')";
 	}
 }
