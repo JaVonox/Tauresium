@@ -3,31 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
+<link rel="stylesheet" href="MainStyle.css">
+
 <style>
-	polygon
-	{
+polygon{
 		fill:#FFE7AB;stroke:black;stroke-width:1;
-	}
+}
 </style>
 
 <title>
-100505349 Map Game
+Tauresium - Main Page
 </title>
 </head>
 <body>
 
-<div id="LogoDiv" style="background-image:linear-gradient(to left, rgba(226, 225, 225, 0.2), rgba(226, 225, 225, 1)),url('Backgroundimages/Volcano.png');width:100%;height:140px;overflow:hidden;background-position: center;background-size:100%;">
-Logo goes here
+<div id="LogoDiv" style="background-image:linear-gradient(to left, rgba(226, 225, 225, 0.2), rgba(226, 225, 225, 1)),url('Backgroundimages/Volcano.png');width:100%;height:140px;overflow:hidden;background-position:center;background-size:100%;text-align:left;">
+<font style="font-family:Greekhouse;font-size:80px;"> Tauresium </font>
 </div>
 
 <div id="MenuBar" style="background-color:#FAFAFA;width:100%;height:40px;"> 
-	Menu would go here
+	<button style="float:right;" class="menuButton" onclick="document.location='index.html'">Logout</button>
+	<button class="menuButton">World Information</button>
+	<button class="menuButton">My Country</button>
+	<button class="menuButton">Events</button>
 </div>
 
 <div style="background-color:lightgrey;height:570px;overflow:auto;">
 	<table style="width:100%;table-layout:fixed;overflow:auto;">
 	<tr>
-	<th style="width:25%;background-color:lightgrey;">
+	<th style="width:25%;background-color:lightgrey;vertical-align:top;">
+	My Nation:
+	<br>
+	Name
+	<br><br>
+	<br><br>
+	Current Influence
+	<br><br>
+	Culture Influence
+	<br><br>
+	Economic Influence
+	<br><br>
+	Military Influence
+	<br><br>
+	Time until next event
+	<br><br>
+	<br><br>
+	Recent changes:
 	</th>
 	<th style="background-color:white;">
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;">
@@ -497,7 +518,7 @@ Logo goes here
 	</table>
 </div>
 
-<div id="InformationContainer" style="background-color:grey;width:100%;height:15vh;display:flex">
+<div id="InformationContainer" style="background-color:grey;width:100%;height:10vh;display:flex">
 	<table style="width:100%;table-layout:fixed;overflow:hidden;">
 	<tr>
 	<th style="width:75%">
@@ -515,7 +536,7 @@ Logo goes here
 	</table>
 </div>
 
-<div style="background-color:lightgrey;width:100%;height:10vh;display:flex;">
+<div class="Disclaimer">
 	<p> Program by 100505349.
 	This web application is not intended to be an accurate representation of political borders or cultural boundaries. The map shown in this production is a rough triangulated map meant to serve as a
 	representation - with regions being represented by relevant locations (which may not be placed properly).

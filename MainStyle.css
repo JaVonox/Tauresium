@@ -1,0 +1,30 @@
+@font-face {
+	font-family: Greekhouse;
+	src: url(Fonts/Greekhouse.ttf);
+}
+.menuButton {
+	background-color:#2196f3;
+	color: white;
+	text-align: center;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	width:200px;
+	height:30px;
+	border:none;
+	font-family:'Helvetica';
+	float:left;
+}
+.InformationText{
+	font-family:'Tahoma';
+}
+.Disclaimer{
+	font-family:'Tahoma';
+	background-color:#0e1015;
+	color:white;
+	width:100%;
+	text-align:center;
+	height:10vh;
+	display:flex;
+}
