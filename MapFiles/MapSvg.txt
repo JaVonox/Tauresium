@@ -144,7 +144,6 @@
 	<polygon id="Europe_GermanyBrandenberg" points="447,105 432,105 449,118"/>
 	<polygon id="Europe_GermanySchleswig" points="447,105 432,100 432,105"/>
 	<polygon id="Europe_GermanyPomerania" points="449,118 447,105 463,102"/>
-	<polygon id="Europe_PolandPomerania" points="449,118 447,105 462,103"/>
 	<polygon id="Europe_PolandSilesia" points="449,118 463,123 462,103"/>
 	<polygon id="Europe_CzechRepublic" points="449,118 463,123 457,131"/>
 	<polygon id="Europe_Austria" points="449,118 445,139 457,131"/>
