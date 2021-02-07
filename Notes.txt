@@ -1,0 +1,1 @@
+y=10\left(2\arctan\left(x\ -\ 5\right)+7\right)
