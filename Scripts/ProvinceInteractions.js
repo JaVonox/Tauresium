@@ -1,5 +1,5 @@
 var selectedRegion = "Ocean" 
-	
+
 function _clickEvent(evt) 
 {
 	if (selectedRegion != "Ocean")

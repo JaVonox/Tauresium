@@ -18,9 +18,16 @@ Tauresium - Game Page
 </head>
 <body>
 
-<div id="LogoDiv" style="background-image:linear-gradient(to left, rgba(226, 225, 225, 0.2), rgba(226, 225, 225, 1)),url('Backgroundimages/Volcano.png');width:100%;height:120px;overflow:hidden;background-position:center;background-size:100%;text-align:center;">
-<font style="font-family:Romanus;font-size:80px;"> Tauresium </font>
-</div>
+<?php include_once 'PageElements/TopBar.php';?>
+<?php include_once "Scripts/DBLoader.php";?>
+
+<?php
+$database = new Database();
+$db = $database->getConnection();
+$sqlExec = "SELECT Province_ID FROM Provinces;";
+$result = $db->query($sqlExec);
+echo $result->fetch_array()[0];
+?>
 
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;"> 
 	<button style="float:right;" class="menuButton" onclick="document.location='index.php'">Logout</button>
