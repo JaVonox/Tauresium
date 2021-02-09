@@ -60,21 +60,29 @@ $provinceSet = json_encode($database->getProvinceArray());
 </div>
 
 <div style="background-color:lightgrey;height:600px;overflow:auto;">
-	<table id="MapBack" style="width:100%;height:100%;table-layout:fixed;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;">
+	<table id="MapBack" style="width:100%;height:100%;table-layout:fixed;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 	<tr>
 	<td style="width:400px;;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
-	<h2 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
-	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
-	<br><br>
+	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:20px;">Ocean</i>
-	<br><br>
-	<font id="ProvClimate">Wet</font>
+	<br>
+	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
+	<br>
+	<font id="ProvClimate">Marine</font>
 	<br><br>
 	<font id="ProvInfo">The vast sea between lands</font>
 	<br><br>
+	<font id="ProvPopulation">City Population: Zero</font>
+	<br>
+	<font id="ProvHDI">HDI: Zero</font>
+	<br>
+	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
+	<br>
 	<font id="ProvCulture">C: Infinite</font>
 	<font id="ProvEconomic">E: Infinite</font>
 	<font id="ProvMilitary">M: Infinite</font>
+	<br><br>
+	<button id="ProvExamine" style="background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">View/Annex Province</button>
 	</td>
 	<td style="width:100%;height:100%;"> 
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
@@ -561,12 +569,15 @@ function _clickEvent(evt)
 		selectedRegion = "Ocean";
 		document.getElementById("ProvCapital").textContent = "Ocean";
 		document.getElementById("ProvRegion").textContent = "Ocean";
-		document.getElementById("ProvClimate").textContent = "Wet";
+		document.getElementById("ProvClimate").textContent = "Marine";
 		document.getElementById("ProvInfo").textContent = "The vast sea between lands";
+		document.getElementById("ProvPopulation").textContent = "Population: Zero";
+		document.getElementById("ProvHDI").textContent = "HDI: Zero";
+		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
 		document.getElementById("ProvCulture").textContent = "C: Infinite";
 		document.getElementById("ProvEconomic").textContent = "E: Infinite";
 		document.getElementById("ProvMilitary").textContent = "M: Infinite";
-		
+		document.getElementById("ProvExamine").onclick = "";
 		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
 	}
@@ -577,11 +588,15 @@ function _clickEvent(evt)
 		
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
 		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
-		document.getElementById("ProvClimate").textContent = selectedProvince.Climate;
+		document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
 		document.getElementById("ProvInfo").textContent = selectedProvince.Description;
+		document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
+		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
+		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
 		document.getElementById("ProvCulture").textContent = "C:" + selectedProvince.Culture_Cost;
 		document.getElementById("ProvEconomic").textContent = "E:" + selectedProvince.Economic_Cost;
 		document.getElementById("ProvMilitary").textContent = "M:" + selectedProvince.Military_Cost;
+		document.getElementById("ProvExamine").onclick = function() { document.location='index.php?' + selectedProvince.Province_ID; } //change from index
 		
 		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
