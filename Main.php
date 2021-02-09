@@ -5,7 +5,6 @@
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>
-<script type="text/javascript" src="Scripts/ProvinceInteractions.js"> </script>
 <style>
 polygon{
 		fill:#FFE7AB;stroke:black;stroke-width:1;
@@ -24,9 +23,7 @@ Tauresium - Game Page
 <?php
 $database = new Database();
 $db = $database->getConnection();
-$sqlExec = "SELECT Province_ID FROM Provinces;";
-$result = $db->query($sqlExec);
-echo $result->fetch_array()[0];
+$provinceSet = json_encode($database->getProvinceArray());
 ?>
 
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;"> 
@@ -63,23 +60,21 @@ echo $result->fetch_array()[0];
 </div>
 
 <div style="background-color:lightgrey;height:600px;overflow:auto;">
-	<table id="MapBack" style="width:100%;height:100%;table-layout:fixed;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/OceanBackdrop.png');background-repeat: no-repeat;background-position:center;background-size:120%;">
+	<table id="MapBack" style="width:100%;height:100%;table-layout:fixed;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;">
 	<tr>
 	<td style="width:400px;;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
-	<h2 style="font-family: Romanus;font-size:32px;"> Capital City </h2>
-	<i id="SelectedRegionID" style="font-family: Romanus;font-size:20px;">Region</i>
-	<br><br><br>
-	<font id="ProvinceClimate">Province Climate</font>
+	<h2 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
+	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
 	<br><br>
-	<font id="ProvinceInfo">Province Description</font>
+	<i id="ProvRegion" style="font-family: Romanus;font-size:20px;">Ocean</i>
 	<br><br>
-	<font id="CultureCost"> Culture Cost</font>
+	<font id="ProvClimate">Wet</font>
 	<br><br>
-	<font id="CultureCost"> Economic Cost</font>
+	<font id="ProvInfo">The vast sea between lands</font>
 	<br><br>
-	<font id="CultureCost"> Military Cost</font>
-	<br><br><br><br>
-	<img id="ProvinceImage" src="Assets/OceanProvince.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
+	<font id="ProvCulture">C: Infinite</font>
+	<font id="ProvEconomic">E: Infinite</font>
+	<font id="ProvMilitary">M: Infinite</font>
 	</td>
 	<td style="width:100%;height:100%;"> 
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
@@ -549,6 +544,51 @@ echo $result->fetch_array()[0];
 	</tr>
 	</table>
 </div>
+
+<script>
+var selectedRegion = "Ocean";
+var phpArray = <?php echo $provinceSet ?>;
+
+function _clickEvent(evt) 
+{
+	if (selectedRegion != "Ocean")
+	{
+		document.getElementById(selectedRegion).style.fill = "#FFE7AB";
+	}
+	
+	if(event.srcElement.id == "")
+	{
+		selectedRegion = "Ocean";
+		document.getElementById("ProvCapital").textContent = "Ocean";
+		document.getElementById("ProvRegion").textContent = "Ocean";
+		document.getElementById("ProvClimate").textContent = "Wet";
+		document.getElementById("ProvInfo").textContent = "The vast sea between lands";
+		document.getElementById("ProvCulture").textContent = "C: Infinite";
+		document.getElementById("ProvEconomic").textContent = "E: Infinite";
+		document.getElementById("ProvMilitary").textContent = "M: Infinite";
+		
+		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
+		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
+	}
+	else
+	{
+		selectedRegion = event.srcElement.id;
+		var selectedProvince = phpArray.find(element => element.Province_ID == selectedRegion);
+		
+		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
+		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
+		document.getElementById("ProvClimate").textContent = selectedProvince.Climate;
+		document.getElementById("ProvInfo").textContent = selectedProvince.Description;
+		document.getElementById("ProvCulture").textContent = "C:" + selectedProvince.Culture_Cost;
+		document.getElementById("ProvEconomic").textContent = "E:" + selectedProvince.Economic_Cost;
+		document.getElementById("ProvMilitary").textContent = "M:" + selectedProvince.Military_Cost;
+		
+		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
+		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
+		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
+	}
+}
+</script>
 
 <div class="Disclaimer">
 	<p> Program by 100505349.
