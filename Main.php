@@ -15,7 +15,7 @@ polygon{
 Tauresium - Game Page
 </title>
 </head>
-<body>
+<body style="background-color:white;margin:0px;">
 
 <?php include_once 'PageElements/TopBar.php';?>
 <?php include_once "Scripts/DBLoader.php";?>
@@ -26,41 +26,15 @@ $db = $database->getConnection();
 $provinceSet = json_encode($database->getProvinceArray());
 ?>
 
-<div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;"> 
-	<button style="float:right;" class="menuButton" onclick="document.location='index.php'">Logout</button>
-	<button class="menuButton">World Information</button>
+<div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
+	<button style="float:right;margin-right:20px;" class="menuButton" onclick="document.location='index.php'">Logout</button>
+	<button style="margin-left:20px;" class="menuButton">World Information</button>
 	<button class="menuButton">My Country</button>
 	<button class="menuButton">Events</button>
 </div>
 
-<div id="InformationContainer" style="background-color:grey;width:100%;height:5vh;display:flex">
-	<table style="width:100%;table-layout:fixed;overflow:hidden;">
-	<tr>
-	<td>
-		Name
-	</td>
-	<td>
-	Current Events
-	</td>
-	<td>
-	Culture Influence
-	</td>
-	<td>
-	Economic Influence
-	</td>
-	<td>
-	Military Influence
-	<td>
-	</td>
-	<td>
-	Time until next event
-	</td>
-	</tr>
-	</table>
-</div>
-
-<div style="background-color:lightgrey;height:600px;overflow:auto;">
-	<table id="MapBack" style="width:100%;height:100%;table-layout:fixed;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
+<div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
+	<table style="width:100%;height:100%;table-layout:fixed;overflow:auto;">
 	<tr>
 	<td style="width:400px;;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
 	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
@@ -78,11 +52,12 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<br>
 	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
 	<br>
-	<font id="ProvCulture">C: Infinite</font>
-	<font id="ProvEconomic">E: Infinite</font>
-	<font id="ProvMilitary">M: Infinite</font>
+	<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvCulture"> Infinite</font>
+	<br>
+	<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvEconomic"> Infinite</font>
+	<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvMilitary">Infinite</font>
 	<br><br>
-	<button id="ProvExamine" style="background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">View/Annex Province</button>
+	<button id="ProvExamine" style="visibility:hidden;background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">View/Annex Province</button>
 	</td>
 	<td style="width:100%;height:100%;"> 
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
@@ -574,10 +549,12 @@ function _clickEvent(evt)
 		document.getElementById("ProvPopulation").textContent = "Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
-		document.getElementById("ProvCulture").textContent = "C: Infinite";
-		document.getElementById("ProvEconomic").textContent = "E: Infinite";
-		document.getElementById("ProvMilitary").textContent = "M: Infinite";
+		document.getElementById("ProvCulture").textContent = "Infinite";
+		document.getElementById("ProvEconomic").textContent = "Infinite";
+		document.getElementById("ProvMilitary").textContent = "Infinite";
 		document.getElementById("ProvExamine").onclick = "";
+		document.getElementById("ProvExamine").style.visibility = "hidden";
+		
 		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
 	}
@@ -593,10 +570,12 @@ function _clickEvent(evt)
 		document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
-		document.getElementById("ProvCulture").textContent = "C:" + selectedProvince.Culture_Cost;
-		document.getElementById("ProvEconomic").textContent = "E:" + selectedProvince.Economic_Cost;
-		document.getElementById("ProvMilitary").textContent = "M:" + selectedProvince.Military_Cost;
+		document.getElementById("ProvCulture").textContent = selectedProvince.Culture_Cost;
+		document.getElementById("ProvEconomic").textContent = selectedProvince.Economic_Cost;
+		document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
+		
 		document.getElementById("ProvExamine").onclick = function() { document.location='index.php?' + selectedProvince.Province_ID; } //change from index
+		document.getElementById("ProvExamine").style.visibility = "visible";
 		
 		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
@@ -606,7 +585,7 @@ function _clickEvent(evt)
 </script>
 
 <div class="Disclaimer">
-	<p> Program by 100505349.
+	<p style="margin-left:10%;margin-right:10%;"> Program by 100505349.
 	This web application is not intended to be an accurate representation of political borders or cultural boundaries. The map shown in this production is a rough triangulated map meant to serve as a
 	representation - with regions being represented by relevant locations (which may not be placed properly).
 	The map constructed in this application was made by hand by 100505349 - using image references to properly plot the coordinates </p>

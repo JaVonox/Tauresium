@@ -5,14 +5,16 @@
 <td style="width:20%">
 </td>
 <td>
-<div style="background-color:black;border:5px solid black;border-radius:5px;margin-right:50px;color:white;">
-<form>
-<font style="font-family:Romanus;font-size:18px;"> Existing Session ID? </font>
+<div style="background-color:#A4D3EE;border:5px solid black;border-radius:5px;margin-right:50px;color:black;vertical-align:middle;">
+<font style="font-family:Romanus;font-size:18px;"> Country Name </font>
 <br>
-<input type="text" width="100%" id="Login" name="LoginInput"/>
+<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> 000
+<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> 000
+<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> 000
 <br>
-<input type="submit" value="Login"/>
-</form>
+<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> 00:00
+<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> 0/5
+<br>
 </div>	
 </td>
 </tr>
