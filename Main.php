@@ -44,14 +44,12 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<br>
 	<font id="ProvClimate">Marine</font>
 	<br><br>
-	<font id="ProvInfo">The vast sea between lands</font>
-	<br><br>
 	<font id="ProvPopulation">City Population: Zero</font>
 	<br>
 	<font id="ProvHDI">HDI: Zero</font>
 	<br>
 	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
-	<br>
+	<br><br>
 	<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvCulture"> Infinite</font>
 	<br>
 	<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvEconomic"> Infinite</font>
@@ -545,7 +543,6 @@ function _clickEvent(evt)
 		document.getElementById("ProvCapital").textContent = "Ocean";
 		document.getElementById("ProvRegion").textContent = "Ocean";
 		document.getElementById("ProvClimate").textContent = "Marine";
-		document.getElementById("ProvInfo").textContent = "The vast sea between lands";
 		document.getElementById("ProvPopulation").textContent = "Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
@@ -566,7 +563,6 @@ function _clickEvent(evt)
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
 		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
 		document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
-		document.getElementById("ProvInfo").textContent = selectedProvince.Description;
 		document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
@@ -574,7 +570,7 @@ function _clickEvent(evt)
 		document.getElementById("ProvEconomic").textContent = selectedProvince.Economic_Cost;
 		document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
 		
-		document.getElementById("ProvExamine").onclick = function() { document.location='index.php?' + selectedProvince.Province_ID; } //change from index
+		document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
 		document.getElementById("ProvExamine").style.visibility = "visible";
 		
 		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
