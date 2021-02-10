@@ -50,12 +50,7 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<br>
 	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
 	<br><br>
-	<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvCulture"> Infinite</font>
-	<br>
-	<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvEconomic"> Infinite</font>
-	<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="ProvMilitary">Infinite</font>
-	<br><br>
-	<button id="ProvExamine" style="visibility:hidden;background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">View/Annex Province</button>
+	<button id="ProvExamine" style="visibility:hidden;background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td style="width:100%;height:100%;"> 
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
@@ -546,9 +541,6 @@ function _clickEvent(evt)
 		document.getElementById("ProvPopulation").textContent = "Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
-		document.getElementById("ProvCulture").textContent = "Infinite";
-		document.getElementById("ProvEconomic").textContent = "Infinite";
-		document.getElementById("ProvMilitary").textContent = "Infinite";
 		document.getElementById("ProvExamine").onclick = "";
 		document.getElementById("ProvExamine").style.visibility = "hidden";
 		
@@ -566,9 +558,6 @@ function _clickEvent(evt)
 		document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
-		document.getElementById("ProvCulture").textContent = selectedProvince.Culture_Cost;
-		document.getElementById("ProvEconomic").textContent = selectedProvince.Economic_Cost;
-		document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
 		
 		document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
 		document.getElementById("ProvExamine").style.visibility = "visible";
