@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
-<script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>
 <style>
 polygon{
 		fill:#FFE7AB;stroke:black;stroke-width:1;
@@ -28,7 +27,7 @@ $provinceSet = json_encode($database->getProvinceArray());
 
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
 	<button style="float:right;margin-right:20px;" class="menuButton" onclick="document.location='index.php'">Logout</button>
-	<button style="margin-left:20px;" class="menuButton">World Information</button>
+	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Main.php'">The World</button>
 	<button class="menuButton">My Country</button>
 	<button class="menuButton">Events</button>
 </div>

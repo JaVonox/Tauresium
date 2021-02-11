@@ -13,23 +13,14 @@ if($selectedProvince == Null)
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
-<script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>
 <style>
 table{
 	width:100%;
-	border:0px solid black;
-	border-collapse:collapse;
-}
-tr{
-	border:0px solid black;
-}
-td{
-	border:0px solid black;
 }
 </style>
 
 <title>
-Tauresium - Index
+Tauresium - Province
 </title>
 </head>
 <body style="background-color:white;margin:0px;">
@@ -44,12 +35,14 @@ $loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
 ?>
 
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
-	<button style="margin-left:20px;" class="menuButton">World Information</button>
+	<button style="float:right;margin-right:20px;" class="menuButton" onclick="document.location='index.php'">Logout</button>
+	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Main.php'">The World</button>
 	<button class="menuButton">My Country</button>
 	<button class="menuButton">Events</button>
 </div>
 
-<div style="background-color:lightgrey;width:95%;min-height:570px;overflow:auto;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
+<div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
+<div style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
 <button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">< Back</button>
 <table style="width:60%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:5px solid black;">
@@ -116,9 +109,8 @@ $loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
 <td><button id="MilitaryAnnex" style="background-color:pink;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
 </tr>
 </table>
-
 </div>
-
+</div>
 <script>
 var phpArray = <?php echo $loadedProvince ?>;
 var selectedProvince = phpArray[0];
@@ -138,6 +130,7 @@ document.getElementById("ProvMilitary").textContent = selectedProvince.Military_
 document.getElementById("CultureModSig").textContent = (selectedProvince.Culture_Modifier * 100) + "%";
 document.getElementById("EconomicModEnv").textContent = (selectedProvince.Economic_Enviroment_Modifier * 100) + "%";
 document.getElementById("MilitaryModEnv").textContent = (selectedProvince.Military_Enviroment_Modifier * 100) + "%";
+document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 
 </script>
 

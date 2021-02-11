@@ -20,3 +20,4 @@
 </tr>
 </table>
 </div>
+<script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>
