@@ -6,7 +6,7 @@
 </td>
 <td>
 <div style="background-color:black;border:5px solid black;border-radius:5px;margin-right:50px;color:white;">
-<form action="Main.php">
+<form action="Scripts/LoginVerify.php" method="GET">
 <font style="font-family:Romanus;font-size:18px;"> Existing Player ID? </font>
 <br>
 <input type="text" width="100%" id="Login" name="LoginInput"/>

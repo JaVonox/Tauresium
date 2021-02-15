@@ -1,5 +1,5 @@
 <?php
-$selectedProvince = htmlspecialchars($_GET["ProvinceView"]);
+$selectedProvince = $_GET["ProvinceView"];
 if($selectedProvince == Null)
 {
 	header("Location: index.php");

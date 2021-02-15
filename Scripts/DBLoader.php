@@ -1,5 +1,6 @@
 <?php
 class Database{
+	//Might have to change all of this to use REST API structure
 	
 	private $host  = 'localhost';
     private $user  = 'root';
@@ -36,6 +37,22 @@ class Database{
 		$result = $this->connectionData->query($sqlExec);
 		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
 		return $dataSet;
+	}
+	
+	public function verifyIdentity($PlayerIdentity)
+	{
+		$sqlExec = "SELECT Player_ID FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
+		$result = $this->connectionData->query($sqlExec);
+		$return = $result->fetch_row();
+		
+		if($return[0] == $PlayerIdentity && $return[0] != "")
+		{
+			return True;
+		}
+		else
+		{
+			return False;
+		}
 	}
 }
 ?>

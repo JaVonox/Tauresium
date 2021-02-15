@@ -18,7 +18,6 @@ Tauresium - Game Page
 
 <?php include_once 'PageElements/TopBar.php';?>
 <?php include_once "Scripts/DBLoader.php";?>
-
 <?php
 $database = new Database();
 $db = $database->getConnection();
@@ -537,7 +536,7 @@ function _clickEvent(evt)
 		document.getElementById("ProvCapital").textContent = "Ocean";
 		document.getElementById("ProvRegion").textContent = "Ocean";
 		document.getElementById("ProvClimate").textContent = "Marine";
-		document.getElementById("ProvPopulation").textContent = "Population: Zero";
+		document.getElementById("ProvPopulation").textContent = "City Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
 		document.getElementById("ProvExamine").onclick = "";
@@ -554,7 +553,7 @@ function _clickEvent(evt)
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
 		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
 		document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
-		document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
+		document.getElementById("ProvPopulation").textContent = "City Population: " + selectedProvince.City_Population_Total;
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
 		
