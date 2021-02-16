@@ -54,5 +54,13 @@ class Database{
 			return False;
 		}
 	}
+	
+		public function getPlayerStats($PlayerIdentity)
+	{
+		$sqlExec = "SELECT Country_Name,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
+		$result = $this->connectionData->query($sqlExec);
+		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
+		return $dataSet;
+	}
 }
 ?>

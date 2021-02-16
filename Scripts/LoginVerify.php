@@ -9,6 +9,8 @@ $returnBool = $database->verifyIdentity($loginRequest);
 
 if($returnBool == True)
 {
+	session_start();
+	$_SESSION['user'] = $loginRequest; //This needs to be modified in the future. Storing the login for a player is a bad idea.
 	header("Location: ../Main.php");
 }
 else

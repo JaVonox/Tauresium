@@ -9,13 +9,19 @@
 <form action="Scripts/LoginVerify.php" method="GET">
 <font style="font-family:Romanus;font-size:18px;"> Existing Player ID? </font>
 <br>
-<input type="text" width="100%" id="Login" name="LoginInput"/>
+<input type="text" width="100%" id="Login" name="LoginInput" autocomplete="off"/>
 <br>
-<input type="submit" value="Login" />
+<input type="submit" value="Login"/>
 </form>
 </div>	
 </td>
 </tr>
 </table>
 </div>
+<div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
+	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Index.php'">Index</button>
+	<button class="menuButton" onclick="document.location='NewSession.php'">Create a new session</button>
+	<button class="menuButton" onclick="document.location='JoinSession.php'">Join a session</button>
+</div>
+
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>

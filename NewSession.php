@@ -10,11 +10,7 @@ Tauresium - New Session
 </head>
 <body style="background-color:white;margin:0px;">
 
-<?php include_once 'PageElements/LoginTopBar.php';?>
-
-<div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
-	<button style="margin-left:20px;" class="menuButton" onclick="document.location='index.php'">Main Menu</button>
-</div>
+<?php include_once 'Scripts/PageUpdate.php'?>
 
 <div style="background-color:lightgrey;width:95%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
 <button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index.php'">< Back</button>
