@@ -1,3 +1,36 @@
+<?php
+$NationError = (!isset($_GET["NationName"]) ? "" : $_GET["NationName"] );
+$WorldCodeError = (!isset($_GET["WorldCodeInput"]) ? "" : $_GET["WorldCodeInput"]);
+$GovernmentTypeError = (!isset($_GET["GovernmentType"]) ? "" : $_GET["GovernmentType"]);
+$CountryColourError = (!isset($_GET["CountryColour"]) ? "" : $_GET["CountryColour"]);
+
+$NationValue = "";
+$WorldCodeValue = "";
+$GovernmentTypeValue = "";
+$CountryColourValue = "";
+
+if($NationError != "MISSING")
+{
+	$NationValue = $NationError;
+}
+
+if($WorldCodeError != "MISSING")
+{
+	$WorldCodeValue = $WorldCodeError;
+}
+
+if($GovernmentTypeError != "MISSING")
+{
+	$GovernmentTypeValue = $GovernmentTypeError;
+}
+
+if($CountryColourError != "MISSING")
+{
+	$CountryColourValue = $CountryColourError;
+}
+
+?>
+
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -12,8 +45,8 @@ Tauresium - Join Session
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 
-<div style="background-image:linear-gradient(to top, rgba(226, 225, 225, 0.7), rgba(230, 191, 131, 1)),url('Backgroundimages/InkPage.png');width:95%;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
-<button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index.php'">< Back</button>
+<div id="Background" style="background-image:radial-gradient(circle at center, rgba(230, 191, 131, 1), rgba(226, 225, 225, 0.7)),url('Backgroundimages/InkPage.png');width:95%;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
+<button id="BackButton" class="backButton" style="text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index.php'">< Back</button>
 
 <table style="width:100%;text-align:center;">
 <tr>
@@ -23,10 +56,10 @@ Tauresium - Join Session
 <br><br>
 <font id="NationTitle" style="font-family:Castellar;font-size:52px;" > New Nation </font>
 <br><br>
-<form>
+<form method="POST" action="Scripts/CreateNewAccount.php">
 <font style="font-family:Romanus;font-size:48px;" >My nation name: </font>
 <br><br>
-<input id="NationName" type="text" width="100%" name="CountryNameInput" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" onkeyup="_UpdateTitle()"/>
+<input id="NationName" name="NationName" type="text" width="100%" name="CountryNameInput" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" onkeyup="_UpdateTitle()" value="<?php echo $NationValue; ?>"/>
 <br><br>
 <font style="font-family:Romanus;font-size:32px;">World Code: </font>
 <br>
@@ -34,7 +67,7 @@ Tauresium - Join Session
 <font style="font-family:Arial;font-size:12px;word-wrap: break-word;">You must generate this from the "Create a new Session" tab, any code generated can be shared with up to 5 friends to play a world together </font>
 </div>
 <br>
-<input type="text" width="100%" name="WorldCodeInput" autocomplete="off" size="37" maxlength="16" style="text-align:center;font-size:18px;font-family:Romanus;"/>
+<input type="text" width="100%" name="WorldCodeInput" autocomplete="off" size="37" maxlength="16" style="text-align:center;font-size:18px;font-family:Romanus;" value="<?php echo $WorldCodeValue; ?>"/>
 <br><br>
 <font style="font-family:Romanus;font-size:32px;" >Government Type: </font>
 <br>
@@ -51,41 +84,41 @@ Tauresium - Join Session
 </tr>
 <tr onclick="_SelectionResponse()">
 <td>
-<input type="radio" width="100%" name="GovernmentType" value="Sultanate" /> <label for="GovernmentType"> Sultanate </label> <!-- ++++culture --economic -military + C:200 E:0 M:100 300-->
+<input type="radio" width="100%" name="GovernmentType" value="Sultanate" <?php echo ($GovernmentTypeValue == "Sultanate") ? 'checked="checked"' : ''; ?> /> <label for="GovernmentType"> Sultanate </label> <!-- ++++culture --economic -military + C:200 E:0 M:100 300-->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="Horde"/> <label for="GovernmentType"> Horde </label> <!-- ++++culture ----economic [] C:300 E:0 M:0 300-->
+<input type="radio" width="100%" name="GovernmentType" value="Horde" <?php echo ($GovernmentTypeValue == "Horde") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Horde </label> <!-- ++++culture ----economic [] C:300 E:0 M:0 300-->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="ElectoralMonarchy"/> <label for="GovernmentType"> Electoral Monarchy </label>  <!-- +++culture +military ---economic + C:70 E:0 M:150 220-->
+<input type="radio" width="100%" name="GovernmentType" value="ElectoralMonarchy" <?php echo ($GovernmentTypeValue == "ElectoralMonarchy") ? 'checked="checked"' : ''; ?> /> <label for="GovernmentType"> Electoral Monarchy </label>  <!-- +++culture +military ---economic + C:70 E:0 M:150 220-->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="Theocracy"/> <label for="GovernmentType"> Theocracy </label> <!-- ++culture -military + C:200 E:0 M:50 250 -->
+<input type="radio" width="100%" name="GovernmentType" value="Theocracy" <?php echo ($GovernmentTypeValue == "Theocracy") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Theocracy </label> <!-- ++culture -military + C:200 E:0 M:50 250 -->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="Monarchy"/> <label for="GovernmentType">  Hereditary Monarchy </label> <!-- +culture + C:100 E:50 M:80 230-->
-<br>
-</td>
-<td>
-<input type="radio" width="100%" name="GovernmentType" value="Libertarian"/> <label for="GovernmentType"> Libertarian Republic </label> <!-- --military --culture ++++economic [] C:70 E:150 M:50 270-->
-<br>
-<input type="radio" width="100%" name="GovernmentType" value="Colonial"/> <label for="GovernmentType"> Colonial Republic </label> <!-- +++economic --military + C:100 E:100 M:100 300-->
-<br>
-<input type="radio" width="100%" name="GovernmentType" value="Democracy"/> <label for="GovernmentType"> Democracy </label> <!-- +++economic --culture + C:70 E:150 M:0 220-->
-<br>
-<input type="radio" width="100%" name="GovernmentType" value="MerchantRepublic"/> <label for="GovernmentType">  Merchant Republic </label> <!-- ++economic -military + C:80 E:120 M:50 250-->
-<br>
-<input type="radio" width="100%" name="GovernmentType" value="ClassicRepublic"/> <label for="GovernmentType"> Classical Republic </label> <!-- +economic + C:70 E:100 M:70 240 -->
+<input type="radio" width="100%" name="GovernmentType" value="Monarchy" <?php echo ($GovernmentTypeValue == "Monarchy") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType">  Hereditary Monarchy </label> <!-- +culture + C:100 E:50 M:80 230-->
 <br>
 </td>
 <td>
-<input type="radio" width="100%" name="GovernmentType" value="Dictatorship"/> <label for="GovernmentType"> Dictatorship </label> <!-- +++military -economic -culture + C:30 E:50 M:150 230 -->
+<input type="radio" width="100%" name="GovernmentType" value="Libertarian" <?php echo ($GovernmentTypeValue == "Libertarian") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Libertarian Republic </label> <!-- --military --culture ++++economic [] C:70 E:150 M:50 270-->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="CommunistRepublic"/> <label for="GovernmentType"> People's Republic </label> <!-- ++military ++culture ---economic + C:70 E:0 M:150 220-->
+<input type="radio" width="100%" name="GovernmentType" value="Colonial" <?php echo ($GovernmentTypeValue == "Colonial") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Colonial Republic </label> <!-- +++economic --military + C:100 E:100 M:100 300-->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="Oligarchy"/> <label for="GovernmentType"> Oligarchy </label> <!-- +military + C:50 E:70 M:100 220-->
+<input type="radio" width="100%" name="GovernmentType" value="Democracy" <?php echo ($GovernmentTypeValue == "Democracy") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Democracy </label> <!-- +++economic --culture + C:70 E:150 M:0 220-->
+<br>
+<input type="radio" width="100%" name="GovernmentType" value="MerchantRepublic" <?php echo ($GovernmentTypeValue == "MerchantRepublic") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType">  Merchant Republic </label> <!-- ++economic -military + C:80 E:120 M:50 250-->
+<br>
+<input type="radio" width="100%" name="GovernmentType" value="ClassicRepublic" <?php echo ($GovernmentTypeValue == "ClassicRepublic") ? 'checked="checked"' : ''; ?> /> <label for="GovernmentType"> Classical Republic </label> <!-- +economic + C:70 E:100 M:70 240 -->
 <br>
 </td>
 <td>
-<input type="radio" width="100%" name="GovernmentType" value="Anarchy"/> <label for="GovernmentType"> Anarchist Commune </label> <!-- -military -culture -economic --- C:25 E:25 M:25 75-->
+<input type="radio" width="100%" name="GovernmentType" value="Dictatorship"/ <?php echo ($GovernmentTypeValue == "Dictatorship") ? 'checked="checked"' : ''; ?>> <label for="GovernmentType"> Dictatorship </label> <!-- +++military -economic -culture + C:30 E:50 M:150 230 -->
 <br>
-<input type="radio" width="100%" name="GovernmentType" value="Tribe"/> <label for="GovernmentType"> Tribe </label> <!-- --military --culture --economic ------ C:0 E:0 M:0 0-->
+<input type="radio" width="100%" name="GovernmentType" value="CommunistRepublic" <?php echo ($GovernmentTypeValue == "CommunistRepublic") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> People's Republic </label> <!-- ++military ++culture ---economic + C:70 E:0 M:150 220-->
+<br>
+<input type="radio" width="100%" name="GovernmentType" value="Oligarchy"/ <?php echo ($GovernmentTypeValue == "Oligarchy") ? 'checked="checked"' : ''; ?>> <label for="GovernmentType"> Oligarchy </label> <!-- +military + C:50 E:70 M:100 220-->
+<br>
+</td>
+<td>
+<input type="radio" width="100%" name="GovernmentType" value="Anarchy" <?php echo ($GovernmentTypeValue == "Anarchy") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Anarchist Commune </label> <!-- -military -culture -economic --- C:25 E:25 M:25 75-->
+<br>
+<input type="radio" width="100%" name="GovernmentType" value="Tribe" <?php echo ($GovernmentTypeValue == "Tribe") ? 'checked="checked"' : ''; ?>/> <label for="GovernmentType"> Tribe </label> <!-- --military --culture --economic ------ C:0 E:0 M:0 0-->
 <br>
 </td>
 </tr>
@@ -115,19 +148,19 @@ Tauresium - Join Session
 <br><br>
 <table style="width:min-content;margin-left:auto;margin-right:auto;background-color:white;border:10px solid #966F33;">
 <tr>
-<td style="padding:20px;"> <img style="background-color:#D66B67;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="D66B67"/> </td>
-<td style="padding:20px"> <img style="background-color:#DE965D;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="DE965D"/> </td>
-<td style="padding:20px"> <img style="background-color:#ECE788;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="ECE788"/></td>
+<td style="padding:20px;"> <img style="background-color:#D66B67;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="D66B67" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "D66B67") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#DE965D;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="DE965D" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "DE965D") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#ECE788;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="ECE788" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "ECE788") ? 'checked="checked"' : ''; ?>/></td>
 </tr>
 <tr>
-<td style="padding:20px"> <img style="background-color:#B5DB7F;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="B5DB7F"/> </td>
-<td style="padding:20px"> <img style="background-color:#8ECDD2;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8ECDD2"/></td>
-<td style="padding:20px"> <img style="background-color:#8F97CF;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8F97CF"/> </td>
+<td style="padding:20px"> <img style="background-color:#B5DB7F;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="B5DB7F" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "B5DB7F") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#8ECDD2;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8ECDD2" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "8ECDD2") ? 'checked="checked"' : ''; ?>/></td>
+<td style="padding:20px"> <img style="background-color:#8F97CF;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8F97CF" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "8F97CF") ? 'checked="checked"' : ''; ?>/> </td>
 </tr>
 </table>
 <br><br>
 
-<button type="submit" id="Submit" style="background-color:green;color: white;text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;width:600px;height:80px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='index.php'">Create my nation!</button>
+<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';float:center;" onclick="document.location='index.php'">Create my nation!</button>
 </form>
 <br><br>
 </div>
@@ -136,6 +169,7 @@ Tauresium - Join Session
 
 <script>
 var selectedGovernment = "NULL";
+var selectedColour = "NULL";
 var governmentTitles = new Map([['Sultanate', 'The Sultanate of'],
 ['Horde', 'The Great Horde of'],
 ['ElectoralMonarchy', 'The Electoral Kingdom of'],
@@ -147,12 +181,37 @@ var governmentTitles = new Map([['Sultanate', 'The Sultanate of'],
 ['MerchantRepublic', 'The Mercantile Republic of'],
 ['ClassicRepublic', 'The Republic of'],
 ['Dictatorship', 'The Nation of'],
-['CommunistRepublic', "The People's Republic of"],
+['CommunistRepublic', "The Peoples Republic of"],
 ['Oligarchy', 'The Oligarchical State of'],
 ['Anarchy', 'The Free Communities of'],
 ['Tribe', 'The Tribe of'],
 ]);
-	
+var phpName = "<?php echo $NationValue; ?>";
+var phpGov = "<?php echo $GovernmentTypeValue; ?>";
+var phpColour = "<?php echo $CountryColourValue; ?>";
+
+if(typeof phpGov !== 'undefined')
+{
+	selectedGovernment = phpGov;
+	if(typeof phpName !== 'undefined')
+	{
+		document.getElementById("NationTitle").textContent = governmentTitles.get(selectedGovernment) + " " + document.getElementById("NationName").value;
+	}
+	else
+	{
+		document.getElementById("NationTitle").textContent = governmentTitles.get(selectedGovernment) + " ";
+	}
+}
+
+if(typeof phpColour !== 'undefined')
+{
+	selectedColour = phpColour;
+	var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
+	var greenComponent = ((parseInt(selectedColour[2],16) * 16) + parseInt(selectedColour[3],16));
+	var blueComponent = ((parseInt(selectedColour[4],16) * 16) + parseInt(selectedColour[5],16));
+	document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
+}
+
 function _UpdateTitle()
 {
 	if(selectedGovernment != "NULL")
@@ -161,7 +220,23 @@ function _UpdateTitle()
 	}
 	else
 	{
-		document.getElementById("NationTitle").textContent = "State of " + document.getElementById("NationName").value;
+		var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
+		var greenComponent = ((parseInt(selectedColour[2],16) * 16) + parseInt(selectedColour[3],16));
+		var blueComponent = ((parseInt(selectedColour[4],16) * 16) + parseInt(selectedColour[5],16));
+		document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
+	}
+}
+
+function _UpdateBackground(evt)
+{
+	selectedColour = event.srcElement.value;
+	
+	if(selectedColour !== "NULL")
+	{
+		var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
+		var greenComponent = ((parseInt(selectedColour[2],16) * 16) + parseInt(selectedColour[3],16));
+		var blueComponent = ((parseInt(selectedColour[4],16) * 16) + parseInt(selectedColour[5],16));
+		document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
 	}
 }
 

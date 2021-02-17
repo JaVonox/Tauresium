@@ -41,7 +41,7 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<br>
 	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
 	<br><br>
-	<button id="ProvExamine" style="visibility:hidden;background-color:#4CAF50;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
+	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td style="width:100%;height:100%;"> 
 		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">

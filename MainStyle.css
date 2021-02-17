@@ -2,6 +2,7 @@
 	font-family: Romanus;
 	src: url(Fonts/ROMANUS.otf);
 }
+
 .menuButton {
 	background-color:#2196f3;
 	color: white;
@@ -18,7 +19,31 @@
 }
 
 .menuButton:Hover{
+	background-color:darkblue;
+	color: white;
+}
+
+.gameButton {
 	background-color:green;
+	border:5px solid black;
+	color:white;
+}
+
+.gameButton:Hover{
+	background-color:darkgreen;
+	border:5px solid black;
+	color: white;
+}
+
+.backButton {
+	background-color:red;
+	border:5px solid black;
+	color:white;
+}
+
+.backButton:Hover{
+	background-color:darkred;
+	border:5px solid black;
 	color: white;
 }
 
