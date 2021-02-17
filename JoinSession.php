@@ -8,23 +8,72 @@ $NationValue = "";
 $WorldCodeValue = "";
 $GovernmentTypeValue = "";
 $CountryColourValue = "";
+$ErrorMessage = "";
 
-if($NationError != "MISSING")
+
+if($NationError == "MISSING")
+{
+	$ErrorMessage = $ErrorMessage . "Please enter a nation name <br>";
+}
+else if(substr($NationError,0,7) == "INVALID")
+{
+	$ErrorMessage = $ErrorMessage . "Nation name must be less than 20 characters long and may only consist of alphabetical characters <br>";
+	$NationValue = substr($NationError,7,strlen($NationError));
+}
+else if(substr($NationError,0,8) == "OCCUPIED")
+{
+	$ErrorMessage = $ErrorMessage . "That country name is currently in use by another player in your session, please choose something else <br>";
+	$NationValue = substr($NationError,8,strlen($NationError));
+}
+else
 {
 	$NationValue = $NationError;
 }
 
-if($WorldCodeError != "MISSING")
+
+if($WorldCodeError == "MISSING")
+{
+	$ErrorMessage = $ErrorMessage . "Please enter a world code <br>";
+}
+else if(substr($WorldCodeError,0,7) == "INVALID")
+{
+	$ErrorMessage = $ErrorMessage . "World codes may only be alphanumeric characters and must be 16 characters in length<br>";
+	$WorldCodeValue = substr($WorldCodeError,7,strlen($WorldCodeError));
+}
+else if(substr($WorldCodeError,0,8) == "OCCUPIED")
+{
+	$ErrorMessage = $ErrorMessage . "The entered world code is not a valid code <br>";
+	$WorldCodeValue = substr($WorldCodeError,8,strlen($WorldCodeError));
+}
+else
 {
 	$WorldCodeValue = $WorldCodeError;
 }
 
-if($GovernmentTypeError != "MISSING")
+
+if($GovernmentTypeError == "MISSING" || $GovernmentTypeError == "INVALID")
+{
+	$ErrorMessage = $ErrorMessage . "Please select a government type <br>";
+}
+else 
 {
 	$GovernmentTypeValue = $GovernmentTypeError;
 }
 
-if($CountryColourError != "MISSING")
+if($CountryColourError == "MISSING")
+{
+	$ErrorMessage = $ErrorMessage . "Please select a country colour <br>";
+}
+else if(substr($CountryColourError,0,7) == "INVALID")
+{
+	$ErrorMessage = $ErrorMessage . "Please select a valid country colour <br>";
+}
+else if(substr($CountryColourError,0,8) == "OCCUPIED")
+{
+	$ErrorMessage = $ErrorMessage . "This colour is in use by another player in your session, please choose another.<br>";
+	$CountryColourValue = substr($CountryColourError,8,strlen($CountryColourError));
+}
+else
 {
 	$CountryColourValue = $CountryColourError;
 }
@@ -56,6 +105,9 @@ Tauresium - Join Session
 <br><br>
 <font id="NationTitle" style="font-family:Castellar;font-size:52px;" > New Nation </font>
 <br><br>
+<div id="ErrorBox">
+<font style="color:red;"> <?php echo $ErrorMessage; ?></font>
+</div>
 <form method="POST" action="Scripts/CreateNewAccount.php">
 <font style="font-family:Romanus;font-size:48px;" >My nation name: </font>
 <br><br>

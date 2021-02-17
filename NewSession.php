@@ -12,7 +12,7 @@ Tauresium - New Session
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 
-<div id="Background" style="background-image:radial-gradient(circle at center, rgba(230, 191, 131, 1), rgba(226, 225, 225, 0.5)),url('Backgroundimages/MappaMundi.png');width:95%;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
+<div id="Background" style="background-image:linear-gradient(to top, rgba(226, 225, 225, 0.5), rgba(230, 191, 131, 1)),url('Backgroundimages/MappaMundi.png');width:95%;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
 <button id="BackButton" class="backButton" style="text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index.php'">< Back</button>
 
 <table style="width:100%;text-align:center;">
@@ -46,7 +46,7 @@ Tauresium - New Session
 <img style="background-image:url('Assets/WorldMapIcon.png');width:256px;height:256px;margin:0px;vertical-align:middle;"/> 
 <font> Real World </font>
 <br>
-<input type="radio" name="MapType" value="Earth"/>
+<input type="radio" name="MapType" value="Earth" checked="checked"/>
 </td>
 <td style="padding:20px;"> 
 <img style="background-image:url('Assets/WorldMapGreyscale.png');width:256px;height:256px;margin:0px;vertical-align:middle;"/> 
@@ -67,7 +67,7 @@ Tauresium - New Session
 <input type="radio" name="GameSpeed" style="pointer-events:none;opacity:0.5;" value="Quick"/> <label for="MapType"> Quick (10 Minute event timer)</label>
 </td>
 <td style="padding:20px;"> 
-<input type="radio" name="GameSpeed" value="Normal"/> <label for="MapType"> Normal (20 Minute event timer)</label>
+<input type="radio" name="GameSpeed" value="Normal" checked="checked"/> <label for="MapType"> Normal (20 Minute event timer)</label>
 </td>
 <td style="padding:20px;"> 
 <input type="radio" name="GameSpeed" style="pointer-events:none;opacity:0.5;" value="Slow"/> <label for="MapType"> Slow (40 Minute event timer)</label>

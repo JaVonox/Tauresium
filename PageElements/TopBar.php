@@ -15,6 +15,7 @@ $divStyle = '"background-color: #' . $playerStats[0]['Colour'] . ';border:5px so
 </td>
 <td>
 <div style= <?php echo $divStyle ?>>
+<div style="width:70%;background-color:white;margin-left:auto;margin-right:auto;">
 <font style="font-family:Romanus;font-size:18px;text-decoration:underline;"> <?php echo $playerStats[0]['Country_Name']; ?></font>
 <br><br>
 <img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $playerStats[0]['Culture_Influence'] . " "; ?>
@@ -27,6 +28,7 @@ $divStyle = '"background-color: #' . $playerStats[0]['Colour'] . ';border:5px so
 </td>
 </tr>
 </table>
+</div>
 </div>
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;overflow:auto;"> 
 	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Index.php'">Index</button>
