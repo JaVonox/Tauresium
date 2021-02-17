@@ -190,20 +190,24 @@ var phpName = "<?php echo $NationValue; ?>";
 var phpGov = "<?php echo $GovernmentTypeValue; ?>";
 var phpColour = "<?php echo $CountryColourValue; ?>";
 
-if(typeof phpGov !== 'undefined')
+if(phpGov !== "")
 {
 	selectedGovernment = phpGov;
-	if(typeof phpName !== 'undefined')
+	_QualityResponse(selectedGovernment);
+}
+else
+{
+	if(phpName !== "")
 	{
-		document.getElementById("NationTitle").textContent = governmentTitles.get(selectedGovernment) + " " + document.getElementById("NationName").value;
+		document.getElementById("NationTitle").textContent = document.getElementById("NationName").value;
 	}
 	else
 	{
-		document.getElementById("NationTitle").textContent = governmentTitles.get(selectedGovernment) + " ";
+		document.getElementById("NationTitle").textContent = "New Nation";
 	}
 }
 
-if(typeof phpColour !== 'undefined')
+if(phpColour !== "")
 {
 	selectedColour = phpColour;
 	var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
@@ -220,10 +224,7 @@ function _UpdateTitle()
 	}
 	else
 	{
-		var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
-		var greenComponent = ((parseInt(selectedColour[2],16) * 16) + parseInt(selectedColour[3],16));
-		var blueComponent = ((parseInt(selectedColour[4],16) * 16) + parseInt(selectedColour[5],16));
-		document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
+		document.getElementById("NationTitle").textContent = document.getElementById("NationName").value;
 	}
 }
 
@@ -239,10 +240,14 @@ function _UpdateBackground(evt)
 		document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
 	}
 }
-
 function _SelectionResponse(evt) 
 {
-	selectedGovernment = event.srcElement.value;
+	_QualityResponse(event.srcElement.value);
+}
+
+function _QualityResponse(source) 
+{
+	selectedGovernment = source;
 	//C = C+ E= E+ M= M+ D = C- F= E- W=M-
 	
 	var governmentEffects = new Map([['Sultanate', 'CCCCFFW'],
