@@ -57,9 +57,14 @@ class Database{
 	
 	public function getPlayerStats($PlayerIdentity)
 	{
-		$sqlExec = "SELECT Country_Name,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
+		$sqlExec = "SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
 		$result = $this->connectionData->query($sqlExec);
-		$dataSet = $result->fetch_all(MYSQLI_ASSOC); //fetch all does 2d array
+		$dataSet = $result->fetch_assoc();
+		
+		$sqlExec = "SELECT Title FROM governmenttypes WHERE GovernmentForm = '" . $dataSet['Country_Type'] . "';";
+		$result = $this->connectionData->query($sqlExec);
+		$dataSet['Title'] = $result->fetch_assoc()['Title'];
+		
 		return $dataSet;
 	}
 	
@@ -79,38 +84,57 @@ class Database{
 		}
 	}
 	
-	public function getPlayersInWorld($WorldCode)
+	public function getPlayersInWorld($worldCode)
 	{
-		$sqlExec = "SELECT players.Country_Name FROM players WHERE players.World_Code = '" . $WorldCode . "';";
+		$sqlExec = "SELECT players.Country_Name FROM players WHERE players.World_Code = '" . $worldCode . "';";
 		$result = $this->connectionData->query($sqlExec);
 		$dataSet = $result->fetch_row();
 		return $dataSet;
 	}
 	
-	public function getColoursInWorld($WorldCode)
+	public function getColoursInWorld($worldCode)
 	{
-		$sqlExec = "SELECT players.Colour FROM players WHERE players.World_Code = '" . $WorldCode . "';";
+		$sqlExec = "SELECT players.Colour FROM players WHERE players.World_Code = '" . $worldCode . "';";
 		$result = $this->connectionData->query($sqlExec);
 		$dataSet = $result->fetch_row();
 		return $dataSet;
 	}
 	
-	public function addNewCountry($CountryName,$Government,$Colour,$World_Code)
+	public function addNewCountry($countryName,$government,$colour,$world_Code)
 	{
 		//ADD better stuff here
-		$ID = "BFDIBFDIBFDIBFDI";
-		$Military_Influence = 0;
-		$Military_Generation = 0;
-		$Culture_Influence = 0;
-		$Culture_Generation = 0;
-		$Economic_Influence = 0;
-		$Economic_Generation = 0;
+		$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
+
+		$ID = "";
+		$checksum = 0;
+		for($i = 0;$i < 15;$i+=1)
+		{
+			$nextCharacter = $characterArray[rand(0,count($characterArray)-1)];
+			$ID = $ID . $nextCharacter;
+			$checksum = $checksum + ord($nextCharacter);
+		}
+		
+		//Simple checksum - add up all ascii values and then modulo by the characterArray.
+		
+		$checksum = $checksum % 33;
+		$ID = $ID . $characterArray[$checksum];
+		
+		$sqlExec = "SELECT Base_Military_Generation,Base_Culture_Generation,Base_Economic_Generation,Base_Military_Influence,Base_Culture_Influence,Base_Economic_Influence FROM governmenttypes WHERE GovernmentForm = '" . $government . "';";
+		$result = $this->connectionData->query($sqlExec);
+		$governmentProperties = $result->fetch_assoc();
+		
+		$military_Influence = $governmentProperties['Base_Military_Influence'];
+		$military_Generation =  $governmentProperties['Base_Military_Generation'];
+		$culture_Influence =  $governmentProperties['Base_Culture_Influence'];
+		$culture_Generation =  $governmentProperties['Base_Culture_Generation'];
+		$economic_Influence =  $governmentProperties['Base_Economic_Influence'];
+		$economic_Generation =  $governmentProperties['Base_Economic_Generation'];
 		$LET = date("Y/m/d h:i:s");
 		
-		$sqlExec = "INSERT INTO players VALUES('" . $ID . "','" . $CountryName . "','" . $Government . "','" . $Colour . "','" . $World_Code . "'," . $Military_Influence . "," . $Military_Generation . "," . $Culture_Influence . "," . $Culture_Generation . "," . $Economic_Influence . "," . $Economic_Generation . ",'" .$LET . "',0);";
+		$sqlExec = "INSERT INTO players VALUES('" . $ID . "','" . $countryName . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',0);";
 		$this->connectionData->query($sqlExec);
 		
-		return $this->connectionData->error;
+		return $ID;
 	}
 }
 ?>

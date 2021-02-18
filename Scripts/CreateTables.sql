@@ -30,7 +30,7 @@ Score int NOT NULL
 CREATE TABLE Players(
 Player_ID varchar(16) PRIMARY KEY NOT NULL,
 Country_Name varchar(50) NOT NULL,
-Country_Type varchar(50) NOT NULL,
+Country_Type varchar(50) NOT NULL, /*FK*/
 Colour varchar(6) NOT NULL,
 World_Code varchar(16) NOT NULL, /*FK*/
 Military_Influence int NOT NULL,
@@ -46,6 +46,17 @@ Events_Stacked FLOAT NOT NULL
 CREATE TABLE Worlds(
 World_Code varchar(16) PRIMARY KEY NOT NULL,
 Capacity int NOT NULL
+);
+
+CREATE TABLE GovernmentTypes(
+GovernmentForm varchar(50) PRIMARY KEY NOT NULL,
+Title TEXT NOT NULL,
+Base_Military_Generation FLOAT NOT NULL,
+Base_Culture_Generation FLOAT NOT NULL,
+Base_Economic_Generation FLOAT NOT NULL,
+Base_Military_Influence int NOT NULL,
+Base_Culture_Influence int NOT NULL,
+Base_Economic_Influence int NOT NULL
 );
 
 /* TO BE ADDED LATER
@@ -88,8 +99,31 @@ add constraint PlayersM_to_WorldO
 foreign key(World_Code)
 references Worlds(World_Code);
 
+/* One to Many - One GovernmentType to Many Players */
+
+ALTER TABLE Players
+add constraint PlayersM_to_GovernmentTypesO
+foreign key(Country_Type)
+references GovernmentTypes(GovernmentForm);
+
+INSERT INTO GovernmentTypes VALUES('Sultanate','The Sultanate of',0.9,1.4,0.8,100,200,0);
+INSERT INTO GovernmentTypes VALUES('Horde','The Great Horde of',1,1.4,0.6,0,300,0);
+INSERT INTO GovernmentTypes VALUES('ElectoralMonarchy','The Electoral Kingdom of',1.1,1.3,0.6,180,70,0);
+INSERT INTO GovernmentTypes VALUES('Theocracy','The Prince bishopric of',0.9,1.2,1,50,200,0);
+INSERT INTO GovernmentTypes VALUES('Monarchy','The Kingdom of',1,1.1,1,80,100,50);
+INSERT INTO GovernmentTypes VALUES('Libertarian','The Free State of',0.8,0.8,1.4,50,70,150);
+INSERT INTO GovernmentTypes VALUES('Colonial','The Colonial Domain of',0.8,1,1.3,100,100,100);
+INSERT INTO GovernmentTypes VALUES('Democracy','The Democratic Republic of',1,0.8,1.3,0,70,150);
+INSERT INTO GovernmentTypes VALUES('MerchantRepublic','The Mercantile Republic of',0.9,1,1.2,50,80,120);
+INSERT INTO GovernmentTypes VALUES('ClassicRepublic','The Republic of',1,1,1.1,70,70,100);
+INSERT INTO GovernmentTypes VALUES('Dictatorship','The Nation of',1.3,0.9,0.9,150,30,50);
+INSERT INTO GovernmentTypes VALUES('CommunistRepublic','The Peoples Republic of',1.2,1.2,0.6,150,70,0);
+INSERT INTO GovernmentTypes VALUES('Oligarchy','The Oligarchical State of',1.1,1,1,100,50,70);
+INSERT INTO GovernmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0.9,25,25,25);
+INSERT INTO GovernmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
+
 INSERT INTO Worlds VALUES('WORLWORLWORLWORL',5);
-INSERT INTO Players VALUES('ADMIADMIADMIADMI','ADMIN','Administrator','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO Players VALUES('ADMIADMIADMIADMI','ADMIN','Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
 
 INSERT INTO Provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');
 INSERT INTO Provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57','188');

@@ -145,7 +145,8 @@ if($errorsOccured == True)
 }
 else
 {
-	$success = $database->addNewCountry($countryName,$worldCode,$countryColour,$governmentType);
-	echo $success;
+	$playerCode = $database->addNewCountry($countryName,$governmentType,$countryColour,$worldCode);
+	echo "Temporary Page. Player code is " . $playerCode;
+	
 }
 ?>
