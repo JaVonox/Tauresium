@@ -1,8 +1,19 @@
 <?php
+include_once "Scripts/DBLoader.php";
+
 $selectedProvince = $_GET["ProvinceView"];
 if($selectedProvince == Null)
 {
-	header("Location: index.php");
+	header("Location: ErrorPage.php"); //if no variables were passed.
+}
+
+$database = new Database();
+$db = $database->getConnection();
+$loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
+
+if($loadedProvince == "[]") //if the province does not exist
+{
+	header("Location: ErrorPage.php"); 
 }
 
 ?>
@@ -26,13 +37,7 @@ Tauresium - Province
 <body style="background-color:white;margin:0px;">
 
 <?php include_once 'Scripts/PageUpdate.php'?>
-<?php include_once "Scripts/DBLoader.php";?>
-
-<?php
-$database = new Database();
-$db = $database->getConnection();
-$loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
-?>
+<?php include_once 'Scripts/CheckLogin.php'?>
 
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 <div style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">

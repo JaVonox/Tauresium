@@ -124,7 +124,7 @@ Tauresium - Join Session
 <font style="font-family:Arial;font-size:12px;word-wrap: break-word;">Please make sure you choose a password you will remember - there is no way to recover this password if it is forgotten.</font>
 </div>
 <br>
-<input id="NationPass" type="text" width="100%" name="CountryPassInput" size="50" maxlength="25" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;"/>
+<input id="NationPass" type="password" width="100%" name="CountryPassInput" size="50" maxlength="25" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;"/>
 <br><br>
 <font style="font-family:Romanus;font-size:32px;">World Code: </font>
 <br>

@@ -18,6 +18,7 @@ Tauresium - Game Page
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 <?php include_once "Scripts/DBLoader.php";?>
+<?php include_once "Scripts/CheckLogin.php";?>
 <?php
 $database = new Database();
 $db = $database->getConnection();

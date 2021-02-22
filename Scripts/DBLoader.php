@@ -12,9 +12,9 @@ class Database{
     public function getConnection()
 	{		
 		$conn = new mysqli($this->host, $this->user, $this->password, $this->database);
-		if($conn->connect_error)
+		if($conn->connect_error) 
 		{
-			die("Could not connect to database");
+			header("Location: ../ErrorPage.php"); //redirects to error page in case of error.
 		} 
 		else 
 		{
