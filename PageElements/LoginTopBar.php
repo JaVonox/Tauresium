@@ -9,7 +9,11 @@
 <form action="Scripts/LoginVerify.php" method="GET">
 <font style="font-family:Romanus;font-size:18px;"> Existing Player ID? </font>
 <br>
+Username:
 <input type="text" width="100%" id="Login" name="LoginInput" autocomplete="off"/>
+<br>
+Password:
+<input type="text" width="100%" id="Login" name="PasswordInput" autocomplete="off"/>
 <br>
 <input type="submit" value="Login"/>
 </form>

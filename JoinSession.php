@@ -1,5 +1,6 @@
 <?php
 $NationError = (!isset($_GET["NationName"]) ? "" : $_GET["NationName"] );
+$PasswordError = (!isset($_GET["Password"]) ? "" : $_GET["Password"] );
 $WorldCodeError = (!isset($_GET["WorldCodeInput"]) ? "" : $_GET["WorldCodeInput"]);
 $GovernmentTypeError = (!isset($_GET["GovernmentType"]) ? "" : $_GET["GovernmentType"]);
 $CountryColourError = (!isset($_GET["CountryColour"]) ? "" : $_GET["CountryColour"]);
@@ -30,6 +31,10 @@ else
 	$NationValue = $NationError;
 }
 
+if($PasswordError == "INVALID")
+{
+	$ErrorMessage = $ErrorMessage . "The password entered is missing or invalid. Please enter a new password.<br>";
+}
 
 if($WorldCodeError == "MISSING")
 {
@@ -111,7 +116,15 @@ Tauresium - Join Session
 <form method="POST" action="Scripts/CreateNewAccount.php">
 <font style="font-family:Romanus;font-size:48px;" >My nation name: </font>
 <br><br>
-<input id="NationName" name="NationName" type="text" width="100%" name="CountryNameInput" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" onkeyup="_UpdateTitle()" value="<?php echo $NationValue; ?>"/>
+<input id="NationName" type="text" width="100%" name="CountryNameInput" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" onkeyup="_UpdateTitle()" value="<?php echo $NationValue; ?>"/>
+<br><br>
+<font style="font-family:Romanus;font-size:48px;" >My password: </font>
+<br>
+<div style="width:400px;;margin-left:auto;margin-right:auto;">
+<font style="font-family:Arial;font-size:12px;word-wrap: break-word;">Please make sure you choose a password you will remember - there is no way to recover this password if it is forgotten.</font>
+</div>
+<br>
+<input id="NationPass" type="text" width="100%" name="CountryPassInput" size="50" maxlength="25" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;"/>
 <br><br>
 <font style="font-family:Romanus;font-size:32px;">World Code: </font>
 <br>

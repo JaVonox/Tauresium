@@ -28,8 +28,8 @@ Score int NOT NULL
 );
 
 CREATE TABLE Players(
-Player_ID varchar(16) PRIMARY KEY NOT NULL,
-Country_Name varchar(50) NOT NULL,
+Country_Name varchar(50) PRIMARY KEY NOT NULL,
+Hashed_Password TEXT NOT NULL,
 Country_Type varchar(50) NOT NULL, /*FK*/
 Colour varchar(6) NOT NULL,
 World_Code varchar(16) NOT NULL, /*FK*/
@@ -57,6 +57,12 @@ Base_Economic_Generation FLOAT NOT NULL,
 Base_Military_Influence int NOT NULL,
 Base_Culture_Influence int NOT NULL,
 Base_Economic_Influence int NOT NULL
+);
+
+CREATE TABLE Sessions(
+SessionRelationID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+SessionID TEXT NOT NULL,
+Country_Login varchar(50) NOT NULL
 );
 
 /* TO BE ADDED LATER
@@ -123,7 +129,7 @@ INSERT INTO GovernmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0
 INSERT INTO GovernmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
 
 INSERT INTO Worlds VALUES('WORLWORLWORLWORL',5);
-INSERT INTO Players VALUES('ADMIADMIADMIADMI','ADMIN','Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO Players VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
 
 INSERT INTO Provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');
 INSERT INTO Provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57','188');

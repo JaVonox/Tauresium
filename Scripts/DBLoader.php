@@ -39,9 +39,9 @@ class Database{
 		return $dataSet;
 	}
 	
-	public function verifyIdentity($PlayerIdentity)
+	public function verifyIdentity($PlayerIdentity,$hashedPassword)
 	{
-		$sqlExec = "SELECT Player_ID FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
+		$sqlExec = "SELECT Country_Name FROM players WHERE Country_Name = '" . $PlayerIdentity . "' AND Hashed_Password = '" . $hashedPassword . "';";
 		$result = $this->connectionData->query($sqlExec);
 		$return = $result->fetch_row();
 		
@@ -57,7 +57,7 @@ class Database{
 	
 	public function getPlayerStats($PlayerIdentity)
 	{
-		$sqlExec = "SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked FROM players WHERE Player_ID = '" . $PlayerIdentity . "';";
+		$sqlExec = "SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked FROM players WHERE Country_Name = '" . $PlayerIdentity . "';";
 		$result = $this->connectionData->query($sqlExec);
 		$dataSet = $result->fetch_assoc();
 		
@@ -84,12 +84,20 @@ class Database{
 		}
 	}
 	
-	public function getPlayersInWorld($worldCode)
+	public function getPlayersInWorld($countryName)
 	{
-		$sqlExec = "SELECT players.Country_Name FROM players WHERE players.World_Code = '" . $worldCode . "';";
+		$sqlExec = "SELECT players.Country_Name FROM players WHERE players.Country_Name = '" . $countryName . "';";
 		$result = $this->connectionData->query($sqlExec);
 		$dataSet = $result->fetch_row();
-		return $dataSet;
+		
+		if($dataSet[0] == $countryName && $dataSet[0] != "")
+		{
+			return True;
+		}
+		else
+		{
+			return False;
+		}
 	}
 	
 	public function getColoursInWorld($worldCode)
@@ -100,24 +108,25 @@ class Database{
 		return $dataSet;
 	}
 	
-	public function addNewCountry($countryName,$government,$colour,$world_Code)
-	{
-		//ADD better stuff here
-		$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
+	//ADD better stuff here
+	//$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
 
-		$ID = "";
-		$checksum = 0;
-		for($i = 0;$i < 15;$i+=1)
-		{
-			$nextCharacter = $characterArray[rand(0,count($characterArray)-1)];
-			$ID = $ID . $nextCharacter;
-			$checksum = $checksum + ord($nextCharacter);
-		}
+	//$ID = "";
+	//$checksum = 0;
+	//for($i = 0;$i < 15;$i+=1)
+	//{
+	//	$nextCharacter = $characterArray[rand(0,count($characterArray)-1)];
+	//	$ID = $ID . $nextCharacter;
+	//	$checksum = $checksum + ord($nextCharacter);
+	//}
 		
-		//Simple checksum - add up all ascii values and then modulo by the characterArray.
+	//Simple checksum - add up all ascii values and then modulo by the characterArray.
 		
-		$checksum = $checksum % 33;
-		$ID = $ID . $characterArray[$checksum];
+	//$checksum = $checksum % 33;
+	//$ID = $ID . $characterArray[$checksum];
+	
+	public function addNewCountry($countryName,$passwordPreHash,$government,$colour,$world_Code)
+	{
 		
 		$sqlExec = "SELECT Base_Military_Generation,Base_Culture_Generation,Base_Economic_Generation,Base_Military_Influence,Base_Culture_Influence,Base_Economic_Influence FROM governmenttypes WHERE GovernmentForm = '" . $government . "';";
 		$result = $this->connectionData->query($sqlExec);
@@ -131,10 +140,34 @@ class Database{
 		$economic_Generation =  $governmentProperties['Base_Economic_Generation'];
 		$LET = date("Y/m/d h:i:s");
 		
-		$sqlExec = "INSERT INTO players VALUES('" . $ID . "','" . $countryName . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',0);";
+		$passwordHash = hash('sha256',$passwordPreHash,false); // This built in algorithm hashes the password provided using sha256.
+		
+		
+		$sqlExec = "INSERT INTO players VALUES('" . $countryName . "','" . $passwordHash . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',0);";
 		$this->connectionData->query($sqlExec);
 		
-		return $ID;
+		return True;
+	}
+	
+	public function AddNewSession($sessionID,$countryName)
+	{
+		$sqlExec = "INSERT INTO Sessions (SessionID,Country_Login) VALUES('" . $sessionID . "','" . $countryName . "');";
+		$this->connectionData->query($sqlExec);
+	}
+	
+	public function ReturnLogin($sessionID)
+	{
+		$sqlExec = "SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';";
+		$result = $this->connectionData->query($sqlExec);
+		$dataSet = $result->fetch_row();
+		return $dataSet[0];
+	}
+	
+	public function KillSession($sessionID)
+	{
+		$sqlExec = "DELETE FROM Sessions WHERE SessionID = '" . $sessionID . "';";
+		$this->connectionData->query($sqlExec);
+		return True;
 	}
 }
 ?>

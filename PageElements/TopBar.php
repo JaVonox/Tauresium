@@ -3,7 +3,9 @@
 <?php
 $database = new Database();
 $db = $database->getConnection();
-$playerStats = $database->getPlayerStats($_SESSION['user']);
+$player = $database->ReturnLogin(session_id());
+
+$playerStats = $database->getPlayerStats($player);
 $divStyle = '"background-color: #' . $playerStats['Colour'] . ';border:5px solid black;border-radius:5px;margin-right:50px;color:black;vertical-align:middle;overflow:auto;"';
 ?>
 

@@ -4,6 +4,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 $countryName = "";
+$countryPass = "";
 $worldCode = "";
 $governmentType = "";
 $countryColour = "";
@@ -14,7 +15,6 @@ $possibleGovernmentTypes = ['Sultanate','Horde','ElectoralMonarchy','Theocracy',
 $possibleColours = ['D66B67','DE965D','ECE788','B5DB7F','8ECDD2','8F97CF'];
 
 $validWorldCode = False;
-$occupiedCountryNames = ['DUMMY'];
 $occupiedColours = ['DUMMY'];
 
 if($_POST['WorldCodeInput'] != "" && isset($_POST['WorldCodeInput']))
@@ -39,7 +39,6 @@ if($_POST['WorldCodeInput'] != "" && isset($_POST['WorldCodeInput']))
 		else
 		{
 			$errorCode = $errorCode . "WorldCodeInput=" . $worldCode  . "&";
-			$occupiedCountryNames = $database->getPlayersInWorld($worldCode);
 			$occupiedColours = $database->getColoursInWorld($worldCode);
 		}
 		
@@ -52,18 +51,19 @@ else
 	$errorsOccured = True;
 }
 
-if($_POST['NationName'] != "" && isset($_POST['NationName']))
+if($_POST['CountryNameInput'] != "" && isset($_POST['CountryNameInput']))
 {
-	$countryName = $_POST['NationName'];
+	$countryName = $_POST['CountryNameInput'];
 	
 	if(strlen($countryName) > 20 || !ctype_alpha($countryName))
 	{
 		$errorCode = $errorCode . "NationName=INVALID" . $countryName  . "&";
 		$errorsOccured = True;
 	}
-	else if($validWorldCode)
+	else 
 	{
-		if(!in_array($countryName,$occupiedCountryNames))
+		
+		if(!$database->getPlayersInWorld($countryName))
 		{
 			$errorCode = $errorCode . "NationName=" . $countryName  . "&";
 		}
@@ -73,14 +73,26 @@ if($_POST['NationName'] != "" && isset($_POST['NationName']))
 			$errorsOccured = True;
 		}
 	}
-	else
-	{
-		$errorCode = $errorCode . "NationName=" . $countryName  . "&";
-	}
 }
 else
 {
 	$errorCode = $errorCode . "NationName=MISSING&";
+	$errorsOccured = True;
+}
+
+if(isset($_POST['CountryPassInput']) && $_POST['CountryPassInput'] != "")
+{
+	$countryPass = $_POST['CountryPassInput'];
+	
+	if(strlen($countryPass) > 25)
+	{
+		$errorCode = $errorCode . "Password=INVALID&";
+		$errorsOccured = True;
+	}
+}
+else
+{
+	$errorCode = $errorCode . "Password=INVALID&";
 	$errorsOccured = True;
 }
 
@@ -145,8 +157,15 @@ if($errorsOccured == True)
 }
 else
 {
-	$playerCode = $database->addNewCountry($countryName,$governmentType,$countryColour,$worldCode);
-	echo "Temporary Page. Player code is " . $playerCode;
+	$accountSuccess = $database->addNewCountry($countryName,$countryPass,$governmentType,$countryColour,$worldCode);
+	if($accountSuccess)
+	{
+		echo "Temporary Page. Account creation successful.";
+	}
+	else
+	{
+		echo "Something went wrong during account creation. Please try again.";
+	}
 	
 }
 ?>
