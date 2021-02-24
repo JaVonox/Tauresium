@@ -45,6 +45,8 @@ Events_Stacked FLOAT NOT NULL
 
 CREATE TABLE Worlds(
 World_Code varchar(16) PRIMARY KEY NOT NULL,
+MapType varchar(16) NOT NULL,
+Speed int,
 Capacity int NOT NULL
 );
 
@@ -65,32 +67,32 @@ SessionID TEXT NOT NULL,
 Country_Login varchar(50) NOT NULL
 );
 
-/* TO BE ADDED LATER
+/*TO BE ADDED LATER
 CREATE TABLE Province_Occupation(
 Occupation_ID int PRIMARY KEY NOT NULL,
 World_Code varchar(16) NOT NULL, /*FK
 Province_ID varchar(255) NOT NULL, /*FK
 Player_ID varchar(16) NOT NULL /*FK
-);
+);*/
 
 CREATE TABLE Events(
-Event_ID PRIMARY KEY NOT NULL,
+Event_ID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
 Title TEXT NOT NULL,
 Description TEXT NOT NULL,
 Base_Influence_Reward int NOT NULL,
-Option_1_ID int NOT NULL, /*FK
-Option_2_ID int NOT NULL, /*FK
-Option_3_ID int NOT NULL /*FK
+Option_1_ID int NOT NULL, /*FK*/
+Option_2_ID int NOT NULL, /*FK*/
+Option_3_ID int NOT NULL /*FK*/
 );
 
 CREATE TABLE Options(
-Option_ID PRIMARY KEY NOT NULL,
+Option_ID int PRIMARY KEY NOT NULL,
 Option_Description TEXT NOT NULL,
 Culture_Gen_Modifier FLOAT NOT NULL,
 Economic_Gen_Modifier FLOAT NOT NULL,
 Military_Gen_Modifier FLOAT NOT NULL
 ); 
-*/
+
 
 /*
 One to One - Foreign key on one side (both)
@@ -112,6 +114,46 @@ add constraint PlayersM_to_GovernmentTypesO
 foreign key(Country_Type)
 references GovernmentTypes(GovernmentForm);
 
+/* One to One - One EventOption to One Option(s) */
+
+ALTER TABLE Events
+add constraint EventOption1_OptionID
+foreign key(Option_1_ID)
+references Options(Options_ID);
+
+ALTER TABLE Options
+add constraint OptionID_to_EventOption1
+foreign key(Option_ID)
+references Events(Option_1_ID);
+
+ALTER TABLE Events
+add constraint EventOption2_OptionID
+foreign key(Option_2_ID)
+references Options(Options_ID);
+
+ALTER TABLE Options
+add constraint OptionID_to_EventOption2
+foreign key(Option_ID)
+references Events(Option_2_ID);
+
+ALTER TABLE Events
+add constraint EventOption3_OptionID
+foreign key(Option_3_ID)
+references Options(Options_ID);
+
+ALTER TABLE Options
+add constraint OptionID_to_EventOption3
+foreign key(Option_ID)
+references Events(Option_3_ID);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Dissidents In Our Government',
+'Recent investigations have confirmed the existence of high ranking officials opposed to official government policy, having such persons in our administration threatens to undermine our authority, what actions should we take with these dissidents?',
+50,1,2,3);
+
+INSERT INTO Options VALUES(1,'These rebels should be removed from their offices at once',-0.04,0,0.04);
+INSERT INTO Options VALUES(2,'Our government must be open to all opinions',0.03,0.02,-0.06);
+INSERT INTO Options VALUES(3,'Perhaps we can pretend they simply do not exist',-0.01,-0.01,-0.01);
+
 INSERT INTO GovernmentTypes VALUES('Sultanate','The Sultanate of',0.9,1.4,0.8,100,200,0);
 INSERT INTO GovernmentTypes VALUES('Horde','The Great Horde of',1,1.4,0.6,0,300,0);
 INSERT INTO GovernmentTypes VALUES('ElectoralMonarchy','The Electoral Kingdom of',1.1,1.3,0.6,180,70,0);
@@ -128,7 +170,7 @@ INSERT INTO GovernmentTypes VALUES('Oligarchy','The Oligarchical State of',1.1,1
 INSERT INTO GovernmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0.9,25,25,25);
 INSERT INTO GovernmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
 
-INSERT INTO Worlds VALUES('WORLWORLWORLWORL',5);
+INSERT INTO Worlds VALUES('WORLWORLWORLWORL','Earth','20',4);
 INSERT INTO Players VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
 
 INSERT INTO Provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');

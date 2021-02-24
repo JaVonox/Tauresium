@@ -100,6 +100,7 @@ class Database{
 		}
 	}
 	
+
 	public function getColoursInWorld($worldCode)
 	{
 		$sqlExec = "SELECT players.Colour FROM players WHERE players.World_Code = '" . $worldCode . "';";
@@ -107,23 +108,6 @@ class Database{
 		$dataSet = $result->fetch_row();
 		return $dataSet;
 	}
-	
-	//ADD better stuff here
-	//$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
-
-	//$ID = "";
-	//$checksum = 0;
-	//for($i = 0;$i < 15;$i+=1)
-	//{
-	//	$nextCharacter = $characterArray[rand(0,count($characterArray)-1)];
-	//	$ID = $ID . $nextCharacter;
-	//	$checksum = $checksum + ord($nextCharacter);
-	//}
-		
-	//Simple checksum - add up all ascii values and then modulo by the characterArray.
-		
-	//$checksum = $checksum % 33;
-	//$ID = $ID . $characterArray[$checksum];
 	
 	public function addNewCountry($countryName,$passwordPreHash,$government,$colour,$world_Code)
 	{
@@ -146,7 +130,50 @@ class Database{
 		$sqlExec = "INSERT INTO players VALUES('" . $countryName . "','" . $passwordHash . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',0);";
 		$this->connectionData->query($sqlExec);
 		
+		$sqlWorldScript = "UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = '" . $world_Code . "';";
+		$this->connectionData->query($sqlWorldScript);
+		
 		return True;
+	}
+	
+	public function addNewWorld($worldName,$mapType,$gameSpeed)
+	{
+		$speedMapping = array("Quick"=>10,"Normal"=>20,"Slow"=>40,"VerySlow"=>60);
+		$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
+		$worldCode = "";
+		
+		While(True)
+		{
+
+			$ID = "";
+			$checksum = 0;
+			for($i = 0;$i < 15;$i+=1)
+			{
+				$nextCharacter = $characterArray[rand(0,count($characterArray)-1)];
+				$ID = $ID . $nextCharacter;
+				$checksum = $checksum + ord($nextCharacter);
+			}
+		
+			//Simple checksum - add up all ascii values and then modulo by the characterArray.
+		
+			$checksum = $checksum % 33;
+			$ID = $ID . $characterArray[$checksum];
+			
+			$sqlExec = "SELECT 1 FROM worlds WHERE World_Code = '" . $ID . "';";
+			$result = $this->connectionData->query($sqlExec);
+			$return = $result->fetch_row(); //fetches an array
+
+			if($return[0] != "1")
+			{
+				$worldCode = $ID;
+				break;
+			}
+		}
+		
+		$sqlExec = "INSERT INTO worlds VALUES('" . $worldCode . "','" . $mapType . "'," . $speedMapping[$gameSpeed] . ",5);";
+		$this->connectionData->query($sqlExec);
+		
+		return $worldCode;
 	}
 	
 	public function AddNewSession($sessionID,$countryName)

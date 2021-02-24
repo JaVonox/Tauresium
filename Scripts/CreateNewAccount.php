@@ -39,7 +39,7 @@ if($_POST['WorldCodeInput'] != "" && isset($_POST['WorldCodeInput']))
 		else
 		{
 			$errorCode = $errorCode . "WorldCodeInput=" . $worldCode  . "&";
-			$occupiedColours = $database->getColoursInWorld($worldCode);
+			array_push($occupiedColours,$database->getColoursInWorld($worldCode));
 		}
 		
 	}
@@ -120,7 +120,7 @@ if(isset($_POST['CountryColour']))
 {
 	$countryColour = $_POST['CountryColour'];
 	
-	if(!in_array($countryColour,$possibleColours)) //this needs to be not for some reason??
+	if(!in_array($countryColour,$possibleColours)) 
 	{
 		$errorCode = $errorCode . "CountryColour=INVALID&"; //only should occur if user has been messing with the source code
 		$errorsOccured = True;
@@ -153,18 +153,18 @@ else
 if($errorsOccured == True)
 {
 	$errorCode = rtrim($errorCode,"&"); 
-	header("Location: ../JoinSession.php" . $errorCode); //redirects to the joinsession page with the arguments
+	header("Location: ../JoinSession" . $errorCode); //redirects to the joinsession page with the arguments
 }
 else
 {
 	$accountSuccess = $database->addNewCountry($countryName,$countryPass,$governmentType,$countryColour,$worldCode);
 	if($accountSuccess)
 	{
-		echo "Temporary Page. Account creation successful.";
+		header("Location: ../SessionSuccess?Type=Country"); 
 	}
 	else
 	{
-		echo "Something went wrong during account creation. Please try again.";
+		header("Location: ../ErrorPage"); 
 	}
 	
 }
