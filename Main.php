@@ -45,7 +45,7 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td style="width:100%;height:100%;"> 
-		<svg class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
+		<svg id="SvgProvID" class="Provinces" onclick="_clickEvent()" style="background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;">
 		
 			<!-- Plotted by 100505349 (Assignment requires anonymous marking). Regions included in this document are not to be taken as real borders, they are simply triangles
 			named after major constituents within the region --->
@@ -513,6 +513,40 @@ $provinceSet = json_encode($database->getProvinceArray());
 	</table>
 </div>
 
+<script src="Libraries/svg-pan-zoom.js"></script>
+
+<script>
+
+beforePan = function(oldPan, newPan){ //This function is sourced from an example in the svg-pan-zoom documentation. 
+  var stopHorizontal = false
+	, stopVertical = false
+	, gutterWidth = 940
+	, gutterHeight = 532
+	, sizes = this.getSizes()
+	, leftLimit = -((sizes.viewBox.x + sizes.viewBox.width) * sizes.realZoom) + gutterWidth
+	, rightLimit = sizes.width - gutterWidth - (sizes.viewBox.x * sizes.realZoom)
+	, topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight
+	, bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom)
+
+  customPan = {}
+  customPan.x = Math.max(leftLimit, Math.min(rightLimit, newPan.x))
+  customPan.y = Math.max(topLimit, Math.min(bottomLimit, newPan.y))
+
+  return customPan
+}
+
+
+var ProvinceZoom = svgPanZoom('#SvgProvID',{
+  zoomScaleSensitivity: 0.5
+, panEnabled: true
+, dblClickZoomEnabled: false
+, minZoom: 1
+, maxZoom: 10
+, beforePan: beforePan
+});
+ //This uses the svg-pan-zoom library (https://github.com/ariutta/svg-pan-zoom)
+</script>
+
 <script>
 var selectedRegion = "Ocean";
 var phpArray = <?php echo $provinceSet ?>;
@@ -524,7 +558,7 @@ function _clickEvent(evt)
 		document.getElementById(selectedRegion).style.fill = "#FFE7AB";
 	}
 	
-	if(event.srcElement.id == "")
+	if(event.target.id == "SvgProvID" || event.target.nodeName == "g")
 	{
 		selectedRegion = "Ocean";
 		document.getElementById("ProvCapital").textContent = "Ocean";
@@ -541,7 +575,7 @@ function _clickEvent(evt)
 	}
 	else
 	{
-		selectedRegion = event.srcElement.id;
+		selectedRegion = event.target.id;
 		var selectedProvince = phpArray.find(element => element.Province_ID == selectedRegion);
 		
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
@@ -554,7 +588,7 @@ function _clickEvent(evt)
 		document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
 		document.getElementById("ProvExamine").style.visibility = "visible";
 		
-		document.getElementById(event.srcElement.id).style.fill = "#abc3ff";
+		document.getElementById(event.target.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 	}
