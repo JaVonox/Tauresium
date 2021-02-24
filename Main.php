@@ -513,7 +513,7 @@ $provinceSet = json_encode($database->getProvinceArray());
 	</table>
 </div>
 
-<script src="Libraries/svg-pan-zoom.js"></script>
+<script src="Libraries/SvgPanZoom/svg-pan-zoom.js"></script>
 
 <script>
 
