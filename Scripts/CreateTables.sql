@@ -154,6 +154,54 @@ INSERT INTO Options VALUES(1,'These rebels should be removed from their offices 
 INSERT INTO Options VALUES(2,'Our government must be open to all opinions',0.03,0.02,-0.06);
 INSERT INTO Options VALUES(3,'Perhaps we can pretend they simply do not exist',-0.01,-0.01,-0.01);
 
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Riches Untold',
+'Spurred on by a popular tabloid, rumours have begun to circulate that under a recently constructed town lies a large amount of gold. Our Advisors assure us that there is no such thing, but yet the public still calls for us to demolish and excavate the site.',
+30,4,5,6);
+
+INSERT INTO Options VALUES(4,'Release evidence disproving the baseless rumours',-0.05,0,0.2);
+INSERT INTO Options VALUES(5,'It is just a harmless rumor, perhaps we can just let the people imagine?',0.04,0,-0.01);
+INSERT INTO Options VALUES(6,'Excavate the site to disprove the rumor once and for all',-0.03,-0.04,0.03);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Counter Culture',
+'Recently, an obscure village on the fringes of our country have began to develop traditions of their own, many of which contradict our peoples own beliefs. Public outcry has called for us to suppress these so called harmful revolutionaries.',
+40,7,8,9);
+
+INSERT INTO Options VALUES(7,'Send a police task force to deal with them',0.02,0,0.03);
+INSERT INTO Options VALUES(8,'Threaten to cut vital subsidies to the region',0.01,-0.02,0.01);
+INSERT INTO Options VALUES(9,'Allow them to practice what they wish',-0.03,0.02,0);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Creature Comforts',
+'Zoologists under our funding have discovered a new species of freshwater fish native to rivers in our nation. Since the discovery of these fish, their population has skyrocketed, harming local ecosystems. Local communities have asked us to intervene to protect their interests in the area.',
+25,10,11,12);
+
+INSERT INTO Options VALUES(10,'Nonsense! These unique and beautiful animals will be our new national animal!',0.04,-0.04,0);
+INSERT INTO Options VALUES(11,'Cull the population to acceptable levels',-0.01,0.03,0);
+INSERT INTO Options VALUES(12,'This is really not an issue of national importance, they can deal with it how they see fit.',0,0.01,0);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Placebo Particle',
+'After the installation of a nuclear power plant near a rural town locals have began to complain of frequent headaches and pains, and in some cases even vomiting. Investigation into the matter has cleared any suspicion of radiation-related causes, yet the locals have organised a blockade of the facility in protest, the power company has turned to us for help in this crisis.',
+45,13,14,15);
+
+INSERT INTO Options VALUES(13,'Blockading the nuclear plant is putting them in more danger than any fake symptoms, they must be dispersed by force.',0,0.02,0.03);
+INSERT INTO Options VALUES(14,'Agree to demolish the plant to appease the people',0.02,-0.05,-0.02);
+INSERT INTO Options VALUES(15,'There cannot be *nothing* causing their illness, fund an investigation into the true causes of the symptoms',0.01,-0.01,-0.01);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Teach The Controversy',
+'A small group of protesters have gathered to demand public education include modules on their frighteningly misguided conspiracy theories, calling the lack of such topics censorship',
+30,16,17,18);
+
+INSERT INTO Options VALUES(16,'We cannot allow our children to believe such nonsense',-0.01,0.03,0);
+INSERT INTO Options VALUES(17,'Of course! Teaching all sides of a debate teaches children critical thinking skills.',0.02,-0.05,0);
+INSERT INTO Options VALUES(18,'School should only be for teaching productive skills. We should remove all irrelevant subjects from the curriculum',-0.06,0.06,0.02);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Quality Of Strife',
+'An obscure murder trial has sparked national controversy after the defence team declared it a consentual duel between adults, resulting in a not guilty verdict. All participants in the trial have been disbarred for their actions which clearly violate state law, but some protesters claim the verdict should be maintained, and furthermore, dueling should be legalised between consenting partners.',
+40,19,20,21);
+
+INSERT INTO Options VALUES(19,'Duels are an archaic system that cannot be permitted within a modern nation.',-0.03,0.03,-0.03);
+INSERT INTO Options VALUES(20,'Such a rich part of our history cannot be ignored. Duels should be legal once more.',0.05,-0.05,0.02);
+INSERT INTO Options VALUES(21,'Duels should only be permitted to those who hold military positions, perhaps they can serve as an alternate method of training?',0,-0.01,0.03);
+
 INSERT INTO GovernmentTypes VALUES('Sultanate','The Sultanate of',0.9,1.4,0.8,100,200,0);
 INSERT INTO GovernmentTypes VALUES('Horde','The Great Horde of',1,1.4,0.6,0,300,0);
 INSERT INTO GovernmentTypes VALUES('ElectoralMonarchy','The Electoral Kingdom of',1.1,1.3,0.6,180,70,0);

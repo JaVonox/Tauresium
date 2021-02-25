@@ -201,5 +201,42 @@ class Database{
 		
 		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $userLogin[0] . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
 	}
+	
+	public function GetEvent($sessionID)
+	{
+		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';");
+		$userLogin = $result->fetch_row();
+		
+		$result = $this->connectionData->query("SELECT Events_Stacked FROM players WHERE Country_Name = '" . $userLogin[0] . "';");
+		$StackCount = $result->fetch_row();
+		
+		if($StackCount[0] >= 1)
+		{
+			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1 WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
+			
+			$result = $this->connectionData->query("SELECT Count(Event_ID) FROM events;");
+			$EventsCount = $result->fetch_row();
+			$LoadEvent = rand(1,$EventsCount[0]);
+			
+			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $LoadEvent . "';") or die(mysqli_error($this->connectionData));
+			$dataSet = $result->fetch_assoc();
+		
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_1_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_1_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_2_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_2_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_3_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_3_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			return $dataSet;
+			
+		}
+		else
+		{
+			return False;
+		}
+	}
 }
 ?>
