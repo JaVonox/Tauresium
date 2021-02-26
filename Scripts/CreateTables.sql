@@ -40,13 +40,15 @@ Culture_Generation FLOAT NOT NULL,
 Economic_Influence int NOT NULL,
 Economic_Generation FLOAT NOT NULL,
 Last_Event_Time DATETIME NOT NULL,
-Events_Stacked FLOAT NOT NULL
+Events_Stacked FLOAT NOT NULL,
+Active_Event_ID int /*FK*/
 );
 
 CREATE TABLE Worlds(
 World_Code varchar(16) PRIMARY KEY NOT NULL,
+World_Name varchar(20) NOT NULL,
 MapType varchar(16) NOT NULL,
-Speed int,
+Speed int NOT NULL,
 Capacity int NOT NULL
 );
 
@@ -146,6 +148,13 @@ add constraint OptionID_to_EventOption3
 foreign key(Option_ID)
 references Events(Option_3_ID);
 
+/* Many to one - one event to many players */
+
+ALTER TABLE Players
+add constraint PlayersM_to_EventIDO
+foreign key(Active_Event_ID)
+references Events(Event_ID);
+
 INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Dissidents In Our Government',
 'Recent investigations have confirmed the existence of high ranking officials opposed to official government policy, having such persons in our administration threatens to undermine our authority, what actions should we take with these dissidents?',
 50,1,2,3);
@@ -218,8 +227,8 @@ INSERT INTO GovernmentTypes VALUES('Oligarchy','The Oligarchical State of',1.1,1
 INSERT INTO GovernmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0.9,25,25,25);
 INSERT INTO GovernmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
 
-INSERT INTO Worlds VALUES('WORLWORLWORLWORL','Earth','20',4);
-INSERT INTO Players VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO Worlds VALUES('WORLWORLWORLWORL','Elysium','Earth','20',4);
+INSERT INTO Players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
 
 INSERT INTO Provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');
 INSERT INTO Provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57','188');

@@ -47,6 +47,26 @@
 	color: white;
 }
 
+.eventsButton {
+	background-color:#339900;
+	color: white;
+	text-align: center;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	width:200px;
+	height:30px;
+	border:none;
+	font-family:'Helvetica';
+	float:right;
+}
+
+.eventsButton:Hover{
+	background-color:#226600;
+	color: white;
+}
+
 .InformationText{
 	font-family:'Tahoma';
 }

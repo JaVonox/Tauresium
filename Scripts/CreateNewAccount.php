@@ -63,7 +63,7 @@ if($_POST['CountryNameInput'] != "" && isset($_POST['CountryNameInput']))
 	else 
 	{
 		
-		if(!$database->getPlayersInWorld($countryName))
+		if(!$database->getDuplicatePlayers($countryName))
 		{
 			$errorCode = $errorCode . "NationName=" . $countryName  . "&";
 		}

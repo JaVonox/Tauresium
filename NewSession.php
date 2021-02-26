@@ -14,7 +14,7 @@ if($worldError == "MISSING")
 }
 else if(substr($worldError,0,7) == "INVALID")
 {
-	$errorMessage = $errorMessage . "World name must be less than 20 characters long and may only consist of alphabetical characters <br>";
+	$errorMessage = $errorMessage . "World name must be less than 14 characters long and may only consist of alphabetical characters <br>";
 	$worldValue = substr($worldError,7,strlen($worldError));
 }
 else
@@ -88,7 +88,7 @@ Tauresium - New Session
 <font style="font-family:Arial;font-size:12px;word-wrap: break-word;"> The name of your world will have no impact on gameplay, but for roleplay reasons you might want to choose a name that you like!</font>
 </div>
 <br>
-<input type="text" width="100%" name="WorldName" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" />
+<input type="text" width="100%" name="WorldName" size="23" maxlength="13" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" />
 <br><br><br>
 <font style="font-family:Romanus;font-size:48px;" > World Map Type: </font>
 <div style="width:400px;;margin-left:auto;margin-right:auto;">
@@ -139,25 +139,6 @@ Tauresium - New Session
 </div>
 <br><br><br>
 </div>
-
-<script>
-var selectedGovernment = "NULL";
-var selectedColour = "NULL";
-	
-
-function _UpdateBackground(evt)
-{
-	selectedColour = event.srcElement.value;
-	
-	if(selectedColour !== "NULL")
-	{
-		var redComponent = ((parseInt(selectedColour[0],16) * 16) + parseInt(selectedColour[1],16));
-		var greenComponent = ((parseInt(selectedColour[2],16) * 16) + parseInt(selectedColour[3],16));
-		var blueComponent = ((parseInt(selectedColour[4],16) * 16) + parseInt(selectedColour[5],16));
-		document.getElementById("Background").style.backgroundImage = "radial-gradient(circle at center,rgba(" + redComponent +"," + greenComponent + "," + blueComponent+", 1), rgba(226, 225, 225, 0.8)),url('Backgroundimages/InkPage.png')";
-	}
-}
-</script>
 
 <div class="Disclaimer">
 	<p style="margin-left:10%;margin-right:10%;"> Program by 100505349.

@@ -41,7 +41,8 @@ $timeLeftFormatted = gmdate("i:s",$timeUntilEventAbsolute);
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;overflow:auto;"> 
 	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Index.php'">Index</button>
 	<button style="float:right;margin-right:20px;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';" class="backButton" onclick="document.location='Scripts/KillSession.php'">Logout</button>
-	<button class="menuButton" onclick="document.location='Main.php'">The World</button>
-	<button class="menuButton" <?php echo (floor($playerStats['Events_Stacked']) >= 1) ? "onclick=" . '"' . "document.location='LoadEvent'" . '"' : "style='pointer-events:none;visibility:hidden;'" ?> >Events (<?php echo floor($playerStats['Events_Stacked']) ?>) </button>
+	<button class="menuButton" onclick="document.location='Main'">World Map</button>
+	<button class="menuButton" onclick="document.location='SessionStats'"><?php echo $playerStats['World_Name']; ?></button>
+	<button class="eventsButton" <?php echo (floor($playerStats['Events_Stacked']) >= 1) ? "onclick=" . '"' . "document.location='LoadEvent'" . '"' : "style='pointer-events:none;visibility:hidden;'" ?> >Events (<?php echo floor($playerStats['Events_Stacked']) ?>)</button>
 </div>
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>

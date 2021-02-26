@@ -16,7 +16,7 @@ if($_POST['WorldName'] != "" && isset($_POST['WorldName']))
 {
 	$worldName = $_POST['WorldName'];
 	
-	if(strlen($worldName) > 20 || !ctype_alpha($worldName))
+	if(strlen($worldName) > 13 || !ctype_alpha($worldName))
 	{
 		$errorCode = $errorCode . "WorldName=INVALID" . $worldName  . "&";
 		$errorsOccured = True;

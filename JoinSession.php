@@ -23,7 +23,7 @@ else if(substr($NationError,0,7) == "INVALID")
 }
 else if(substr($NationError,0,8) == "OCCUPIED")
 {
-	$ErrorMessage = $ErrorMessage . "That country name is currently in use by another player in your session, please choose something else <br>";
+	$ErrorMessage = $ErrorMessage . "That country name is currently in use by another player, please choose something else <br>";
 	$NationValue = substr($NationError,8,strlen($NationError));
 }
 else

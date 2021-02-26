@@ -60,6 +60,28 @@ class Database{
 		$result = $this->connectionData->query("SELECT Title FROM governmenttypes WHERE GovernmentForm = '" . $dataSet['Country_Type'] . "';") or die(mysqli_error($this->connectionData));
 		$dataSet['Title'] = $result->fetch_assoc()['Title'];
 		
+		$result = $this->connectionData->query("SELECT World_Name FROM worlds WHERE World_Code = '" . $dataSet['World_Code'] . "';") or die(mysqli_error($this->connectionData));
+		$dataSet['World_Name'] = $result->fetch_assoc()['World_Name'];
+		
+		return $dataSet;
+	}
+	
+	public function GetSessionStats($PlayerIdentity)
+	{
+		$result = $this->connectionData->query("SELECT World_Code FROM players WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+		$worldCode = $result->fetch_row()[0];
+		
+		$result = $this->connectionData->query("SELECT * FROM worlds WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$dataSet = $result->fetch_assoc();
+		
+		return $dataSet;
+	}
+	
+	public function GetSessionPlayers($worldCode)
+	{
+		$result = $this->connectionData->query("SELECT Country_Name,Country_Type,Colour,Last_Event_Time FROM players WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
+		
 		return $dataSet;
 	}
 	
@@ -78,7 +100,7 @@ class Database{
 		}
 	}
 	
-	public function getPlayersInWorld($countryName)
+	public function getDuplicatePlayers($countryName)
 	{
 		$result = $this->connectionData->query("SELECT players.Country_Name FROM players WHERE players.Country_Name = '" . $countryName . "';")or die(mysqli_error($this->connectionData));
 		$dataSet = $result->fetch_row();
@@ -118,7 +140,7 @@ class Database{
 		$passwordHash = hash('sha256',$passwordPreHash,false); // This built in algorithm hashes the password provided using sha256.
 		
 		
-		$sqlExec = "INSERT INTO players VALUES('" . $countryName . "','" . $passwordHash . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',0);" or die(mysqli_error($this->connectionData));
+		$sqlExec = "INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES('" . $countryName . "','" . $passwordHash . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',3);" or die(mysqli_error($this->connectionData));
 		$this->connectionData->query($sqlExec);
 		
 		$this->connectionData->query("UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = '" . $world_Code . "';") or die(mysqli_error($this->connectionData));
@@ -159,7 +181,7 @@ class Database{
 			}
 		}
 		
-		$this->connectionData->query("INSERT INTO worlds VALUES('" . $worldCode . "','" . $mapType . "'," . $speedMapping[$gameSpeed] . ",5);") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("INSERT INTO worlds VALUES('" . $worldCode . "','" . $worldName . "','" . $mapType . "'," . $speedMapping[$gameSpeed] . ",5);") or die(mysqli_error($this->connectionData));
 		
 		return $worldCode;
 	}
@@ -207,16 +229,17 @@ class Database{
 		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';");
 		$userLogin = $result->fetch_row();
 		
-		$result = $this->connectionData->query("SELECT Events_Stacked FROM players WHERE Country_Name = '" . $userLogin[0] . "';");
-		$StackCount = $result->fetch_row();
+		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $userLogin[0] . "';");
+		$playerEvents = $result->fetch_assoc();
 		
-		if($StackCount[0] >= 1)
+		if($playerEvents['Events_Stacked'] >= 1 && $playerEvents['Active_Event_ID'] == "")
 		{
-			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1 WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
 			
 			$result = $this->connectionData->query("SELECT Count(Event_ID) FROM events;");
 			$EventsCount = $result->fetch_row();
 			$LoadEvent = rand(1,$EventsCount[0]);
+			
+			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
 			
 			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $LoadEvent . "';") or die(mysqli_error($this->connectionData));
 			$dataSet = $result->fetch_assoc();
@@ -232,6 +255,22 @@ class Database{
 			
 			return $dataSet;
 			
+		}
+		else if($playerEvents['Active_Event_ID'] != "")
+		{
+			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $playerEvents['Active_Event_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet = $result->fetch_assoc();
+		
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_1_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_1_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_2_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_2_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_3_ID'] . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Option_3_Desc'] = $result->fetch_assoc()['Option_Description'];
+			
+			return $dataSet;
 		}
 		else
 		{
