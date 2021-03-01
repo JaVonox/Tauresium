@@ -188,7 +188,16 @@ class Database{
 	
 	public function AddNewSession($sessionID,$countryName)
 	{
+		$result = $this->connectionData->query("SELECT 1 FROM Sessions WHERE SessionID = '" . $sessionID . "';"); //Check if session exists
+		$sessionExists = $result->fetch_row();
+		
+		if($sessionExists[0] == "1")
+		{
+			$this->connectionData->query("DELETE FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
+		}
+		
 		$this->connectionData->query("INSERT INTO Sessions (SessionID,Country_Login) VALUES('" . $sessionID . "','" . $countryName . "');") or die(mysqli_error($this->connectionData));
+
 	}
 	
 	public function ReturnLogin($sessionID)
@@ -216,7 +225,7 @@ class Database{
 		$lastTime = new DateTime($lastEvent[0]);
 		$formattedLastTime = $lastTime->format("Y/m/d h:i:s");
 		$formattedCurTime = $currentTime->format("Y/m/d h:i:s");
-		$secondsElapsed =  min(strtotime($formattedCurTime) - strtotime($formattedLastTime),6000); //needs modifying - min caps at 5 events.
+		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),6000)); //needs modifying - min caps at 5 events. Also abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
 		$eventsAdded = $secondsElapsed / 1200; //20 mins time
 
 		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
@@ -276,6 +285,66 @@ class Database{
 		{
 			return False;
 		}
+		
+	}
+	
+	public function GetLoadedEvent($sessionID)
+	{
+		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
+		$userData['Country'] = $result->fetch_row()[0];
+		
+		$result = $this->connectionData->query("SELECT Active_Event_ID FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
+		$userData['LoadedEvent'] = $result->fetch_row()[0];
+		
+		return $userData;
+	}
+	
+	public function EventResults($userName,$eventID,$selectedOption)
+	{
+		$result = $this->connectionData->query("SELECT Option_1_ID,Option_2_ID,Option_3_ID,Title,Base_Influence_Reward FROM Events WHERE Event_ID = '" . $eventID . "';")  or die(mysqli_error($this->connectionData));
+		$optionIDs = $result->fetch_assoc();
+		$loadedOption = "";
+		
+		if($selectedOption == "Option1"){
+			$loadedOption = $optionIDs['Option_1_ID'];
+		}
+		else if($selectedOption == "Option2"){
+			$loadedOption = $optionIDs['Option_2_ID'];
+		}
+		else if($selectedOption == "Option3"){
+			$loadedOption = $optionIDs['Option_3_ID'];
+		}
+		
+		$result = $this->connectionData->query("SELECT Option_Description,Culture_Gen_Modifier,Economic_Gen_Modifier,Military_Gen_Modifier FROM Options WHERE Option_ID = '" . $loadedOption . "';")  or die(mysqli_error($this->connectionData));
+		$eventParams = $result->fetch_assoc();
+		$eventParams['Title'] = $optionIDs['Title'];
+		$eventParams['Base_Influence_Reward'] = $optionIDs['Base_Influence_Reward'];
+		
+		$this->connectionData->query("UPDATE players SET Military_Generation = Military_Generation + " . $eventParams['Military_Gen_Modifier'] . ",Economic_Generation = Economic_Generation +" . $eventParams['Economic_Gen_Modifier'] . ",Culture_Generation = Culture_Generation + ". $eventParams['Culture_Gen_Modifier'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Active_Event_ID = NULL WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		
+		$result = $this->connectionData->query("SELECT Military_Generation,Economic_Generation,Culture_Generation FROM Players WHERE Country_Name = '" . $userName . "';")  or die(mysqli_error($this->connectionData));
+		$playerModifiers = $result->fetch_assoc();
+		
+		$eventParams['AddMil'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Military_Generation']);
+		$eventParams['AddEco'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Economic_Generation']);
+		$eventParams['AddCult'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Culture_Generation']);
+		$this->connectionData->query("UPDATE players SET Military_Influence = Military_Influence + " . $eventParams['AddMil'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Economic_Influence = Economic_Influence + " . $eventParams['AddEco'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Culture_Influence = Culture_Influence + " . $eventParams['AddCult'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		
+		return $eventParams;
+	}
+	
+	public function GetPlayerChanges($sessionID)
+	{
+		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
+		$userData['Country'] = $result->fetch_row()[0];
+		
+		$result = $this->connectionData->query("SELECT Military_Influence,Military_Generation,Economic_Influence,Economic_Generation,Culture_Influence,Culture_Generation,Events_Stacked FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
+		$newValues = $result->fetch_assoc();
+		
+		return $newValues;
 	}
 }
 ?>

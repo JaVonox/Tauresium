@@ -38,7 +38,7 @@ else
 	<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Description'] ?>
 	</div>
 	<br><br><br><br>
-	<form>
+	<form method="GET" action="Scripts/EventCompleted.php">
 	<input type="submit" class="gameButton" name="Option1" style="font-size:24px;" value="<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Option_1_Desc'] ?>">  </input>
 	<br><br><br>
 	<input type="submit" class="gameButton" name="Option2" style="font-size:24px;" value="<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Option_2_Desc'] ?>">  </input>
@@ -47,11 +47,6 @@ else
 	</form>
 </div>
 
-<div class="Disclaimer">
-	<p style="margin-left:10%;margin-right:10%;"> Program by 100505349.
-	This web application is not intended to be an accurate representation of political borders or cultural boundaries. The map shown in this production is a rough triangulated map meant to serve as a
-	representation - with regions being represented by relevant locations (which may not be placed properly).
-	The map constructed in this application was made by hand by 100505349 - using image references to properly plot the coordinates </p>	
-</div>
+<?php include "PageElements/Disclaimer.html" ?>
 </body>
 </html>

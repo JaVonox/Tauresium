@@ -29,11 +29,6 @@ Tauresium - Error
 	</font>
 </div>
 
-<div class="Disclaimer">
-	<p style="margin-left:10%;margin-right:10%;"> Program by 100505349.
-	This web application is not intended to be an accurate representation of political borders or cultural boundaries. The map shown in this production is a rough triangulated map meant to serve as a
-	representation - with regions being represented by relevant locations (which may not be placed properly).
-	The map constructed in this application was made by hand by 100505349 - using image references to properly plot the coordinates </p>	
-</div>
+<?php include "PageElements/Disclaimer.html" ?>
 </body>
 </html>

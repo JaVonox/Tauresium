@@ -39,7 +39,7 @@ if($_POST['WorldCodeInput'] != "" && isset($_POST['WorldCodeInput']))
 		else
 		{
 			$errorCode = $errorCode . "WorldCodeInput=" . $worldCode  . "&";
-			array_push($occupiedColours,$database->getColoursInWorld($worldCode));
+			$occupiedColours = $database->getColoursInWorld($worldCode);
 		}
 		
 	}
