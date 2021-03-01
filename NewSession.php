@@ -88,7 +88,7 @@ Tauresium - New Session
 <font style="font-family:Arial;font-size:12px;word-wrap: break-word;"> The name of your world will have no impact on gameplay, but for roleplay reasons you might want to choose a name that you like!</font>
 </div>
 <br>
-<input type="text" width="100%" name="WorldName" size="23" maxlength="13" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" />
+<input type="text" width="100%" name="WorldName" size="23" maxlength="13" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" <?php echo 'value="' . $worldValue . '";'; ?>/>
 <br><br><br>
 <font style="font-family:Romanus;font-size:48px;" > World Map Type: </font>
 <div style="width:400px;;margin-left:auto;margin-right:auto;">

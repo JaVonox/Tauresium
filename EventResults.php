@@ -1,14 +1,33 @@
 <?php
 include_once "Scripts/DBLoader.php";
-$milGenChanges = (!isset($_GET["MilInfluenceChanges"]) ? "" : $_GET["MilInfluenceChanges"] );
-$ecoGenChanges = (!isset($_GET["EcoInfluenceChanges"]) ? "" : $_GET["EcoInfluenceChanges"] ); 
-$cultGenChanges = (!isset($_GET["CultInfluenceChanges"]) ? "" : $_GET["CultInfluenceChanges"]);
+$missingParams = False;
+$milGenChanges = (!isset($_GET["MilInfluenceChanges"]) ? $missingParams = True : $_GET["MilInfluenceChanges"] );
+$ecoGenChanges = (!isset($_GET["EcoInfluenceChanges"]) ? $missingParams = True : $_GET["EcoInfluenceChanges"] ); 
+$cultGenChanges = (!isset($_GET["CultInfluenceChanges"]) ? $missingParams = True : $_GET["CultInfluenceChanges"]);
 
-$eventTitle = (!isset($_GET["EventTitle"]) ? "" : $_GET["EventTitle"]);
-$eventOption = (!isset($_GET["OptionTitle"]) ? "" : $_GET["OptionTitle"]);
-$newMil = (!isset($_GET["AddMil"]) ? "" : $_GET["AddMil"]);
-$newEco = (!isset($_GET["AddEco"]) ? "" : $_GET["AddEco"]);
-$newCult = (!isset($_GET["AddCult"]) ? "" : $_GET["AddCult"]);
+$eventTitle = (!isset($_GET["EventTitle"]) ? $missingParams = True : $_GET["EventTitle"]);
+$eventOption = (!isset($_GET["OptionTitle"]) ? $missingParams = True : $_GET["OptionTitle"]);
+$newMil = (!isset($_GET["AddMil"]) ? $missingParams = True : $_GET["AddMil"]);
+$newEco = (!isset($_GET["AddEco"]) ? $missingParams = True : $_GET["AddEco"]);
+$newCult = (!isset($_GET["AddCult"]) ? $missingParams = True : $_GET["AddCult"]);
+$backgroundParams = "";
+
+if($missingParams)
+{
+	header("Location: ErrorPage.php"); 
+}
+else if($cultGenChanges >= $milGenChanges && $cultGenChanges >= $ecoGenChanges)
+{
+	$backgroundParams = "background-image:radial-gradient(circle at center, rgba(0, 0, 98, 1), rgba(0, 0, 98, 0.2)),url('Backgroundimages/CultureDecision.png')";
+}
+else if($ecoGenChanges >= $cultGenChanges && $ecoGenChanges >= $milGenChanges)
+{
+	$backgroundParams = "background-image:radial-gradient(circle at center, rgba(0, 98, 0, 1), rgba(0, 98, 0, 0.2)),url('Backgroundimages/EconomicDecision.png')";
+}
+else if($milGenChanges >= $cultGenChanges && $milGenChanges >= $ecoGenChanges)
+{
+	$backgroundParams = "background-image:radial-gradient(circle at center, rgba(98, 0, 0, 1), rgba(98, 0, 0, 0.2)),url('Backgroundimages/MilitaryDecision.png')";
+}
 ?>
 
 <!DOCTYPE HTML>
@@ -36,7 +55,8 @@ if($newTotals['Events_Stacked'] > 1)
 	$eventsRemaining = True;
 }
 ?>
-<div style="background-color:lightgrey;width:95%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
+<div style="<?php echo $backgroundParams ?>;width:100%;background-repeat:no-repeat;background-position:center;background-size:cover;">
+<div style="background-color:lightgrey;width:60%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
 	<font style="font-size:72px;color:black;font-family:Romanus;"> <?php echo $eventTitle ?> </font>
 	<br>
 	<font style="font-size:48px;color:black;font-family:Romanus;">"<i><?php echo $eventOption ?></i>"</font>
@@ -87,6 +107,7 @@ if($newTotals['Events_Stacked'] > 1)
 	}
 	?>
 	<br><br><br><br>
+</div>
 </div>
 
 <?php include "PageElements/Disclaimer.html" ?>
