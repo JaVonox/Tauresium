@@ -69,13 +69,12 @@ SessionID TEXT NOT NULL,
 Country_Login varchar(50) NOT NULL
 );
 
-/*TO BE ADDED LATER
 CREATE TABLE Province_Occupation(
-Occupation_ID int PRIMARY KEY NOT NULL,
-World_Code varchar(16) NOT NULL, /*FK
-Province_ID varchar(255) NOT NULL, /*FK
-Player_ID varchar(16) NOT NULL /*FK
-);*/
+Occupation_ID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+World_Code varchar(16) NOT NULL, /*FK*/
+Province_ID varchar(255) NOT NULL, /*FK*/
+Country_Name varchar(50) NOT NULL /*FK*/
+);
 
 CREATE TABLE Events(
 Event_ID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -155,6 +154,28 @@ add constraint PlayersM_to_EventIDO
 foreign key(Active_Event_ID)
 references Events(Event_ID);
 
+/*Province Occupation relations */
+
+/* Many to one. Many provinces to one province ID */
+
+ALTER TABLE Province_Occupation
+add constraint ProvinceOcc_ProvID_M_To_Prov_IDO
+foreign key(Province_ID)
+references Provinces(Province_ID);
+
+/* Many to one. Many WorldCodes to one WorldCode */
+
+ALTER TABLE Province_Occupation
+add constraint ProvinceOcc_WC_M_To_Worlds_WCO
+foreign key(World_Code)
+references Worlds(World_Code);
+
+/* Many to one. Many ProvOcc country to one country */
+
+ALTER TABLE Province_Occupation
+add constraint ProvinceOcc_Count_M_To_Players_CountCO
+foreign key(Country_Name)
+references Players(Country_Name);
 
 INSERT INTO GovernmentTypes VALUES('Sultanate','The Sultanate of',0.9,1.4,0.8,100,200,0);
 INSERT INTO GovernmentTypes VALUES('Horde','The Great Horde of',1,1.4,0.6,0,300,0);
@@ -174,6 +195,7 @@ INSERT INTO GovernmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
 
 INSERT INTO Worlds VALUES('WORLWORLWORLWORL','Elysium','Earth','20',4);
 INSERT INTO Players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO Province_Occupation (World_Code,Province_ID,Country_Name) VALUES('WORLWORLWORLWORL','China_Beijing','ADMIN');
 
 INSERT INTO Provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');
 INSERT INTO Provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57','188');

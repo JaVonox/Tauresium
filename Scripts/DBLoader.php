@@ -145,6 +145,12 @@ class Database{
 		
 		$this->connectionData->query("UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = '" . $world_Code . "';") or die(mysqli_error($this->connectionData));
 		
+		$result = $this->connectionData->query("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM Province_Occupation WHERE World_Code = '" . $world_Code . "') ORDER BY RAND() LIMIT 1;") or die(mysqli_error($this->connectionData)); //This needs to be changed to handle when there are no locations left. 
+		$randomCapital = $result->fetch_row()[0];
+		
+		$sqlExec = "INSERT INTO Province_Occupation (World_Code,Province_ID,Country_Name) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "');" or die(mysqli_error($this->connectionData));
+		$this->connectionData->query($sqlExec);
+		
 		return True;
 	}
 	
@@ -345,6 +351,23 @@ class Database{
 		$newValues = $result->fetch_assoc();
 		
 		return $newValues;
+	}
+	
+	public function GetOccupation($sessionID)
+	{
+		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
+		$loadedUser = $result->fetch_row()[0];
+		
+		$result = $this->connectionData->query("SELECT World_Code FROM Players WHERE Country_Name = '" . $loadedUser . "';") or die(mysqli_error($this->connectionData));
+		$loadedWorldCode = $result->fetch_row()[0];
+		
+		$result = $this->connectionData->query("SELECT Country_Name,Colour FROM Players WHERE World_Code = '" . $loadedWorldCode . "';") or die(mysqli_error($this->connectionData));
+		$worldPlayers = $result->fetch_all(MYSQLI_ASSOC);
+		
+		$result = $this->connectionData->query("SELECT Province_occupation.Province_ID,Province_occupation.Country_Name,Players.Colour,GovernmentTypes.Title FROM (Province_occupation INNER JOIN (Players INNER JOIN governmentTypes ON players.Country_Type = governmentTypes.GovernmentForm) ON Province_Occupation.Country_Name = Players.Country_Name) WHERE Province_occupation.World_Code = '" . $loadedWorldCode . "';") or die(mysqli_error($this->connectionData));
+		$ownedProvinces = $result->fetch_all(MYSQLI_ASSOC);
+		
+		return $ownedProvinces;
 	}
 }
 ?>

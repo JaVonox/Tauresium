@@ -20,9 +20,11 @@ Tauresium - Game Page
 <?php include_once "Scripts/DBLoader.php";?>
 <?php include_once "Scripts/CheckLogin.php";?>
 <?php
+/* Session already exists */
 $database = new Database();
 $db = $database->getConnection();
 $provinceSet = json_encode($database->getProvinceArray());
+$occupiedSet = json_encode($database->GetOccupation(session_id()));
 ?>
 
 <div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
@@ -35,6 +37,8 @@ $provinceSet = json_encode($database->getProvinceArray());
 	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
 	<br>
 	<font id="ProvClimate">Marine</font>
+	<br><br>
+	<font id="ProvOwner">Owned By: Unoccupied</font>
 	<br><br>
 	<font id="ProvPopulation">City Population: Zero</font>
 	<br>
@@ -549,10 +553,14 @@ var ProvinceZoom = svgPanZoom('#SvgProvID',{
 
 <script>
 var selectedRegion = "Ocean";
-var phpArray = <?php echo $provinceSet ?>;
+var provinceArray = <?php echo $provinceSet ?>;
+var occupiedArray = <?php echo $occupiedSet ?>;
+
+_occupiedProvinces();
 
 function _clickEvent(evt) 
 {
+	
 	if (selectedRegion != "Ocean")
 	{
 		document.getElementById(selectedRegion).style.fill = "#FFE7AB";
@@ -563,6 +571,7 @@ function _clickEvent(evt)
 		selectedRegion = "Ocean";
 		document.getElementById("ProvCapital").textContent = "Ocean";
 		document.getElementById("ProvRegion").textContent = "Ocean";
+		document.getElementById("ProvOwner").textContent = "Owned By: Unoccupied";
 		document.getElementById("ProvClimate").textContent = "Marine";
 		document.getElementById("ProvPopulation").textContent = "City Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
@@ -572,14 +581,26 @@ function _clickEvent(evt)
 		
 		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
+		_occupiedProvinces();
 	}
 	else
 	{
+		_occupiedProvinces();
 		selectedRegion = event.target.id;
-		var selectedProvince = phpArray.find(element => element.Province_ID == selectedRegion);
+		var selectedProvince = provinceArray.find(element => element.Province_ID == selectedRegion);
+		var selectedProvinceOwner = occupiedArray.find(element => element.Province_ID == selectedRegion);
 		
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
 		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
+		
+		if(selectedProvinceOwner !== undefined)
+		{
+			document.getElementById("ProvOwner").textContent = "Owned By: " + selectedProvinceOwner.Title + " " + selectedProvinceOwner.Country_Name;
+		}
+		else
+		{
+			document.getElementById("ProvOwner").textContent = "Owned By: Unoccupied";
+		}
 		document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
 		document.getElementById("ProvPopulation").textContent = "City Population: " + selectedProvince.City_Population_Total;
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
@@ -591,6 +612,14 @@ function _clickEvent(evt)
 		document.getElementById(event.target.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
+	}
+}
+
+function _occupiedProvinces()
+{
+	for (i = 0; i < Object.keys(occupiedArray).length; i++)
+	{
+		document.getElementById(occupiedArray[i].Province_ID).style.fill = "#" + occupiedArray[i].Colour;
 	}
 }
 </script>
