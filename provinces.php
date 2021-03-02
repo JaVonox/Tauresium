@@ -1,5 +1,5 @@
 <?php
-include_once "Scripts/DBLoader.php";
+include_once "Scripts/MapConnections.php"; //This includes databases
 
 $selectedProvince = $_GET["ProvinceView"];
 if($selectedProvince == Null)
@@ -38,7 +38,13 @@ Tauresium - Province
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 <?php include_once 'Scripts/CheckLogin.php'?>
-
+<?php
+$mapConnect = new MapConnections();
+$baaa = json_encode($mapConnect->init(session_id()));
+$adjacent = $mapConnect->CheckCulture($selectedProvince); //For both mil and culture
+$coastalAdjacent = False; //unused at the moment
+$enemyOwned = False;
+?>
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 <div style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
 <button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">< Back</button>
@@ -48,6 +54,8 @@ Tauresium - Province
 <font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Null, </font>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;">Null</i>
 	<br>
+	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By:</i>
+	<br><br>
 	<i id="ProvClimate">Marine</i>
 	<br><br><br>
 </td>
@@ -72,7 +80,7 @@ Tauresium - Province
 <table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
-<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
+<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $adjacent ? '' : 'filter:grayscale(1);'?>"/> </td>
 <td align="center"><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
 <td align="center"><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
 </tr>
@@ -102,7 +110,7 @@ Tauresium - Province
 </tr>
 <tr>
 <td></td>
-<td> <button id="CultureAnnex" style="background-color:lightblue;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
+<td> <button id="CultureAnnex" style="<?php echo $adjacent ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
 <td> <button id="EconomicAnnex" style="background-color:lightgreen;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Economically</button>  </td>
 <td><button id="MilitaryAnnex" style="background-color:pink;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
 </tr>
@@ -124,7 +132,7 @@ document.getElementById("ProvEconomic").textContent = selectedProvince.Economic_
 document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
 document.getElementById("ProvInfo").textContent = selectedProvince.Description;
 document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
-
+		
 document.getElementById("CultureModSig").textContent = (selectedProvince.Culture_Modifier * 100) + "%";
 document.getElementById("EconomicModEnv").textContent = (selectedProvince.Economic_Enviroment_Modifier * 100) + "%";
 document.getElementById("MilitaryModEnv").textContent = (selectedProvince.Military_Enviroment_Modifier * 100) + "%";

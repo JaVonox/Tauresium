@@ -213,6 +213,12 @@ class Database{
 		return $dataSet[0];
 	}
 	
+	public function ReturnWorld($loadedUser)
+	{
+		$result = $this->connectionData->query("SELECT World_Code FROM Players WHERE Country_Name = '" . $loadedUser . "';") or die(mysqli_error($this->connectionData));
+		return $result->fetch_row()[0];
+	}
+	
 	public function KillSession($sessionID)
 	{
 		$this->connectionData->query("DELETE FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
@@ -221,10 +227,9 @@ class Database{
 	
 	public function UpdateEventTimer($sessionID)
 	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';");
-		$userLogin = $result->fetch_row();
+		$userLogin = $this->ReturnLogin($sessionID);
 		
-		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $userLogin[0] . "';");
+		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $userLogin . "';");
 		$lastEvent = $result->fetch_row();
 		
 		$currentTime = new DateTime(date("Y/m/d h:i:s"));
@@ -234,17 +239,16 @@ class Database{
 		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),6000)); //needs modifying - min caps at 5 events. Also abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
 		$eventsAdded = $secondsElapsed / 1200; //20 mins time
 
-		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $userLogin . "';") or die(mysqli_error($this->connectionData));
 		
-		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $userLogin[0] . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $userLogin . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
 	}
 	
 	public function GetEvent($sessionID)
 	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';");
-		$userLogin = $result->fetch_row();
+		$userLogin = $this->ReturnLogin($sessionID);
 		
-		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $userLogin[0] . "';");
+		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $userLogin . "';");
 		$playerEvents = $result->fetch_assoc();
 		
 		if($playerEvents['Events_Stacked'] >= 1 && $playerEvents['Active_Event_ID'] == "")
@@ -254,7 +258,7 @@ class Database{
 			$EventsCount = $result->fetch_row();
 			$LoadEvent = rand(1,$EventsCount[0]);
 			
-			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $userLogin[0] . "';") or die(mysqli_error($this->connectionData));
+			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $userLogin . "';") or die(mysqli_error($this->connectionData));
 			
 			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $LoadEvent . "';") or die(mysqli_error($this->connectionData));
 			$dataSet = $result->fetch_assoc();
@@ -296,8 +300,7 @@ class Database{
 	
 	public function GetLoadedEvent($sessionID)
 	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		$userData['Country'] = $result->fetch_row()[0];
+		$userData['Country'] = $this->ReturnLogin($sessionID);
 		
 		$result = $this->connectionData->query("SELECT Active_Event_ID FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
 		$userData['LoadedEvent'] = $result->fetch_row()[0];
@@ -344,8 +347,7 @@ class Database{
 	
 	public function GetPlayerChanges($sessionID)
 	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		$userData['Country'] = $result->fetch_row()[0];
+		$userData['Country'] = $this->ReturnLogin($sessionID);
 		
 		$result = $this->connectionData->query("SELECT Military_Influence,Military_Generation,Economic_Influence,Economic_Generation,Culture_Influence,Culture_Generation,Events_Stacked FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
 		$newValues = $result->fetch_assoc();
@@ -355,11 +357,9 @@ class Database{
 	
 	public function GetOccupation($sessionID)
 	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM Sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		$loadedUser = $result->fetch_row()[0];
+		$loadedUser = $this->ReturnLogin($sessionID);
 		
-		$result = $this->connectionData->query("SELECT World_Code FROM Players WHERE Country_Name = '" . $loadedUser . "';") or die(mysqli_error($this->connectionData));
-		$loadedWorldCode = $result->fetch_row()[0];
+		$loadedWorldCode = $this->ReturnWorld($loadedUser);
 		
 		$result = $this->connectionData->query("SELECT Country_Name,Colour FROM Players WHERE World_Code = '" . $loadedWorldCode . "';") or die(mysqli_error($this->connectionData));
 		$worldPlayers = $result->fetch_all(MYSQLI_ASSOC);
@@ -369,5 +369,23 @@ class Database{
 		
 		return $ownedProvinces;
 	}
+	
+	public function GetPlayerVertexes($sessionID)
+	{
+		$loadedUser = $this->ReturnLogin($sessionID);
+		$loadedWorldCode = $this->ReturnWorld($loadedUser);
+		
+		$result = $this->connectionData->query("SELECT Vertex_1,Vertex_2,Vertex_3 FROM (Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "');");
+		$ownedVertexes = $result->fetch_all(MYSQLI_NUM);
+		return $ownedVertexes;
+	}
+	
+	public function GetProvinceVertexes($provinceID)
+	{
+		$result = $this->connectionData->query("SELECT Vertex_1,Vertex_2,Vertex_3 FROM Provinces WHERE Province_ID = '" . $provinceID . "';");
+		$provVertexes = $result->fetch_row();
+		return $provVertexes;
+	}
+	
 }
 ?>

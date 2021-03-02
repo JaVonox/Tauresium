@@ -30,7 +30,7 @@ $occupiedSet = json_encode($database->GetOccupation(session_id()));
 <div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 	<table style="width:100%;height:100%;table-layout:fixed;overflow:auto;">
 	<tr>
-	<td style="width:400px;;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
+	<td style="width:400px;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
 	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:20px;">Ocean</i>
 	<br>
@@ -596,10 +596,15 @@ function _clickEvent(evt)
 		if(selectedProvinceOwner !== undefined)
 		{
 			document.getElementById("ProvOwner").textContent = "Owned By: " + selectedProvinceOwner.Title + " " + selectedProvinceOwner.Country_Name;
+			var redComponent = ((parseInt(selectedProvinceOwner.Colour[0],16) * 16) + parseInt(selectedProvinceOwner.Colour[1],16));
+			var greenComponent = ((parseInt(selectedProvinceOwner.Colour[2],16) * 16) + parseInt(selectedProvinceOwner.Colour[3],16));
+			var blueComponent = ((parseInt(selectedProvinceOwner.Colour[4],16) * 16) + parseInt(selectedProvinceOwner.Colour[5],16));
+			document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(" + redComponent + ", " + greenComponent + ", " + blueComponent + ", 0.30), rgba(" + redComponent + ", " + greenComponent + ", " + blueComponent + ", 0.60)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 		}
 		else
 		{
 			document.getElementById("ProvOwner").textContent = "Owned By: Unoccupied";
+			document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 		}
 		document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
 		document.getElementById("ProvPopulation").textContent = "City Population: " + selectedProvince.City_Population_Total;
@@ -611,7 +616,6 @@ function _clickEvent(evt)
 		
 		document.getElementById(event.target.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
-		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 	}
 }
 
