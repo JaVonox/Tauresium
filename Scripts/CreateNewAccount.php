@@ -12,7 +12,7 @@ $errorCode = "?";
 
 $errorsOccured = False; //If this is false by the end no errors occured
 $possibleGovernmentTypes = ['Sultanate','Horde','ElectoralMonarchy','Theocracy','Monarchy','Libertarian','Colonial','Democracy','MerchantRepublic','ClassicRepublic','Dictatorship','CommunistRepublic','Oligarchy','Anarchy','Tribe'];
-$possibleColours = ['D66B67','DE965D','ECE788','B5DB7F','8ECDD2','8F97CF'];
+$possibleColours = ['ff0000','e67800','008000','1a88ff','ee82ee','5725c7'];
 
 $validWorldCode = False;
 $occupiedColours = ['DUMMY'];

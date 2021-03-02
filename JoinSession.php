@@ -213,14 +213,14 @@ Tauresium - Join Session
 <br><br>
 <table style="width:min-content;margin-left:auto;margin-right:auto;background-color:white;border:10px solid #966F33;">
 <tr>
-<td style="padding:20px;"> <img style="background-color:#D66B67;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="D66B67" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "D66B67") ? 'checked="checked"' : ''; ?>/> </td>
-<td style="padding:20px"> <img style="background-color:#DE965D;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="DE965D" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "DE965D") ? 'checked="checked"' : ''; ?>/> </td>
-<td style="padding:20px"> <img style="background-color:#ECE788;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="ECE788" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "ECE788") ? 'checked="checked"' : ''; ?>/></td>
+<td style="padding:20px;"> <img style="background-color:#ff0000;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="ff0000" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "ff0000") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#e67800;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="e67800" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "e67800") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#008000;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="008000" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "008000") ? 'checked="checked"' : ''; ?>/></td>
 </tr>
 <tr>
-<td style="padding:20px"> <img style="background-color:#B5DB7F;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="B5DB7F" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "B5DB7F") ? 'checked="checked"' : ''; ?>/> </td>
-<td style="padding:20px"> <img style="background-color:#8ECDD2;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8ECDD2" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "8ECDD2") ? 'checked="checked"' : ''; ?>/></td>
-<td style="padding:20px"> <img style="background-color:#8F97CF;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="8F97CF" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "8F97CF") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#1a88ff;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="1a88ff" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "1a88ff") ? 'checked="checked"' : ''; ?>/> </td>
+<td style="padding:20px"> <img style="background-color:#ee82ee;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="ee82ee" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "ee82ee") ? 'checked="checked"' : ''; ?>/></td>
+<td style="padding:20px"> <img style="background-color:#5725c7;width:64px;height:64px;margin:0px;vertical-align:middle;"/> <input type="radio" width="100%" name="CountryColour" value="5725c7" onclick="_UpdateBackground()" <?php echo ($CountryColourValue == "5725c7") ? 'checked="checked"' : ''; ?>/> </td>
 </tr>
 </table>
 <br><br>
