@@ -40,8 +40,11 @@ Tauresium - Province
 <?php include_once 'Scripts/CheckLogin.php'?>
 <?php
 $mapConnect = new MapConnections();
-$baaa = json_encode($mapConnect->init(session_id()));
-$adjacent = $mapConnect->CheckCulture($selectedProvince); //For both mil and culture
+$mapConnect->init(session_id());
+$sessionID = session_id();
+
+$provCountry = $mapConnect->CheckOwner($selectedProvince);
+$cultureAccess = $mapConnect->CheckCulture($selectedProvince); //For culture
 $coastalAdjacent = False; //unused at the moment
 $enemyOwned = False;
 ?>
@@ -54,7 +57,7 @@ $enemyOwned = False;
 <font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Null, </font>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;">Null</i>
 	<br>
-	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By:</i>
+	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By: <?php echo $provCountry; ?></i>
 	<br><br>
 	<i id="ProvClimate">Marine</i>
 	<br><br><br>
@@ -80,7 +83,7 @@ $enemyOwned = False;
 <table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
-<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $adjacent ? '' : 'filter:grayscale(1);'?>"/> </td>
+<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $cultureAccess ? '' : 'filter:grayscale(1);'?>"/> </td>
 <td align="center"><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
 <td align="center"><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
 </tr>
@@ -110,9 +113,13 @@ $enemyOwned = False;
 </tr>
 <tr>
 <td></td>
-<td> <button id="CultureAnnex" style="<?php echo $adjacent ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
-<td> <button id="EconomicAnnex" style="background-color:lightgreen;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Economically</button>  </td>
-<td><button id="MilitaryAnnex" style="background-color:pink;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
+<form method="POST" action="Scripts/AttemptAnnex.php">
+<td> <button type="submit" name="CultureAnnex" id="CultureAnnex" style="<?php echo $cultureAccess ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
+<td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" style="background-color:lightgreen;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Economically</button>  </td>
+<td><button type="submit" name="MilAnnex" id="MilitaryAnnex" style="background-color:pink;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
+<input type="textbox" style="display:none"  name="invisible-provID" value="<?php echo $selectedProvince ?>">
+<input type="textbox" style="display:none"  name="invisible-playerSession" value="<?php echo $sessionID ?>">
+</form>
 </tr>
 </table>
 </div>

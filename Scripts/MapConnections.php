@@ -34,6 +34,7 @@ class MapConnections
 		$this->database = new Database();
 		$this->db = $this->database->getConnection();
 		$tmpVert = $this->database->GetPlayerVertexes($sessionID);
+		$this->_subjectName = $this->database->ReturnLogin($sessionID);
 		$this->_nationVertexes = $this->FlattenArray($tmpVert,3); 
 		return $this->_nationVertexes;
 	}
@@ -64,9 +65,23 @@ class MapConnections
 		}
 	}
 	
-	public function CheckCulture($provinceID)
+	public function CheckOwner($provinceID)
 	{
-		if($this->CheckAdjacent($provinceID))
+		$owner = $this->database->GetProvinceOwner($provinceID,$this->database->getPlayerStats($this->_subjectName)['World_Code']);
+		
+		if($owner != "NULL")
+		{
+			return $owner;
+		}
+		else
+		{
+			return "No Owner";
+		}
+	}
+	
+	public function CheckCulture($provinceID) 
+	{
+		if($this->database->getPlayerStats($this->_subjectName)['Culture_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Culture_Cost'] && $this->CheckAdjacent($provinceID) && $this->CheckOwner($provinceID) == "No Owner") 
 		{
 			return True;
 		}
@@ -75,5 +90,6 @@ class MapConnections
 			return False;
 		}
 	}
+
 }
 ?>

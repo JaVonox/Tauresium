@@ -387,5 +387,26 @@ class Database{
 		return $provVertexes;
 	}
 	
+	public function GetProvinceOwner($provinceID,$worldCode)
+	{
+		$result = $this->connectionData->query("SELECT Country_Name FROM Province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';");
+		$provOwners = $result->fetch_row();
+		
+		if(mysqli_num_rows($result) == 0)
+		{
+			return "NULL";
+		}
+		else
+		{
+			return $provOwners[0];
+		}
+	}
+	
+	public function AnnexLocationPeaceful($playerID,$provinceID,$pointType,$cost) //$pointType can be either Culture_Influence or Economic_Influence. Mil is seperate function
+	{
+		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("INSERT INTO province_occupation (World_Code,Province_ID,Country_Name) VALUES('" . $this->ReturnWorld($playerID) . "','" . $provinceID . "','" . $playerID ."');") or die(mysqli_error($this->connectionData));
+	}
+	
 }
 ?>
