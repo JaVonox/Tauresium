@@ -94,6 +94,19 @@ Economic_Gen_Modifier FLOAT NOT NULL,
 Military_Gen_Modifier FLOAT NOT NULL
 ); 
 
+CREATE TABLE CoastalRegions
+(
+Coastal_Region varchar(100) PRIMARY KEY NOT NULL,
+Colonial_Penalty int, /* This is how much extra eco it costs to set up the first province in this location. It is a flat extra cost */
+Minimum_Colony_Provinces int, /* This is how many coastal provinces a player must own to use this location to travel to new costal regions*/
+Short_Range_Penalty int, /* This is the extra cost for setting up any additional provinces in a location when there is no adjacency */
+Colonial_Title varchar(100), /* When a player gets enough coastal provinces they get this title in their worldview */
+Outbound_Connection_1 varchar(100), /* A coastal region can have up to five outbound connections. These define purely where a nation with sufficient Min colony provinces can travel to from this location */
+Outbound_Connection_2 varchar(100),
+Outbound_Connection_3 varchar(100),
+Outbound_Connection_4 varchar(100),
+Outbound_Connection_5 varchar(100)
+);
 
 /*
 One to One - Foreign key on one side (both)
@@ -176,6 +189,54 @@ ALTER TABLE Province_Occupation
 add constraint ProvinceOcc_Count_M_To_Players_CountCO
 foreign key(Country_Name)
 references Players(Country_Name);
+
+/* One to Many. One coastal can have many provinces  */
+ALTER TABLE Provinces
+add constraint ProvincesCR_M_To_CoastalRegionsCR_O
+foreign key(Coastal_Region)
+references CoastalRegions(Coastal_Region);
+
+/* One to Many. One coastal region can have many coastal regions */
+
+ALTER TABLE CoastalRegions
+add constraint CoastalRegions_Iterative_1
+foreign key(Outbound_Connection_1)
+references CoastalRegions(Coastal_Region);
+
+ALTER TABLE CoastalRegions
+add constraint CoastalRegions_Iterative_2
+foreign key(Outbound_Connection_2)
+references CoastalRegions(Coastal_Region);
+
+ALTER TABLE CoastalRegions
+add constraint CoastalRegions_Iterative_3
+foreign key(Outbound_Connection_3)
+references CoastalRegions(Coastal_Region);
+
+ALTER TABLE CoastalRegions
+add constraint CoastalRegions_Iterative_4
+foreign key(Outbound_Connection_4)
+references CoastalRegions(Coastal_Region);
+
+ALTER TABLE CoastalRegions
+add constraint CoastalRegions_Iterative_5
+foreign key(Outbound_Connection_5)
+references CoastalRegions(Coastal_Region);
+
+INSERT INTO CoastalRegions VALUES ("America North",50,5,30,"American Artic Ocean","America West","North Atlantic",NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("America East",70,4,20,"Sargasso Sea","Europe","North Atlantic",NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("America West",50,3,40,"North Pacific Ocean","America North",NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("China Sea",70,6,40,"Asian Pacific Ocean","South East Asia",NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("East Africa",40,4,20,"East African Sea","Indian",NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("Europe",50,6,60,"European Oceans","America East","North Atlantic",NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("Indian",100,6,60,"Indian Ocean","East Africa","South East Asia",NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("Mexico",50,3,60,"Caribbean Sea","America East","America West","South America West","South America East","West Africa");
+INSERT INTO CoastalRegions VALUES ("North Atlantic",25,4,10,"Atlantic Ocean","Europe","America East","America North",NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("South America East",40,4,30,"South Atlantic","West Africa",NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("South America West",50,3,35,"South Pacific",NULL,NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("South East Asia",60,6,40,"South East Asian Ocean","Indian","China Sea",NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("Steppes",50,4,40,"Artic Ocean",NULL,NULL,NULL,NULL,NULL);
+INSERT INTO CoastalRegions VALUES ("West Africa",40,5,30,"West African Sea","Mexico","South America East",NULL,NULL,NULL);
 
 INSERT INTO GovernmentTypes VALUES('Sultanate','The Sultanate of',0.9,1.4,0.8,100,200,0);
 INSERT INTO GovernmentTypes VALUES('Horde','The Great Horde of',1,1.4,0.6,0,300,0);

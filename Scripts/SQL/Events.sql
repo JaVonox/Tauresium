@@ -157,3 +157,19 @@ INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 INSERT INTO Options VALUES(58,'These events are a time for national celebration, it will be worth it no matter the cost.',0.08,-0.08,0);
 INSERT INTO Options VALUES(59,'If we increase ticket prices and tax the local area higher than usual, we might be able to make our money back and then some',0.03,0.01,0.03);
 INSERT INTO Options VALUES(60,'We cannot host the event, the financial burden would be too great',-0.05,0.05,0);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('A Miner Issue',
+'After an accident which temporarily trapped some miners underground for 48 hours, miners across our nation have began to protest their working conditions. Until now, the mining industry has largely profitted off the weak national guidelines, allowing them to pay workers little in return for dangerous work.',
+30,61,62,63);
+
+INSERT INTO Options VALUES(61,'Hire new mine workers to replace the striking employees',-0.02,0.04,0.01);
+INSERT INTO Options VALUES(62,'Cave in to their demands',0.06,-0.04,-0.02);
+INSERT INTO Options VALUES(63,'Force the miners back to work, by violent action if neccessary',-0.05,0.03,0.05);
+
+INSERT INTO Events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Lord Kitchner Wants you',
+'The number of enlistees joining our national military has dropped tremendously in recent months, and seems to only get lower each day. While such measures have usually only been enacted during wartime, some officials are recommending we begin mandatory enlistment to ensure our army is strong enough to protect the nation.',
+40,64,65,66);
+
+INSERT INTO Options VALUES(64,'Mandatory military service will make our people strong and capable',-0.04,-0.03,0.05);
+INSERT INTO Options VALUES(65,'We cannot force our citizens to fight for us',0.06,0.03,-0.03);
+INSERT INTO Options VALUES(66,'Perhaps we can hire armies from other nations to fight on our behalf?',-0.01,-0.01,0.02);

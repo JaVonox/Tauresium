@@ -34,21 +34,32 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 	<br>
 	</div>
 	<br><br><br>
-	<table style="width:45%;margin-left:auto;margin-right:auto;text-align:center;font-size:24px;">
+	<table style="width:60%;margin-left:auto;margin-right:auto;text-align:center;font-size:24px;">
 	<th><u> Flag </u></th>
 	<th><u> Country Name  <u></th>
 	<th><u> Government <u></th>
 	<th><u> Last Online <u></th>
+	<th><u> Number Of Provinces <u></th>
+	<th><u> Coastal Power <u></th>
 	<?php 
 	for($x=0;$x < count($worldOccupants);$x++)
 	{
 		$playerTitle = $database->getPlayerStats($worldOccupants[$x]['Country_Name'])['Title'];
+		$playerProvinces = $database->GetPlayerProvinceCount($worldOccupants[$x]['Country_Name']);
+		$playerOceanPowers = $database->GetPlayerAllOceanCount($worldOccupants[$x]['Country_Name']);
 		
 		echo "<tr>";
 		echo "<td> <img src='Assets/Flags/" . $worldOccupants[$x]['Colour'] . "' alt='Country Flag' width='180px' height='120px'/> </td>";
 		echo "<td>" . $playerTitle . " " . $worldOccupants[$x]['Country_Name'] . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Country_Type'] . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Last_Event_Time'] . "</td>";
+		echo "<td>" . $playerProvinces . "</td>";
+		echo "<td style='text-align:center;font-size:18px;'>";
+		foreach($playerOceanPowers as $oceanPower)
+		{
+			echo $oceanPower . "<br>";
+		}
+		echo "</td>";
 		echo "</tr>";
 	}
 	?>

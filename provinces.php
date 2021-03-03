@@ -43,7 +43,7 @@ $mapConnect = new MapConnections();
 $mapConnect->init(session_id());
 $sessionID = session_id();
 
-$provCountry = $mapConnect->CheckOwner($selectedProvince);
+$provCountry = $mapConnect->CheckOwner($selectedProvince); //This could be modified to add title + json stuff
 $cultureAccess = $mapConnect->CheckCulture($selectedProvince); //For culture
 $coastalAdjacent = False; //unused at the moment
 $enemyOwned = False;

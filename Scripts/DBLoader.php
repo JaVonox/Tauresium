@@ -85,6 +85,54 @@ class Database{
 		return $dataSet;
 	}
 	
+	public function GetPlayerProvinceCount($countryName)
+	{
+		$result = $this->connectionData->query("SELECT Count(Country_Name) FROM province_occupation WHERE Country_Name = '" . $countryName . "';") or die(mysqli_error($this->connectionData));
+		$dataSet = $result->fetch_row()[0];
+		
+		return $dataSet;
+	}
+		
+	public function GetPlayerOceanPower($countryName,$oceanName)
+	{
+		$result = $this->connectionData->query("SELECT Count(Country_Name) FROM province_occupation WHERE Country_Name = '" . $countryName . "' AND Province_ID IN (SELECT Province_ID FROM Provinces WHERE Coastal_Region = '" . $oceanName ."' AND Coastal = 1);") or die(mysqli_error($this->connectionData));
+		$oceanProvinces = $result->fetch_row();
+		
+		$result = $this->connectionData->query("SELECT Minimum_Colony_Provinces From coastalregions WHERE Coastal_Region = '" . $oceanName ."';") or die(mysqli_error($this->connectionData));
+		$requiredOceanProvinces = $result->fetch_row();
+		
+		return $oceanProvinces[0] . "/" . $requiredOceanProvinces[0];
+	}
+	
+	public function GetPlayerAllOceanCount($countryName)
+	{
+		$result = $this->connectionData->query("SELECT Coastal_Region,Colonial_Title FROM coastalregions;") or die(mysqli_error($this->connectionData));
+		$allOceans = $result->fetch_all(MYSQLI_NUM);
+		$powerPerOcean = array("");
+		$counter = 0;
+		
+		for ($i=0;$i < count($allOceans);$i++)
+		{
+			$oceanPower = strval($this->GetPlayerOceanPower($countryName,$allOceans[$i][0]));
+
+			$explodedPower = explode("/",$oceanPower);
+			if(intval($explodedPower[0]) > 0 && intval($explodedPower[0]) >= floor($explodedPower[1] / 3) && intval($explodedPower[0]) < intval($explodedPower[1]))
+			{
+				$powerPerOcean[$counter] = strval($allOceans[$i][1] . " (" . $oceanPower . ")");
+				$counter = $counter + 1;
+			}
+			else if(intval($explodedPower[0]) >= intval($explodedPower[1]))
+			{
+				$powerPerOcean[$counter] = "<b>" . strval($allOceans[$i][1]) . "(Dominant) </b>";
+				$counter = $counter + 1;
+			}
+			
+		}
+		
+		return $powerPerOcean;
+		
+	}
+	
 	public function getValidWorldCode($WorldCode)
 	{
 		$result = $this->connectionData->query("SELECT 1 FROM worlds WHERE World_Code = '" . $WorldCode . "' AND Capacity > 0;") or die(mysqli_error($this->connectionData));
