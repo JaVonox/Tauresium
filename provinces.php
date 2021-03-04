@@ -44,9 +44,10 @@ $mapConnect->init(session_id());
 $sessionID = session_id();
 
 $provCountry = $mapConnect->CheckOwner($selectedProvince); //This could be modified to add title + json stuff
+
 $cultureAccess = $mapConnect->CheckCulture($selectedProvince); //For culture
-$coastalAdjacent = False; //unused at the moment
-$enemyOwned = False;
+$economicAccess = $mapConnect->CheckEconomic($selectedProvince); //For Economic 
+$milAccess = False;
 ?>
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 <div style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
@@ -83,9 +84,9 @@ $enemyOwned = False;
 <table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
-<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $cultureAccess ? '' : 'filter:grayscale(1);'?>"/> </td>
-<td align="center"><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
-<td align="center"><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;"/> </td>
+<td align="center"><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $cultureAccess[0] ? '' : 'filter:grayscale(1);'?>"/> </td>
+<td align="center"><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $economicAccess[0] ? '' : 'filter:grayscale(1);'?>"/> </td>
+<td align="center"><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;float:center;<?php echo $milAccess ? '' : 'filter:grayscale(1);'?>"/> </td>
 </tr>
 <tr id="EnviromentalModifier" style="text-align:center;">
 <td>Enviroment:</td>
@@ -100,10 +101,10 @@ $enemyOwned = False;
 <td><font id="MilitaryModSig"> 0% </font></td>
 </tr>
 <tr id="DynamicModifier" style="text-align:center;">
-<td>Other:</td>
-<td><font id="CultureModDyn"> 0% </font></td>
-<td><font id="EconomicModDyn"> 0% </font></td>
-<td><font id="MilitaryModDyn"> 0% </font></td>
+<td>Other Effects:</td>
+<td><font id="CultureModDyn"> <?php echo $cultureAccess[1];?> </font></td>
+<td><font id="EconomicModDyn"> <?php echo $economicAccess[1] . (": +" . $economicAccess[2] . "<br>")?></font></td>
+<td><font id="MilitaryModDyn"> No Additional effects </font></td>
 </tr>
 <tr style="border-top:1px solid black;">
 <td></td>
@@ -114,9 +115,9 @@ $enemyOwned = False;
 <tr>
 <td></td>
 <form method="POST" action="Scripts/AttemptAnnex.php">
-<td> <button type="submit" name="CultureAnnex" id="CultureAnnex" style="<?php echo $cultureAccess ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
-<td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" style="background-color:lightgreen;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Economically</button>  </td>
-<td><button type="submit" name="MilAnnex" id="MilitaryAnnex" style="background-color:pink;color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
+<td> <button type="submit" name="CultureAnnex" id="CultureAnnex" style="<?php echo $cultureAccess[0] ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Diplomatically</button> </td>
+<td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" style="<?php echo $economicAccess[0] ? 'background-color:lightgreen;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Economically</button>  </td>
+<td><button type="submit" name="MilAnnex" id="MilitaryAnnex" style="<?php echo $milAccess ? 'background-color:pink;' : 'background-color:#383838;pointer-events:none;'?>color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="">Annex Militarily</button> </td>
 <input type="textbox" style="display:none"  name="invisible-provID" value="<?php echo $selectedProvince ?>">
 <input type="textbox" style="display:none"  name="invisible-playerSession" value="<?php echo $sessionID ?>">
 </form>
@@ -134,11 +135,10 @@ document.getElementById("ProvClimate").textContent = selectedProvince.Climate + 
 document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
 document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
-document.getElementById("ProvCulture").textContent = selectedProvince.Culture_Cost;
-document.getElementById("ProvEconomic").textContent = selectedProvince.Economic_Cost;
+document.getElementById("ProvCulture").textContent = <?php echo $cultureAccess[2] ? 'selectedProvince.Culture_Cost' : '"Infinite"';?>;
+document.getElementById("ProvEconomic").textContent = (parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>))<1000 ? parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>) : "Infinite";
 document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
 document.getElementById("ProvInfo").textContent = selectedProvince.Description;
-document.getElementById("ProvMilitary").textContent = selectedProvince.Military_Cost;
 		
 document.getElementById("CultureModSig").textContent = (selectedProvince.Culture_Modifier * 100) + "%";
 document.getElementById("EconomicModEnv").textContent = (selectedProvince.Economic_Enviroment_Modifier * 100) + "%";

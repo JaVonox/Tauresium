@@ -626,6 +626,8 @@ function _occupiedProvinces()
 		document.getElementById(occupiedArray[i].Province_ID).style.fill = "#" + occupiedArray[i].Colour;
 	}
 }
+
+
 </script>
 
 <?php include "PageElements/Disclaimer.html" ?>

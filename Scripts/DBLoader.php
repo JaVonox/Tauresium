@@ -133,6 +133,37 @@ class Database{
 		
 	}
 	
+	public function ConvertCoastalTitleToCoastalRegion($colonialTitle)
+	{
+		$result = $this->connectionData->query("SELECT Coastal_Region FROM coastalregions WHERE Colonial_Title = '" . $colonialTitle ."';") or die(mysqli_error($this->connectionData));
+		$coastalTitle = $result->fetch_row();
+		return $coastalTitle[0];
+	}
+	
+	public function ReturnOutboundConnections($coastalRegion)
+	{
+		$result = $this->connectionData->query("SELECT Outbound_Connection_1,Outbound_Connection_2,Outbound_Connection_3,Outbound_Connection_4,Outbound_Connection_5 FROM coastalregions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+		$outboundConnections = $result->fetch_all(MYSQLI_NUM);
+		return $outboundConnections;
+	}
+	
+	public function ReturnOverseasBonusCost($provinceID,$local) //local (True) = not across oceans, colonial (False) = across oceans
+	{
+		$result = $this->connectionData->query("SELECT Coastal_Region FROM Provinces WHERE Province_ID = '" . $provinceID ."';") or die(mysqli_error($this->connectionData));
+		$coastalRegion = $result->fetch_row()[0];
+		
+		if($local)
+		{
+			$result = $this->connectionData->query("SELECT Short_Range_Penalty FROM coastalregions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+			return $result->fetch_row()[0];
+		}
+		else
+		{
+			$result = $this->connectionData->query("SELECT Colonial_Penalty FROM coastalregions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+			return $result->fetch_row()[0];
+		}
+	}
+	
 	public function getValidWorldCode($WorldCode)
 	{
 		$result = $this->connectionData->query("SELECT 1 FROM worlds WHERE World_Code = '" . $WorldCode . "' AND Capacity > 0;") or die(mysqli_error($this->connectionData));
@@ -416,6 +447,65 @@ class Database{
 		$ownedProvinces = $result->fetch_all(MYSQLI_ASSOC);
 		
 		return $ownedProvinces;
+	}
+	
+	public function ReturnAllPlayerDominantCoastal($playerName)
+	{
+		$occupiedLocations = $this->GetPlayerAllOceanCount($playerName);
+		$dominantLocations = array();
+		$counter = 0;
+		foreach($occupiedLocations as $ocean)
+		{
+			if(strpos($ocean,'(Dominant)')) //This is a hacky way of collating all the locations a player is present in.
+			{
+				$dominantLocations[$counter] = $this->ConvertCoastalTitleToCoastalRegion(str_replace("</b>","",str_replace("<b>","",str_replace("(Dominant)","",$ocean))));
+				$counter++;
+			}
+		}
+		
+		return $dominantLocations; //Returns all the locations inwhich the player is dominant
+	}
+	
+	public function ReturnAllVisibleRegions($playerName)
+	{
+		$occupiedLocations = $this->GetPlayerAllOceanCount($playerName);
+		$visibleLocations = array();
+		$counter = 0;
+		
+		foreach($occupiedLocations as $ocean)
+		{
+			if(strpos($ocean,'(Dominant)')) //This is a hacky way of collating all the locations a player is present in.
+			{
+				$visibleLocations[$counter] = $this->ConvertCoastalTitleToCoastalRegion(str_replace("</b>","",str_replace("<b>","",str_replace("(Dominant)","",$ocean))));
+				$counter++;
+			}
+			else
+			{
+				$visibleLocations[$counter] = $this->ConvertCoastalTitleToCoastalRegion(preg_replace('/\((.*?)\)/',"",$ocean)); //regex reduces it to just title
+				$counter++;
+			}
+		}
+		
+		return $visibleLocations; //Returns all the locations inwhich the player is dominant
+	}
+	
+	public function GetVisibility($sessionID)
+	{
+		$loadedUser = $this->ReturnLogin($sessionID);
+		
+		$accessibleCoastal = $this->ReturnAllVisibleRegions($loadedUser);
+		
+		$result = $this->connectionData->query("SELECT Province_ID FROM Provinces WHERE Coastal_Region = '" . $accessibleCoastal[1] . "';") or die(mysqli_error($this->connectionData));
+		$invisibleProvinces = $result->fetch_all(MYSQLI_ASSOC);
+		
+		for($i=1;$i<count($accessibleCoastal);$i++)
+		{
+			$result = $this->connectionData->query("SELECT Province_ID FROM Provinces WHERE Coastal_Region = '" . $accessibleCoastal[$i] . "';") or die(mysqli_error($this->connectionData));
+			$otherInvisibles = $result->fetch_all(MYSQLI_ASSOC);
+			array_merge($invisibleProvinces,$otherInvisibles);
+		}
+		
+		return $invisibleProvinces;
 	}
 	
 	public function GetPlayerVertexes($sessionID)

@@ -11,7 +11,7 @@ if (isset($_POST['CultureAnnex']))
 }
 else if(isset($_POST['EcoAnnex']))
 {
-	//ecoHandle
+	EcoAnnex();
 }
 else if(isset($_POST['MilAnnex']))
 {
@@ -26,9 +26,24 @@ function CultAnnex()
 	
 	$database = new Database();
 	$db = $database->getConnection();
-	if($adjacent) //Last check to ensure that this is valid. Check includes cost+adjacency
+	if($adjacent[0]) //Last check to ensure that this is valid. Check includes cost+adjacency
 	{
 		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Culture_Cost']);
+		header("Location: ../Main.php");
+	}
+}
+
+function EcoAnnex()
+{
+	$mapConnect = new MapConnections();
+	$mapConnect->init($_POST['invisible-playerSession']);
+	$directCoastalConnection = $mapConnect->CheckEconomic($_POST['invisible-provID']); 
+
+	$database = new Database();
+	$db = $database->getConnection();
+	if($directCoastalConnection[0]) 
+	{
+		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost'] + directCoastalConnection[2]); //Needs added Eco Cost
 		header("Location: ../Main.php");
 	}
 }
