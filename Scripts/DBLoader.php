@@ -468,11 +468,12 @@ class Database{
 	
 	public function ReturnAllVisibleRegions($playerName)
 	{
-		$occupiedLocations = $this->GetPlayerAllOceanCount($playerName);
+		$allAccessibleCoastal = $this->GetPlayerAllOceanCount($playerName);
+		
 		$visibleLocations = array();
 		$counter = 0;
 		
-		foreach($occupiedLocations as $ocean)
+		foreach($allAccessibleCoastal as $ocean)
 		{
 			if(strpos($ocean,'(Dominant)')) //This is a hacky way of collating all the locations a player is present in.
 			{
@@ -481,10 +482,29 @@ class Database{
 			}
 			else
 			{
-				$visibleLocations[$counter] = $this->ConvertCoastalTitleToCoastalRegion(preg_replace('/\((.*?)\)/',"",$ocean)); //regex reduces it to just title
+				$visibleLocations[$counter] = $this->ConvertCoastalTitleToCoastalRegion(preg_replace('/\((.*?)\)/',"",$ocean)); //regex removes all brackets
 				$counter++;
 			}
 		}
+		
+		$connectedOcean = array();
+		
+		for($i=0;$i<count($visibleLocations);$i++)
+		{
+			$connectedOcean = array_merge($connectedOcean,$this->ReturnOutboundConnections($visibleLocations[$i])[0]);
+			
+		}
+		
+		for($j=0;$j<count($connectedOcean);$j++)
+			{
+				if(!in_array($connectedOcean[$j],$visibleLocations))
+				{
+					$visibleLocations[$counter] = $connectedOcean[$j]; //regex removes all brackets
+					$counter++;
+				}
+			}
+		
+		//$allAccessibleCoastal = array_merge($allAccessibleCoastal,$this->ReturnOutboundConnections($ocean));
 		
 		return $visibleLocations; //Returns all the locations inwhich the player is dominant
 	}
@@ -492,20 +512,28 @@ class Database{
 	public function GetVisibility($sessionID)
 	{
 		$loadedUser = $this->ReturnLogin($sessionID);
+		$loadedWorldCode = $this->ReturnWorld($loadedUser);
 		
 		$accessibleCoastal = $this->ReturnAllVisibleRegions($loadedUser);
+		$sqlString = "(";
 		
-		$result = $this->connectionData->query("SELECT Province_ID FROM Provinces WHERE Coastal_Region = '" . $accessibleCoastal[1] . "';") or die(mysqli_error($this->connectionData));
-		$invisibleProvinces = $result->fetch_all(MYSQLI_ASSOC);
-		
-		for($i=1;$i<count($accessibleCoastal);$i++)
+		for($i=0;$i<count($accessibleCoastal);$i++)
 		{
-			$result = $this->connectionData->query("SELECT Province_ID FROM Provinces WHERE Coastal_Region = '" . $accessibleCoastal[$i] . "';") or die(mysqli_error($this->connectionData));
-			$otherInvisibles = $result->fetch_all(MYSQLI_ASSOC);
-			array_merge($invisibleProvinces,$otherInvisibles);
+			$sqlString = $sqlString . "'" . $accessibleCoastal[$i] . "',";
 		}
 		
+		$sqlString = rtrim($sqlString, ",");
+		$sqlString = $sqlString . ")";
+		
+		//The following huge query finds every province that isnt adjacent to or has a colonial link to the coastal provinces a player owns
+		$result = $this->connectionData->query("
+		SELECT Province_ID FROM provinces WHERE Coastal_Region NOT IN " . $sqlString . " AND Province_ID NOT IN(SELECT Province_ID FROM Provinces 
+		WHERE (Vertex_1 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_1 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_1 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "')) OR 
+		(Vertex_2 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_2 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_2 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "')) OR 
+		(Vertex_3 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_3 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_3 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $loadedUser . "')))") or die(mysqli_error($this->connectionData));
+		$invisibleProvinces = $result->fetch_all(MYSQLI_ASSOC);
 		return $invisibleProvinces;
+
 	}
 	
 	public function GetPlayerVertexes($sessionID)
@@ -518,11 +546,23 @@ class Database{
 		return $ownedVertexes;
 	}
 	
+	
 	public function GetProvinceVertexes($provinceID)
 	{
 		$result = $this->connectionData->query("SELECT Vertex_1,Vertex_2,Vertex_3 FROM Provinces WHERE Province_ID = '" . $provinceID . "';");
 		$provVertexes = $result->fetch_row();
 		return $provVertexes;
+	}
+	
+	public function ReturnAdjacentVisibility($countryName)
+	{
+		$result = $this->connectionData->query("
+		SELECT Province_ID FROM provinces WHERE Province_ID NOT IN(SELECT Province_ID FROM Provinces 
+		WHERE (Vertex_1 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_1 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_1 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "')) OR 
+		(Vertex_2 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_2 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_2 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "')) OR 
+		(Vertex_3 IN (SELECT Vertex_1 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_3 IN (SELECT Vertex_2 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_3 IN (SELECT Vertex_3 FROM Provinces INNER JOIN Province_Occupation ON Provinces.Province_ID = Province_Occupation.Province_ID AND Province_Occupation.Country_Name = '" . $countryName . "')))") or die(mysqli_error($this->connectionData));
+		$connectedProvinces = $result->fetch_all(MYSQLI_ASSOC);
+		return $connectedProvinces;
 	}
 	
 	public function GetProvinceOwner($provinceID,$worldCode)

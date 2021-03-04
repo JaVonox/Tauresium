@@ -25,6 +25,7 @@ $database = new Database();
 $db = $database->getConnection();
 $provinceSet = json_encode($database->getProvinceArray());
 $occupiedSet = json_encode($database->GetOccupation(session_id()));
+$visibilitySet = json_encode($database->GetVisibility(session_id()));
 ?>
 
 <div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
@@ -555,8 +556,9 @@ var ProvinceZoom = svgPanZoom('#SvgProvID',{
 var selectedRegion = "Ocean";
 var provinceArray = <?php echo $provinceSet ?>;
 var occupiedArray = <?php echo $occupiedSet ?>;
+var invisibleProvinces = <?php echo $visibilitySet?>;
 
-_occupiedProvinces();
+_DrawProvinces();
 
 function _clickEvent(evt) 
 {
@@ -581,11 +583,11 @@ function _clickEvent(evt)
 		
 		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
-		_occupiedProvinces();
+		_DrawProvinces();
 	}
 	else
 	{
-		_occupiedProvinces();
+		_DrawProvinces();
 		selectedRegion = event.target.id;
 		var selectedProvince = provinceArray.find(element => element.Province_ID == selectedRegion);
 		var selectedProvinceOwner = occupiedArray.find(element => element.Province_ID == selectedRegion);
@@ -619,15 +621,28 @@ function _clickEvent(evt)
 	}
 }
 
-function _occupiedProvinces()
+function _DrawProvinces()
 {
 	for (i = 0; i < Object.keys(occupiedArray).length; i++)
 	{
 		document.getElementById(occupiedArray[i].Province_ID).style.fill = "#" + occupiedArray[i].Colour;
 	}
+	
+	for (i = 0; i < Object.keys(invisibleProvinces).length; i++)
+	{
+		if(occupiedArray.some(occupiedArray => occupiedArray.Province_ID === invisibleProvinces[i].Province_ID)) //This checks if the invisible province is one that is supposed to be invisible, and draws it darkened if it is.
+		{
+			document.getElementById(invisibleProvinces[i].Province_ID).style.filter = 'brightness(35%)'; 
+		}
+		else
+		{ 
+			//This is more or less a "fog of war" system, but mostly serves to show players where they can go.
+			document.getElementById(invisibleProvinces[i].Province_ID).style.fill = "#303030";
+			document.getElementById(invisibleProvinces[i].Province_ID).style.filter = 'brightness(60%)'; 
+		}
+	}
+	
 }
-
-
 </script>
 
 <?php include "PageElements/Disclaimer.html" ?>
