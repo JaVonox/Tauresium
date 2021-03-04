@@ -43,7 +43,7 @@ function EcoAnnex()
 	$db = $database->getConnection();
 	if($directCoastalConnection[0]) 
 	{
-		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost'] + directCoastalConnection[2]); //Needs added Eco Cost
+		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($directCoastalConnection[2])); //Eco cost seems not to be working?
 		header("Location: ../Main.php");
 	}
 }

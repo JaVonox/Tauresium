@@ -100,7 +100,7 @@ Tauresium - Join Session
 <?php include_once 'Scripts/PageUpdate.php'?>
 
 <div id="Background" style="background-image:radial-gradient(circle at center, rgba(230, 191, 131, 1), rgba(226, 225, 225, 0.7)),url('Backgroundimages/InkPage.png');width:95%;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
-<button id="BackButton" class="backButton" style="text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index'">< Back</button>
+<button id="BackButton" class="backButton" style="text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:left;" onclick="document.location='index.php'">< Back</button>
 
 <table style="width:100%;text-align:center;">
 <tr>
@@ -225,7 +225,7 @@ Tauresium - Join Session
 </table>
 <br><br>
 
-<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';float:center;" onclick="document.location='index'">Create my nation!</button>
+<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';float:center;" onclick="document.location='index.php'">Create my nation!</button>
 </form>
 <br><br>
 </div>

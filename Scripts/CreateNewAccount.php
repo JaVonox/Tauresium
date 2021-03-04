@@ -153,18 +153,18 @@ else
 if($errorsOccured == True)
 {
 	$errorCode = rtrim($errorCode,"&"); 
-	header("Location: ../JoinSession" . $errorCode); //redirects to the joinsession page with the arguments
+	header("Location: ../JoinSession.php" . $errorCode); //redirects to the joinsession page with the arguments
 }
 else
 {
 	$accountSuccess = $database->addNewCountry($countryName,$countryPass,$governmentType,$countryColour,$worldCode);
 	if($accountSuccess)
 	{
-		header("Location: ../SessionSuccess?Type=Country"); 
+		header("Location: ../SessionSuccess.php?Type=Country"); 
 	}
 	else
 	{
-		header("Location: ../ErrorPage"); 
+		header("Location: ../ErrorPage.php"); 
 	}
 	
 }

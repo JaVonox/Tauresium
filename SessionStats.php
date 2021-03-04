@@ -49,7 +49,7 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 		$playerOceanPowers = $database->GetPlayerAllOceanCount($worldOccupants[$x]['Country_Name']);
 		
 		echo "<tr>";
-		echo "<td> <img src='Assets/Flags/" . $worldOccupants[$x]['Colour'] . "' alt='Country Flag' width='180px' height='120px'/> </td>";
+		echo "<td> <img src='Assets/Flags/" . $worldOccupants[$x]['Colour'] . ".png' alt='Country Flag' width='180px' height='120px'/> </td>";
 		echo "<td>" . $playerTitle . " " . $worldOccupants[$x]['Country_Name'] . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Country_Type'] . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Last_Event_Time'] . "</td>";

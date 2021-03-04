@@ -78,18 +78,18 @@ else
 if($errorsOccured == True)
 {
 	$errorCode = rtrim($errorCode,"&"); 
-	header("Location: ../NewSession" . $errorCode); //redirects to the new session page with the arguments
+	header("Location: ../NewSession.php" . $errorCode); //redirects to the new session page with the arguments
 }
 else
 {
 	$worldSuccess = $database->addNewWorld($worldName,$mapType,$speed);
 	if($worldSuccess != False)
 	{
-		header("Location: ../SessionSuccess?Type=World&Code=" . $worldSuccess); 
+		header("Location: ../SessionSuccess.php?Type=World&Code=" . $worldSuccess); 
 	}
 	else
 	{
-		header("Location: ../ErrorPage"); 
+		header("Location: ../ErrorPage.php"); 
 	}
 	
 }

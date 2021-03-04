@@ -99,7 +99,7 @@ if($newTotals['Events_Stacked'] > 1)
 	if($eventsRemaining == True)
 	{
 		echo "You still have events remaining, click here to complete your next event<br><br><br>";
-		echo '<button class="gameButton" onclick="' . "document.location='LoadEvent'" . '"style="font-size:32px;">Next Event</button>';
+		echo '<button class="gameButton" onclick="' . "document.location='LoadEvent.php'" . '"style="font-size:32px;">Next Event</button>';
 	}
 	else
 	{

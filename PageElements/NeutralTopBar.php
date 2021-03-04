@@ -10,7 +10,7 @@
 </table>
 </div>
 <div id="MenuBar" style="background-color:#E4E4E4;width:100%;height:40px;border-bottom:4px solid black;"> 
-	<button style="margin-left:20px;" class="menuButton" onclick="document.location='Index.php'">Index</button>
+	<button style="margin-left:20px;" class="menuButton" onclick="document.location='index.php'">Index</button>
 </div>
 
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>

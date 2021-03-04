@@ -19,7 +19,7 @@ else if($pageType == "World")
 }
 else
 {
-	header("Location: ErrorPage"); 
+	header("Location: ErrorPage.php"); 
 }
 ?>
 <!DOCTYPE HTML>

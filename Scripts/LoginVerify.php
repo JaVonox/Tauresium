@@ -13,10 +13,10 @@ if($returnBool == True)
 	session_start();
 	$database->AddNewSession(session_id(),$loginRequest);
 	$_SESSION['Active'] = "T";
-	header("Location: ../Main");
+	header("Location: ../Main.php");
 }
 else
 {
-	header("Location: ../LoginFail");
+	header("Location: ../LoginFail.php");
 }
 ?>
