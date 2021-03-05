@@ -8,9 +8,25 @@ $player = $database->ReturnLogin(session_id());
 $playerStats = $database->getPlayerStats($player);
 $divStyle = '"background-color: #' . $playerStats['Colour'] . ';border:5px solid black;border-radius:5px;margin-right:50px;color:black;vertical-align:middle;overflow:auto;"';
 
+$eventSpeed = $database->GetEventSpeed($player);
+$timeFormat = "i:s";
+
+$timeUntilEventAbsolute = abs((($playerStats['Events_Stacked'] - floor($playerStats['Events_Stacked'])) * ($eventSpeed * 60)) - ($eventSpeed * 60));
+
+if(intval(gmdate("h",$timeUntilEventAbsolute)) < 12)
+{
+	$timeFormat = "h:i:s";
+}
+
 //Time until next event - digits of events_stacked * 1200 = time since last event (20secintervals) change with speed.
-$timeUntilEventAbsolute = abs((($playerStats['Events_Stacked'] - floor($playerStats['Events_Stacked'])) * 1200) - 1200);
-$timeLeftFormatted = gmdate("i:s",$timeUntilEventAbsolute);
+if($playerStats['Events_Stacked'] < 5)
+{
+	$timeLeftFormatted = gmdate($timeFormat,$timeUntilEventAbsolute);
+}
+else
+{
+	$timeLeftFormatted = "---";
+}
 ?>
 
 <div id="LogoDiv" style="background-image:linear-gradient(to left, rgba(226, 225, 225, 0.2), rgba(226, 225, 225, 1)),url('Backgroundimages/Volcano.png');width:100%;min-height:120px;height:min-content;background-position:center;background-size:100%;text-align:center;">

@@ -15,7 +15,7 @@ else if(isset($_POST['EcoAnnex']))
 }
 else if(isset($_POST['MilAnnex']))
 {
-	//milHandle
+	MilAnnex();
 }
 
 function CultAnnex()
@@ -37,14 +37,37 @@ function EcoAnnex()
 {
 	$mapConnect = new MapConnections();
 	$mapConnect->init($_POST['invisible-playerSession']);
-	$directCoastalConnection = $mapConnect->CheckEconomic($_POST['invisible-provID']); 
+	$coastalConnection = $mapConnect->CheckEconomic($_POST['invisible-provID']); 
 
 	$database = new Database();
 	$db = $database->getConnection();
-	if($directCoastalConnection[0]) 
+	if($coastalConnection[0]) 
 	{
-		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($directCoastalConnection[2])); //Eco cost seems not to be working?
+		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($directCoastalConnection[2]));
 		header("Location: ../Main.php");
+	}
+}
+
+function MilAnnex()
+{
+	$mapConnect = new MapConnections();
+	$mapConnect->init($_POST['invisible-playerSession']);
+	$milConnection = $mapConnect->CheckMilitary($_POST['invisible-provID']); 
+
+	$database = new Database();
+	$db = $database->getConnection();
+	if($milConnection[0]) 
+	{
+		if($milConnection[3])
+		{
+			$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Military_Influence", $milConnection[2]); 
+			header("Location: ../Main.php");
+		}
+		else
+		{
+			$database->AnnexLocationForceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Military_Influence", $milConnection[2]);
+			header("Location: ../Main.php");
+		}
 	}
 }
 ?>

@@ -119,16 +119,16 @@ Tauresium - New Session
 <table style="width:content;margin-left:auto;margin-right:auto;">
 <tr>
 <td style="padding:20px;"> 
-<input type="radio" name="GameSpeed" style="pointer-events:none;opacity:0.5;" value="Quick" <?php echo ($speedValue == "Quick") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Quick (10 Minute event timer)</label>
+<input type="radio" name="GameSpeed" value="VeryQuick" <?php echo ($speedValue == "VeryQuick") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Very Quick <br> (30 Minute event timer)</label>
 </td>
 <td style="padding:20px;"> 
-<input type="radio" name="GameSpeed" value="Normal" <?php echo ($speedValue == "Normal") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Normal (20 Minute event timer)</label> <!-- checked="checked" -->
+<input type="radio" name="GameSpeed" value="Quick" <?php echo ($speedValue == "Quick") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Quick <br> (1 hour event timer)</label> <!-- checked="checked" -->
 </td>
 <td style="padding:20px;"> 
-<input type="radio" name="GameSpeed" style="pointer-events:none;opacity:0.5;" value="Slow" <?php echo ($speedValue == "Slow") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Slow (40 Minute event timer)</label>
+<input type="radio" name="GameSpeed" value="Normal" <?php echo ($speedValue == "Normal") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Normal <br> (2 hour event timer)</label>
 </td>
 <td style="padding:20px;"> 
-<input type="radio" name="GameSpeed" style="pointer-events:none;opacity:0.5;" value="VerySlow" <?php echo ($speedValue == "VerySlow") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Very Slow (1 Hour event timer)</label>
+<input type="radio" name="GameSpeed" value="Slow" <?php echo ($speedValue == "Slow") ? 'checked="checked"' : ''; ?>/> <label for="GameSpeed"> Slow <br> (4 hour event timer)</label>
 </td>
 </tr>
 </table>

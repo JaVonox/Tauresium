@@ -128,7 +128,7 @@ class MapConnections
 		{
 			if($this->CheckOwner($provinceID) == "No Owner")
 			{
-				return array(False,"Province is not adjacent to one of our cities",True);
+				return array(False,"Province is not adjacent to one of our cities",False);
 			}
 			else
 			{
@@ -146,17 +146,25 @@ class MapConnections
 			$outboundConnectionsCollated = array_merge($outboundConnectionsCollated,$this->database->ReturnOutboundConnections($ocean));
 		}
 		
+		if(count($outboundConnectionsCollated) == 0)
+		{
+			return array(False,"Province is inland or too far away to reach",9999);
+		}
+		
 		for($i=0;$i < count($outboundConnectionsCollated);$i++)
 		{
-			if($outboundConnectionsCollated[$i][0] == $this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'] && $this->database->getProvinceDetail($provinceID)[0]['Coastal'] == 1 && $this->CheckOwner($provinceID) == "No Owner")
+			for($j=0;$j < count($outboundConnectionsCollated[$i]);$j++)
 			{
-				if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Economic_Cost'] + $this->database->ReturnOverseasBonusCost($provinceID,False))
+				if($outboundConnectionsCollated[$i][$j] == $this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'] && $this->database->getProvinceDetail($provinceID)[0]['Coastal'] == 1 && $this->CheckOwner($provinceID) == "No Owner")
 				{
-					return array(True,"Province is in a far away region",$this->database->ReturnOverseasBonusCost($provinceID,False));
-				}
-				else
-				{
-					return array(False,"Province is in a far away region",$this->database->ReturnOverseasBonusCost($provinceID,False));
+					if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Economic_Cost'] + $this->database->ReturnOverseasBonusCost($provinceID,False))
+					{
+						return array(True,"Province is in a far away region",$this->database->ReturnOverseasBonusCost($provinceID,False));
+					}
+					else
+					{
+						return array(False,"Province is in a far away region",$this->database->ReturnOverseasBonusCost($provinceID,False));
+					}
 				}
 			}
 		}
@@ -188,6 +196,121 @@ class MapConnections
 		{
 			return $this->CheckColonial($provinceID,$this->ReturnAllPlayerDominantCoastal($this->_subjectName));
 		}
+	}
+	
+	public function CheckMilitary($provinceID) //this can occur over land or ocean using the same conditions as the other checks. It can be used to take over owned land and unowned land, but has penalties for unowned and coastal invasions.
+	{
+		//Chose the cheaper military cost
+		$landCost = $this->database->getProvinceDetail($provinceID)[0]['Military_Cost'];
+		$seaCost = $this->database->getProvinceDetail($provinceID)[0]['Military_Cost'];
+		$landModifier = 1.5;
+		$seaModifier = 1.5;
+		$peaceful = True;
+		$description = "<br> Base military modifier: +50%";
+		
+		if($this->CheckOwner($provinceID) == "No Owner")
+		{
+			$description .= "<br> Province is unowned: +20%";
+			$landModifier += 0.2;
+			$seaModifier += 0.2;
+		}
+		else if($this->CheckOwner($provinceID) == $this->_subjectName)
+		{
+			$landCost = 9999;
+			$seaCost = 9999;
+		}
+		else
+		{
+			$peaceful = False;
+		}
+		
+		if($this->CheckAdjacent($provinceID)) 
+		{
+			$landModifier -= 0.05;
+			$description .= "<br> Province is adjacent: -5%";
+		}
+		else
+		{
+			$landCost = 9999; //unavailable
+		}
+		
+		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'])) 
+		{
+			$description .= "<br> Province is available by local oceans: +20%";
+			$seaModifier += 0.2;
+		}
+		else
+		{
+			$dominantLocations = $this->ReturnAllPlayerDominantCoastal($this->_subjectName);
+			
+			$outboundConnectionsCollated = array();
+		
+			foreach($dominantLocations as $ocean)
+			{
+				$outboundConnectionsCollated = array_merge($outboundConnectionsCollated,$this->database->ReturnOutboundConnections($ocean));
+			}
+			
+			if(count($outboundConnectionsCollated) == 0)
+			{
+				$seaCost = 9999; //unavailable
+			}
+			
+			$numOfConnections = 0;
+			for($i=0;$i < count($outboundConnectionsCollated);$i++)
+			{
+				for($j=0;$j < count($outboundConnectionsCollated[$i]);$j++)
+				{
+					if($outboundConnectionsCollated[$i][$j] == $this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'] && $this->database->getProvinceDetail($provinceID)[0]['Coastal'] == 1)
+					{
+						$numOfConnections +=1;
+						break 2;
+					}
+				}
+			}
+			
+			if($numOfConnections == 0)
+			{
+				$seaCost = 9999; //unavailable
+			}
+			else
+			{
+				$seaModifier +=1;
+				$description .= "<br> Province is available by faraway oceans: +100%";
+			}
+			
+		}
+		
+		$landCost = $landCost * $landModifier;
+		$seaCost = $seaCost * $seaModifier;
+		
+		
+		if($landCost < $seaCost && $landCost < 9999)
+		{
+			$description .= "<br><br> Total: +" . strval(($landModifier-1)*100) . "%";
+			
+			return array(($this->database->getPlayerStats($this->_subjectName)['Military_Influence'] >= $landCost),$description,floor($landCost),$peaceful);
+
+		}
+		else if($seaCost < $landCost && $seaCost < 9999)
+		{	
+			$description .= "<br><br> Total: +" . strval(($seaModifier-1)*100 . "%");
+			
+			
+			return array(($this->database->getPlayerStats($this->_subjectName)['Military_Influence'] >= $seaCost),$description,floor($seaCost),$peaceful);
+
+		}
+		else
+		{
+			if($this->CheckOwner($provinceID) == $this->_subjectName)
+			{
+				return array(False,"This is your own province","Infinite");
+			}
+			else
+			{
+				return array(False,"No possible route","Infinite");
+			}
+		}
+		
 	}
 
 }

@@ -235,7 +235,7 @@ class Database{
 	
 	public function addNewWorld($worldName,$mapType,$gameSpeed)
 	{
-		$speedMapping = array("Quick"=>10,"Normal"=>20,"Slow"=>40,"VerySlow"=>60);
+		$speedMapping = array("VeryQuick"=>30,"Quick"=>60,"Normal"=>120,"Slow"=>240);
 		$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
 		$worldCode = "";
 		
@@ -311,16 +311,24 @@ class Database{
 		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $userLogin . "';");
 		$lastEvent = $result->fetch_row();
 		
+		$eventSpeed = $this->GetEventSpeed($userLogin);
+		
 		$currentTime = new DateTime(date("Y/m/d h:i:s"));
 		$lastTime = new DateTime($lastEvent[0]);
 		$formattedLastTime = $lastTime->format("Y/m/d h:i:s");
 		$formattedCurTime = $currentTime->format("Y/m/d h:i:s");
-		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),6000)); //needs modifying - min caps at 5 events. Also abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
-		$eventsAdded = $secondsElapsed / 1200; //20 mins time
-
+		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),28800)); //abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
+		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); //20 mins time
 		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $userLogin . "';") or die(mysqli_error($this->connectionData));
 		
 		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $userLogin . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
+	}
+	
+	public function GetEventSpeed($userLogin)
+	{
+		$result = $this->connectionData->query("SELECT Speed FROM worlds WHERE World_Code = '" . $this->ReturnWorld($userLogin) . "';");
+		$eventSpeed = $result->fetch_row();
+		return intval($eventSpeed[0]);
 	}
 	
 	public function GetEvent($sessionID)
@@ -583,11 +591,16 @@ class Database{
 		}
 	}
 	
-	public function AnnexLocationPeaceful($playerID,$provinceID,$pointType,$cost) //$pointType can be either Culture_Influence or Economic_Influence. Mil is seperate function
+	public function AnnexLocationPeaceful($playerID,$provinceID,$pointType,$cost) //$pointType can be either Culture_Influence or Economic_Influence or military if the lcoation is unowned
 	{
-		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
 		$this->connectionData->query("INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name) VALUES('" . $this->ReturnWorld($playerID) . "','" . $provinceID . "','" . $playerID ."');") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
 	}
 	
+	public function AnnexLocationForceful($playerID,$provinceID,$pointType,$cost) //Only used when the province is owned
+	{
+		$this->connectionData->query("UPDATE province_Occupation SET Country_Name = '" . $playerID . "' WHERE World_Code = '" . $this->ReturnWorld($playerID) . "' AND Province_ID = '" . $provinceID . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
+	}
 }
 ?>

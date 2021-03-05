@@ -10,7 +10,7 @@ $speed = "";
 
 $errorsOccured = False; //If this is false by the end no errors occured
 $possibleMaps = ['Earth'];
-$possibleSpeeds = ['Normal'];
+$possibleSpeeds = ['VeryQuick','Quick','Normal','Slow'];
 
 if($_POST['WorldName'] != "" && isset($_POST['WorldName']))
 {
