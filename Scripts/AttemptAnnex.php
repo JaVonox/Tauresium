@@ -4,7 +4,18 @@ include_once "MapConnections.php";
 $database = new Database();
 $db = $database->getConnection();
 
-//Need to add verification of entered provID and sessionID since they are in hidden fields.
+if($_POST['invisible-playerSession'] == "" || $_POST['invisible-provID'] == ""){
+	header("Location: ../ErrorPage.php");
+}
+
+$validHidden = $database->ReturnExists($_POST['invisible-playerSession'],$_POST['invisible-provID']);
+
+
+if(!$validHidden)
+{
+	header("Location: ../ErrorPage.php");
+}
+
 if (isset($_POST['CultureAnnex']))
 {
 	CultAnnex();
@@ -31,6 +42,10 @@ function CultAnnex()
 		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Culture_Cost']);
 		header("Location: ../Main.php");
 	}
+	else
+	{
+		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself"); //Probably noone will ever see this but its funny to me
+	}
 }
 
 function EcoAnnex()
@@ -45,6 +60,10 @@ function EcoAnnex()
 	{
 		$database->AnnexLocationPeaceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($directCoastalConnection[2]));
 		header("Location: ../Main.php");
+	}
+	else
+	{
+		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself");
 	}
 }
 
@@ -68,6 +87,10 @@ function MilAnnex()
 			$database->AnnexLocationForceful($database->ReturnLogin($_POST['invisible-playerSession']),$_POST['invisible-provID'],"Military_Influence", $milConnection[2]);
 			header("Location: ../Main.php");
 		}
+	}
+	else
+	{
+		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself");
 	}
 }
 ?>

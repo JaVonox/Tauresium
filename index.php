@@ -19,16 +19,12 @@ Tauresium - Index
 	<b> What is Tauresium? </b>
 	<br>
 	Tauresium is an online map game inwhich a player takes control of a nation attempting to expand its influence over the modern world. The end goal of this project is to have a game which allows multiple players to
-	interact with a world and each other. Each area in the game reflects a real life enviroment - and it is the intention of the developer to reflect the people and culture of these regions through in game text and
+	interact with a world and each other. Each area in the game reflects a real life enviroment - and it is the intention to reflect the people and culture of these regions through in game text and
 	gameplay mechanics
 	<br><br>
 	<b> How do i play?</b>
 	<br>
-	As of writing, the game is not yet functional, but it is proposed that the game will function using different player made sessions, all of which have a indentifying key. By using this key the player will be able to
-	connect to their session and recieve a login key to access their country within the session. 
-	<br>
-	This game functions in real time - every 15 minutes the player will recieve a new event that will effect their influence in the areas of culture,economics and military - each of which can be used as appropriate to expand
-	the borders of the players empire. The player will not be told how their decisions will effect their nation so it is important that a player carefully considers how their actions will effect their nation before answering.
+	How to play can be found under the tutorial segment on the top bar on any page!
 	<br><br>
 	<b> Who is the winner? </b>
 	<br>

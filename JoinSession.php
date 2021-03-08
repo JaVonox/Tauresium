@@ -118,6 +118,9 @@ Tauresium - Join Session
 <br><br>
 <input id="NationName" type="text" width="100%" name="CountryNameInput" size="45" maxlength="20" autocomplete="off" style="text-align:center;font-size:18px;font-family:Romanus;" onkeyup="_UpdateTitle()" value="<?php echo $NationValue; ?>"/>
 <br><br>
+<div style="width:400px;;margin-left:auto;margin-right:auto;">
+<font style="font-family:Arial;font-size:12px;word-wrap: break-word;">This will be your login name for your account! Ensure you pick something you wont forget!</font>
+</div>
 <font style="font-family:Romanus;font-size:48px;" >My password: </font>
 <br>
 <div style="width:400px;;margin-left:auto;margin-right:auto;">

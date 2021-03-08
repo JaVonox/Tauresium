@@ -39,12 +39,13 @@ else
 	<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Description'] ?>
 	</div>
 	<br><br><br><br>
-	<form method="GET" action="Scripts/EventCompleted.php">
+	<form method="POST" action="Scripts/EventCompleted.php">
 	<input type="submit" class="gameButton" name="Option1" style="font-size:24px;white-space: normal;word-wrap:break-word;margin-left:40px;margin-right:40px;" value="<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Option_1_Desc'] ?>">  </input>
 	<br><br><br>
 	<input type="submit" class="gameButton" name="Option2" style="font-size:24px;white-space: normal;word-wrap:break-word;margin-left:40px;margin-right:40px;" value="<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Option_2_Desc'] ?>">  </input>
 	<br><br><br>
 	<input type="submit" class="gameButton" name="Option3" style="font-size:24px;white-space: normal;word-wrap:break-word;margin-left:40px;margin-right:40px;" value="<?php echo $BadEvents ? 'No Event' : $LoadedEvent['Option_3_Desc'] ?>">  </input>
+	<input name="invisible-loadedEvent" type="hidden" style="display:none" value="<?php echo $LoadedEvent['Event_ID']; ?>">
 	</form>
 	<br><br><br>
 </div>

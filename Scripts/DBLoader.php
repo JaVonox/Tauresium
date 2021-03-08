@@ -54,7 +54,7 @@ class Database{
 	
 	public function getPlayerStats($PlayerIdentity)
 	{
-		$result = $this->connectionData->query("SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked,Last_Event_Time FROM players WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked,Last_Event_Time,Active_Event_ID FROM players WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
 		$dataSet = $result->fetch_assoc();
 		
 		$result = $this->connectionData->query("SELECT Title FROM governmentTypes WHERE GovernmentForm = '" . $dataSet['Country_Type'] . "';") or die(mysqli_error($this->connectionData));
@@ -303,7 +303,24 @@ class Database{
 		$this->connectionData->query("DELETE FROM sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
 		return True;
 	}
+
+	public function ReturnExists($sessionID,$Province_ID)
+	{
+		//This function is used to ensure the user has not entered modified values into hidden fields
+		$loginExists = !empty($this->ReturnLogin($sessionID));
+		$result = $this->connectionData->query("SELECT 1 FROM provinces WHERE Province_ID = '" . $Province_ID . "';") or die(mysqli_error($this->connectionData));
+		$provExists = (($result->fetch_row()[0])==1);
 	
+		return ($loginExists && $provExists); //and gate verifies both exist
+	}
+	
+	public function ReturnCorrectEvent($eventPage,$playerName)
+	{
+		$result = $this->connectionData->query("SELECT 1 FROM players WHERE Country_Name = '" . $playerName . "' AND Active_Event_ID = " . $eventPage .";") or die(mysqli_error($this->connectionData));
+		$validEvent = (($result->fetch_row()[0])==1);
+		
+		return $validEvent;
+	}
 	public function UpdateEventTimer($sessionID)
 	{
 		$userLogin = $this->ReturnLogin($sessionID);

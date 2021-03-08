@@ -2,6 +2,7 @@
 $worldError = (!isset($_GET["WorldName"]) ? "" : $_GET["WorldName"] );
 $mapError = (!isset($_GET["MapType"]) ? "" : $_GET["MapType"] );
 $speedError = (!isset($_GET["GameSpeed"]) ? "" : $_GET["GameSpeed"] );
+
 $errorMessage = "";
 
 $worldValue = "";
@@ -76,7 +77,7 @@ Tauresium - New Session
 <font id="NationTitle" style="font-family:Castellar;font-size:52px;" > Create a New World </font>
 <br>
 <div style="width:400px;;margin-left:auto;margin-right:auto;">
-<font style="font-family:Arial;font-size:12px;word-wrap: break-word;"> Creating a new world allows you to play the game with up to 5 other players - simply fill out this form and click enter to get your world code, which you and your friends can enter on the "Join a session" page to enter a game together. </font>
+<font style="font-family:Arial;font-size:12px;word-wrap: break-word;"> Creating a new world allows you to play the game with up to 4 other players - simply fill out this form and click enter to get your world code, which you and your friends can enter on the "Join a session" page to enter a game together. </font>
 </div>
 <br>
 <div id="ErrorBox">
