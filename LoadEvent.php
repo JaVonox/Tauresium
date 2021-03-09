@@ -17,7 +17,7 @@ Tauresium - Event
 <?php
 $database = new Database();
 $db = $database->getConnection();
-$LoadedEvent = $database->GetEvent(session_id());
+$LoadedEvent = $database->GetEvent($_SESSION['Country']);
 $BadEvents = True; //This is true if an event cannot be loaded.
 
 if(is_array($LoadedEvent)) //This occurs if there is enough event stacks

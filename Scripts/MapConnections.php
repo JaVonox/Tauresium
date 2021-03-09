@@ -1,12 +1,19 @@
 <?php
 include_once "DBLoader.php";
 
+if(!isset($_SESSION)) 
+{ 
+   session_start(); 
+} 
+
+
 class MapConnections
 {
 	private $_nationVertexes = ["0","0","0"];
 	private $_subjectName = "";
 	private $database;
 	private $db;
+	
 	
 	private function FlattenArray($mdArray,$length)
 	{
@@ -28,13 +35,13 @@ class MapConnections
 		return $flatArray;
 	}
 	
-	public function init($sessionID)
+	public function init()
 	{
 		
 		$this->database = new Database();
 		$this->db = $this->database->getConnection();
-		$tmpVert = $this->database->GetPlayerVertexes($sessionID);
-		$this->_subjectName = $this->database->ReturnLogin($sessionID);
+		$tmpVert = $this->database->GetPlayerVertexes($_SESSION['Country']);
+		$this->_subjectName = $_SESSION['Country'];
 		$this->_nationVertexes = $this->FlattenArray($tmpVert,3); 
 		return $this->_nationVertexes;
 	}

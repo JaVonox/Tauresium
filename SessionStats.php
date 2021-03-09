@@ -17,7 +17,7 @@ Tauresium - World View
 <?php
 $database = new Database();
 $db = $database->getConnection();
-$player = $database->ReturnLogin(session_id());
+$player = $_SESSION['Country'];
 $worldStats = $database->GetSessionStats($player);
 $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 ?>
@@ -34,7 +34,7 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 	<br>
 	</div>
 	<br><br><br>
-	<table style="width:60%;margin-left:auto;margin-right:auto;text-align:center;font-size:24px;">
+	<table style="width:60%;margin-left:auto;margin-right:auto;text-align:center;font-size:24px;border-collapse:collapse;">
 	<th><u> Flag </u></th>
 	<th><u> Country Name  <u></th>
 	<th><u> Government <u></th>
@@ -48,7 +48,7 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 		$playerProvinces = $database->GetPlayerProvinceCount($worldOccupants[$x]['Country_Name']);
 		$playerOceanPowers = $database->GetPlayerAllOceanCount($worldOccupants[$x]['Country_Name']);
 		
-		echo "<tr>";
+		echo "<tr style='border-bottom:2px solid black;'>";
 		echo "<td> <img src='Assets/Flags/" . $worldOccupants[$x]['Colour'] . ".png' alt='Country Flag' width='180px' height='120px'/> </td>";
 		echo "<td>" . $playerTitle . " " . $worldOccupants[$x]['Country_Name'] . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Country_Type'] . "</td>";

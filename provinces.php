@@ -40,9 +40,9 @@ Tauresium - Province
 <?php include_once 'Scripts/CheckLogin.php'?>
 <?php
 $mapConnect = new MapConnections();
-$mapConnect->init(session_id());
+$mapConnect->init();
 $sessionID = session_id();
-$playerCountry = $database->ReturnLogin(session_id());
+$playerCountry = $_SESSION['Country'];
 
 $provCountry = $mapConnect->CheckOwner($selectedProvince); //This could be modified to add title + json stuff
 
@@ -83,7 +83,7 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 </table>
 <br><br>
 <form id="DetailsForm" method="POST">
-<table id="DetailsTable" style="width:25%;margin-left:auto;margin-right:auto;">
+<table id="DetailsTable" style="margin-left:auto;margin-right:auto;">
 </table>
 </form>
 </div>
@@ -150,7 +150,6 @@ function _loadDetails()
 		document.getElementById("EconomicAnnex").setAttribute("style",buttonStyle +"<?php echo $economicAccess[0] ? 'background-color:lightgreen;' : 'background-color:#383838;pointer-events:none;'?>");
 		document.getElementById("MilitaryAnnex").setAttribute("style",buttonStyle +"<?php echo $milAccess[0] ? 'background-color:pink;' : 'background-color:#383838;pointer-events:none;'?>");
 		document.getElementById("invisible-provID").value = "<?php echo $selectedProvince ?>";
-		document.getElementById("invisible-playerSession").value = "<?php echo $sessionID ?>";
 		
 		document.getElementById("ProvCulture").textContent = <?php echo $cultureAccess[2] ? 'selectedProvince.Culture_Cost' : '"Infinite"';?>;
 		document.getElementById("ProvEconomic").textContent = (parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>))<1000 ? parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>) : "Infinite";

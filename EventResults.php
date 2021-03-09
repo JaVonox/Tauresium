@@ -47,7 +47,7 @@ Tauresium - Results
 <?php 
 $database = new Database();
 $db = $database->getConnection();
-$newTotals = $database->GetPlayerChanges(session_id());
+$newTotals = $database->GetPlayerChanges($_SESSION['Country']);
 $eventsRemaining = False;
 
 if($newTotals['Events_Stacked'] > 1)

@@ -29,7 +29,7 @@ Score int NOT NULL
 
 CREATE TABLE players(
 Country_Name varchar(50) PRIMARY KEY NOT NULL,
-Hashed_Password TEXT NOT NULL,
+Hashed_Password varchar(64) NOT NULL,
 Country_Type varchar(50) NOT NULL, /*FK*/
 Colour varchar(6) NOT NULL,
 World_Code varchar(16) NOT NULL, /*FK*/
@@ -61,12 +61,6 @@ Base_Economic_Generation FLOAT NOT NULL,
 Base_Military_Influence int NOT NULL,
 Base_Culture_Influence int NOT NULL,
 Base_Economic_Influence int NOT NULL
-);
-
-CREATE TABLE sessions(
-SessionRelationID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-SessionID TEXT NOT NULL,
-Country_Login varchar(50) NOT NULL
 );
 
 CREATE TABLE province_Occupation(

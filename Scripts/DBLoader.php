@@ -270,48 +270,20 @@ class Database{
 		
 		return $worldCode;
 	}
-	
-	public function AddNewSession($sessionID,$countryName)
-	{
-		$result = $this->connectionData->query("SELECT 1 FROM sessions WHERE SessionID = '" . $sessionID . "';"); //Check if session exists
-		$sessionExists = $result->fetch_row();
-		
-		if($sessionExists[0] == "1")
-		{
-			$this->connectionData->query("DELETE FROM sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		}
-		
-		$this->connectionData->query("INSERT INTO sessions (SessionID,Country_Login) VALUES('" . $sessionID . "','" . $countryName . "');") or die(mysqli_error($this->connectionData));
 
-	}
-	
-	public function ReturnLogin($sessionID)
-	{
-		$result = $this->connectionData->query("SELECT Country_Login FROM sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		$dataSet = $result->fetch_row();
-		return $dataSet[0];
-	}
-	
 	public function ReturnWorld($loadedUser)
 	{
 		$result = $this->connectionData->query("SELECT World_Code FROM players WHERE Country_Name = '" . $loadedUser . "';") or die(mysqli_error($this->connectionData));
 		return $result->fetch_row()[0];
 	}
-	
-	public function KillSession($sessionID)
-	{
-		$this->connectionData->query("DELETE FROM sessions WHERE SessionID = '" . $sessionID . "';") or die(mysqli_error($this->connectionData));
-		return True;
-	}
 
-	public function ReturnExists($sessionID,$Province_ID)
+	public function ReturnExists($Province_ID)
 	{
 		//This function is used to ensure the user has not entered modified values into hidden fields
-		$loginExists = !empty($this->ReturnLogin($sessionID));
 		$result = $this->connectionData->query("SELECT 1 FROM provinces WHERE Province_ID = '" . $Province_ID . "';") or die(mysqli_error($this->connectionData));
 		$provExists = (($result->fetch_row()[0])==1);
 	
-		return ($loginExists && $provExists); //and gate verifies both exist
+		return ($provExists); //and gate verifies both exist
 	}
 	
 	public function ReturnCorrectEvent($eventPage,$playerName)
@@ -321,14 +293,13 @@ class Database{
 		
 		return $validEvent;
 	}
-	public function UpdateEventTimer($sessionID)
+	public function UpdateEventTimer($country)
 	{
-		$userLogin = $this->ReturnLogin($sessionID);
 		
-		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $userLogin . "';");
+		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $country . "';");
 		$lastEvent = $result->fetch_row();
 		
-		$eventSpeed = $this->GetEventSpeed($userLogin);
+		$eventSpeed = $this->GetEventSpeed($country);
 		
 		$currentTime = new DateTime(date("Y/m/d h:i:s"));
 		$lastTime = new DateTime($lastEvent[0]);
@@ -336,9 +307,9 @@ class Database{
 		$formattedCurTime = $currentTime->format("Y/m/d h:i:s");
 		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),28800)); //abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
 		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); //20 mins time
-		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $userLogin . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 		
-		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $userLogin . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $country . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
 	}
 	
 	public function GetEventSpeed($userLogin)
@@ -348,11 +319,10 @@ class Database{
 		return intval($eventSpeed[0]);
 	}
 	
-	public function GetEvent($sessionID)
+	public function GetEvent($country)
 	{
-		$userLogin = $this->ReturnLogin($sessionID);
 		
-		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $userLogin . "';");
+		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $country . "';");
 		$playerevents = $result->fetch_assoc();
 		
 		if($playerevents['Events_Stacked'] >= 1 && $playerevents['Active_Event_ID'] == "")
@@ -362,7 +332,7 @@ class Database{
 			$eventsCount = $result->fetch_row();
 			$LoadEvent = rand(1,$eventsCount[0]);
 			
-			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $userLogin . "';") or die(mysqli_error($this->connectionData));
+			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 			
 			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $LoadEvent . "';") or die(mysqli_error($this->connectionData));
 			$dataSet = $result->fetch_assoc();
@@ -402,9 +372,9 @@ class Database{
 		
 	}
 	
-	public function GetLoadedEvent($sessionID)
+	public function GetLoadedEvent($country)
 	{
-		$userData['Country'] = $this->ReturnLogin($sessionID);
+		$userData['Country'] = $country;
 		
 		$result = $this->connectionData->query("SELECT Active_Event_ID FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
 		$userData['LoadedEvent'] = $result->fetch_row()[0];
@@ -449,9 +419,9 @@ class Database{
 		return $eventParams;
 	}
 	
-	public function GetPlayerChanges($sessionID)
+	public function GetPlayerChanges($country)
 	{
-		$userData['Country'] = $this->ReturnLogin($sessionID);
+		$userData['Country'] = $country;
 		
 		$result = $this->connectionData->query("SELECT Military_Influence,Military_Generation,Economic_Influence,Economic_Generation,Culture_Influence,Culture_Generation,Events_Stacked FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
 		$newValues = $result->fetch_assoc();
@@ -459,11 +429,9 @@ class Database{
 		return $newValues;
 	}
 	
-	public function GetOccupation($sessionID)
+	public function GetOccupation($country)
 	{
-		$loadedUser = $this->ReturnLogin($sessionID);
-		
-		$loadedWorldCode = $this->ReturnWorld($loadedUser);
+		$loadedWorldCode = $this->ReturnWorld($country);
 		
 		$result = $this->connectionData->query("SELECT Country_Name,Colour FROM players WHERE World_Code = '" . $loadedWorldCode . "';") or die(mysqli_error($this->connectionData));
 		$worldplayers = $result->fetch_all(MYSQLI_ASSOC);
@@ -537,12 +505,11 @@ class Database{
 		return $visibleLocations; //Returns all the locations inwhich the player is dominant
 	}
 	
-	public function GetVisibility($sessionID)
+	public function GetVisibility($country)
 	{
-		$loadedUser = $this->ReturnLogin($sessionID);
-		$loadedWorldCode = $this->ReturnWorld($loadedUser);
+		$loadedWorldCode = $this->ReturnWorld($country);
 		
-		$accessibleCoastal = $this->ReturnAllVisibleRegions($loadedUser);
+		$accessibleCoastal = $this->ReturnAllVisibleRegions($country);
 		$sqlString = "(";
 		
 		for($i=0;$i<count($accessibleCoastal);$i++)
@@ -556,20 +523,19 @@ class Database{
 		//The following huge query finds every province that isnt adjacent to or has a colonial link to the coastal provinces a player owns
 		$result = $this->connectionData->query("
 		SELECT Province_ID FROM provinces WHERE Coastal_Region NOT IN " . $sqlString . " AND Province_ID NOT IN(SELECT Province_ID FROM provinces 
-		WHERE (Vertex_1 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_1 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_1 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "')) OR 
-		(Vertex_2 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_2 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_2 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "')) OR 
-		(Vertex_3 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_3 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "') OR Vertex_3 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "')))") or die(mysqli_error($this->connectionData));
+		WHERE (Vertex_1 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_1 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_1 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "')) OR 
+		(Vertex_2 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_2 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_2 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "')) OR 
+		(Vertex_3 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_3 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "') OR Vertex_3 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "')))") or die(mysqli_error($this->connectionData));
 		$invisibleprovinces = $result->fetch_all(MYSQLI_ASSOC);
 		return $invisibleprovinces;
 
 	}
 	
-	public function GetPlayerVertexes($sessionID)
+	public function GetPlayerVertexes($country) 
 	{
-		$loadedUser = $this->ReturnLogin($sessionID);
-		$loadedWorldCode = $this->ReturnWorld($loadedUser);
+		$loadedWorldCode = $this->ReturnWorld($country);
 		
-		$result = $this->connectionData->query("SELECT Vertex_1,Vertex_2,Vertex_3 FROM (provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $loadedUser . "');");
+		$result = $this->connectionData->query("SELECT Vertex_1,Vertex_2,Vertex_3 FROM (provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $country . "');");
 		$ownedVertexes = $result->fetch_all(MYSQLI_NUM);
 		return $ownedVertexes;
 	}
@@ -581,17 +547,6 @@ class Database{
 		$provVertexes = $result->fetch_row();
 		return $provVertexes;
 	}
-	
-	//public function ReturnAdjacentVisibility($countryName)
-	//{
-	//	$result = $this->connectionData->query("
-	//	SELECT Province_ID FROM provinces WHERE Province_ID NOT IN(SELECT Province_ID FROM provinces 
-	//	WHERE (Vertex_1 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_1 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_1 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "')) OR 
-	//	(Vertex_2 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_2 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_2 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "')) OR 
-	//	(Vertex_3 IN (SELECT Vertex_1 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_3 IN (SELECT Vertex_2 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "') OR Vertex_3 IN (SELECT Vertex_3 FROM provinces INNER JOIN province_Occupation ON provinces.Province_ID = province_Occupation.Province_ID AND province_Occupation.Country_Name = '" . $countryName . "')))") or die(mysqli_error($this->connectionData));
-	//	$connectedprovinces = $result->fetch_all(MYSQLI_ASSOC);
-	//	return $connectedprovinces;
-	//}
 	
 	public function GetProvinceOwner($provinceID,$worldCode)
 	{

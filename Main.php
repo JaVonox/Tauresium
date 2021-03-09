@@ -24,8 +24,8 @@ Tauresium - Game Page
 $database = new Database();
 $db = $database->getConnection();
 $provinceSet = json_encode($database->getProvinceArray());
-$occupiedSet = json_encode($database->GetOccupation(session_id()));
-$visibilitySet = json_encode($database->GetVisibility(session_id()));
+$occupiedSet = json_encode($database->GetOccupation($_SESSION['Country']));
+$visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 ?>
 
 <div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">

@@ -3,7 +3,7 @@
 <head>
 <link rel="stylesheet" href="MainStyle.css">
 </head>
-<table>
+<table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
 <td align="center"><img src="Assets/CultureIcon.png" id="CultureIcon" /> </td>
@@ -40,7 +40,6 @@
 <td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" >Annex Economically</button>  </td>
 <td><button type="submit" name="MilAnnex" id="MilitaryAnnex" >Annex Militarily</button> </td>
 <input type="hidden" style="display:none"  id="invisible-provID" name="invisible-provID">
-<input type="hidden" style="display:none"  id="invisible-playerSession" name="invisible-playerSession">
 </tr>
 </table>
 <html>

@@ -3,8 +3,8 @@ include_once "DBLoader.php";
 session_start();
 $database = new Database();
 $db = $database->getConnection();
-$playerName = $database->ReturnLogin(session_id());
-$userInfo = $database->GetLoadedEvent(session_id());
+$playerName = $_SESSION['Country'];
+$userInfo = $database->GetLoadedEvent($_SESSION['Country']);
 
 if($_POST['invisible-loadedEvent'] == "" || !is_numeric($_POST['invisible-loadedEvent'])){
 	header("Location: ../ErrorPage.php");

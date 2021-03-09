@@ -1,12 +1,16 @@
 <?php
 include_once "DBLoader.php";
-session_start();
+if(!isset($_SESSION)) 
+{ 
+   session_start(); 
+} 
 
-if(isset($_SESSION['Active']))
+
+if(isset($_SESSION['Country']))
 {
 	$database = new Database();
 	$db = $database->getConnection();
-	$database->UpdateEventTimer(session_id());
+	$database->UpdateEventTimer($_SESSION['Country']);
 	include_once 'PageElements/TopBar.php';
 }
 else

@@ -11,8 +11,7 @@ $returnBool = $database->verifyIdentity($loginRequest,$passwordRequest);
 if($returnBool == True)
 {
 	session_start();
-	$database->AddNewSession(session_id(),$loginRequest);
-	$_SESSION['Active'] = "T";
+	$_SESSION['Country'] = $loginRequest; //Session variables are serverside
 	header("Location: ../Main.php");
 }
 else
