@@ -15,6 +15,7 @@ if($loadedProvince == "[]") //if the province does not exist
 {
 	header("Location: ErrorPage.php"); 
 }
+
 ?>
 
 <!DOCTYPE HTML>
@@ -56,28 +57,28 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 <table style="width:60%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:5px solid black;">
 <td style="text-align:center;" colspan="2">
-<font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Null, </font>
-	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;">Null</i>
+<font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Loading...</font>
+	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;"></i>
 	<br>
 	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By: <?php echo $provCountry; ?></i>
 	<br><br>
-	<i id="ProvClimate">Marine</i>
+	<i id="ProvClimate"></i>
 	<br><br><br>
 </td>
 </tr>
 <tr>
 <td style="text-align:center;border-bottom:3px solid black;">
-	<font id="ProvPopulation" style="font-size:16px;">City Population: Zero</font>
+	<font id="ProvPopulation" style="font-size:16px;"></font>
 	<br>
-	<font id="ProvHDI" style="font-size:16px;">HDI: Zero</font>
+	<font id="ProvHDI" style="font-size:16px;"></font>
 	<br>
-	<font id="ProvGDP" style="font-size:16px;">Nominal GDP per Capita: Zero</font>
+	<font id="ProvGDP" style="font-size:16px;"></font>
 </td>	
 </tr>
 <tr style="border-bottom:3px solid black;">
 <td style="text-align:center;">
 	<br><br>
-	<font id="ProvInfo" style="font-size:18px;">Description</font>
+	<font id="ProvInfo" style="font-size:18px;"></font>
 </td>
 </tr>
 </table>
@@ -88,8 +89,10 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 </form>
 </div>
 </div>
-
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <script>
 var playerName = "<?php echo $playerCountry; ?>";
@@ -106,7 +109,7 @@ if(playerName != "<?php echo $provCountry; ?>") //If the player is the owner
 else
 {
 	$(document).ready(function(){
-		$("#DetailsTable").load("PageElements/ProvinceViewTables/Improve.php", function(responseTxt, statusTxt, xhr){
+		$("#DetailsTable").load("PageElements/ProvinceViewTables/Improve.php?selectedProvince=" + "<?php echo $selectedProvince; ?>", function(responseTxt, statusTxt, xhr){
 		if(statusTxt == "success")
 			_loadDetails();
 		});

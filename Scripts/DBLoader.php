@@ -60,9 +60,16 @@ class Database{
 		$result = $this->connectionData->query("SELECT Title FROM governmentTypes WHERE GovernmentForm = '" . $dataSet['Country_Type'] . "';") or die(mysqli_error($this->connectionData));
 		$dataSet['Title'] = $result->fetch_assoc()['Title'];
 		
+		$dataSet['MilitaryCapacity'] = $this->GetPlayerMilCap($PlayerIdentity);
+		
 		$result = $this->connectionData->query("SELECT World_Name FROM worlds WHERE World_Code = '" . $dataSet['World_Code'] . "';") or die(mysqli_error($this->connectionData));
 		$dataSet['World_Name'] = $result->fetch_assoc()['World_Name'];
 		
+		if(intval($dataSet['Military_Influence'])>intval($dataSet['MilitaryCapacity']))
+		{
+			$this->connectionData->query("UPDATE players SET Military_Influence = " . intval($dataSet['MilitaryCapacity']) . " WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+			$dataSet['Military_Influence'] = intval($dataSet['MilitaryCapacity']);
+		}
 		return $dataSet;
 	}
 	
@@ -77,9 +84,9 @@ class Database{
 		return $dataSet;
 	}
 	
-	public function GetSessionplayers($worldCode)
+	public function GetSessionPlayers($worldCode)
 	{
-		$result = $this->connectionData->query("SELECT Country_Name,Country_Type,Colour,Last_Event_Time FROM players WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT Country_Name,Colour,Last_Event_Time FROM players WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
 		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
 		
 		return $dataSet;
@@ -227,7 +234,9 @@ class Database{
 		$result = $this->connectionData->query("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM province_Occupation WHERE World_Code = '" . $world_Code . "') ORDER BY RAND() LIMIT 1;") or die(mysqli_error($this->connectionData)); //This needs to be changed to handle when there are no locations left. 
 		$randomCapital = $result->fetch_row()[0];
 		
-		$sqlExec = "INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "');" or die(mysqli_error($this->connectionData));
+		$maxValues = $this->GetProvinceMax($provinceID);
+		
+		$sqlExec = "INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "','" . $maxValues[0] . "','" . $maxValues[1] . "','" . $maxValues[2] . "');" or die(mysqli_error($this->connectionData));
 		$this->connectionData->query($sqlExec);
 		
 		return True;
@@ -306,7 +315,7 @@ class Database{
 		$formattedLastTime = $lastTime->format("Y/m/d h:i:s");
 		$formattedCurTime = $currentTime->format("Y/m/d h:i:s");
 		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),28800)); //abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
-		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); //20 mins time
+		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); 
 		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 		
 		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $country . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
@@ -412,7 +421,11 @@ class Database{
 		$eventParams['AddMil'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Military_Generation']);
 		$eventParams['AddEco'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Economic_Generation']);
 		$eventParams['AddCult'] = floor($eventParams['Base_Influence_Reward'] * $playerModifiers['Culture_Generation']);
-		$this->connectionData->query("UPDATE players SET Military_Influence = Military_Influence + " . $eventParams['AddMil'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
+		
+		$currentMilInfluence = $this->connectionData->query("SELECT Military_Influence FROM players WHERE Country_Name = '" . $userName . "';")  or die(mysqli_error($this->connectionData));
+		$newMilitaryInfluence = min(intval($currentMilInfluence->fetch_row()[0]) + intval($eventParams['AddMil']),intval($this->GetPlayerMilCap($userName)));
+		
+		$this->connectionData->query("UPDATE players SET Military_Influence = " . $newMilitaryInfluence . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
 		$this->connectionData->query("UPDATE players SET Economic_Influence = Economic_Influence + " . $eventParams['AddEco'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
 		$this->connectionData->query("UPDATE players SET Culture_Influence = Culture_Influence + " . $eventParams['AddCult'] . " WHERE Country_Name = '" . $userName . "';") or die(mysqli_error($this->connectionData));
 		
@@ -440,6 +453,13 @@ class Database{
 		$ownedprovinces = $result->fetch_all(MYSQLI_ASSOC);
 		
 		return $ownedprovinces;
+	}
+	
+	public function GetPlayerMilCap($country)
+	{
+		$result = $this->connectionData->query("SELECT (200 + (COUNT(Province_ID) * 15)) FROM province_Occupation WHERE province_Occupation.Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
+		$milCap = $result->fetch_row()[0];
+		return $milCap;
 	}
 	
 	public function ReturnAllPlayerDominantCoastal($playerName)
@@ -563,9 +583,80 @@ class Database{
 		}
 	}
 	
+	public function GetProvinceMax($provinceID)
+	{
+		$result = $this->connectionData->query("SELECT Culture_Cost,Economic_Cost,Military_Cost FROM provinces WHERE Province_ID = '" . $provinceID . "';") or die(mysqli_error($this->connectionData));
+		$costs = $result->fetch_all(MYSQLI_ASSOC)[0];
+		$maxCosts = array_keys($costs, max($costs))[0];
+		$provinceMax = "";
+		$buildingType1 = "";
+		$buildingType2 = "";
+		
+		if($maxCosts=="Culture_Cost")
+		{
+			$provinceMax = "Culture";
+			$buildingType1 = "C0";
+			$buildingType2 = "M0";
+		}
+		else if($maxCosts=="Economic_Cost")
+		{
+			$provinceMax = "Economic";
+			$buildingType1 = "E0";
+			$buildingType2 = "C0";
+		}
+		else if($maxCosts=="Military_Cost")
+		{
+			$provinceMax = "Military";
+			$buildingType1 = "M0";
+			$buildingType2 = "E0";
+		}
+		else
+		{
+			die("Error");
+		}
+		
+		return array($provinceMax,$buildingType1,$buildingType2);
+		
+	}
+	
+	public function GetCurrentBuilding($provinceID,$worldCode)
+	{
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';");
+		$currentBuildings = $result->fetch_row();
+		return $currentBuildings;
+	}
+	
+	public function GetPossibleBuildings($provinceType)
+	{
+		$buildingIDarray = array();
+		$buildingsWithInfo = array();
+		
+		if($provinceType == "Culture")
+		{
+			$buildingIDarray = array("C0","C1","C2","C3","C4","M0","M1","M2","M3","M4");
+		}
+		else if($provinceType == "Economic")
+		{
+			$buildingIDarray = array("E0","E1","E2","E3","E4","C0","C1","C2","C3","C4");
+		}
+		else if($provinceType == "Military")
+		{
+			$buildingIDarray = array("M0","M1","M2","M3","M4","E0","E1","E2","E3","E4");
+		}
+		
+		for($i=0;$i<count($buildingIDarray);$i++)
+		{
+			$result = $this->connectionData->query("SELECT BuildingID,Building_Name,Bonus_Mil_Cap,Bonus_Def_Strength,Bonus_Build_Cost,Base_Cost FROM buildings WHERE BuildingID = '" . $buildingIDarray[$i] . "';");
+			$buildingsWithInfo[$i] = $result->fetch_assoc();
+		}
+
+		return $buildingsWithInfo; //Usage : $buildingsWithInfo[0]['Bonus_Mil_Cap'];
+	}
+	
 	public function AnnexLocationPeaceful($playerID,$provinceID,$pointType,$cost) //$pointType can be either Culture_Influence or Economic_Influence or military if the lcoation is unowned
 	{
-		$this->connectionData->query("INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name) VALUES('" . $this->ReturnWorld($playerID) . "','" . $provinceID . "','" . $playerID ."');") or die(mysqli_error($this->connectionData));
+		$maxValues = $this->GetProvinceMax($provinceID);
+		$this->connectionData->query("INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $this->ReturnWorld($playerID) . "','" . $provinceID . "','" . $playerID ."','" . $maxValues[0] . "','" . $maxValues[1] ."','" . $maxValues[2] . "');") or die(mysqli_error($this->connectionData));
 		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
 	}
 	

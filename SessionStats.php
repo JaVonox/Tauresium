@@ -37,7 +37,7 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 	<table style="width:60%;margin-left:auto;margin-right:auto;text-align:center;font-size:24px;border-collapse:collapse;">
 	<th><u> Flag </u></th>
 	<th><u> Country Name  <u></th>
-	<th><u> Government <u></th>
+	<th><u> Max Military Strength <u></th>
 	<th><u> Last Online <u></th>
 	<th><u> Number Of Provinces <u></th>
 	<th><u> Coastal Power <u></th>
@@ -51,7 +51,7 @@ $worldOccupants = $database->GetSessionPlayers($worldStats['World_Code']);
 		echo "<tr style='border-bottom:2px solid black;'>";
 		echo "<td> <img src='Assets/Flags/" . $worldOccupants[$x]['Colour'] . ".png' alt='Country Flag' width='180px' height='120px'/> </td>";
 		echo "<td>" . $playerTitle . " " . $worldOccupants[$x]['Country_Name'] . "</td>";
-		echo "<td>" . $worldOccupants[$x]['Country_Type'] . "</td>";
+		echo "<td>" . $database->GetPlayerMilCap($worldOccupants[$x]['Country_Name']) . "</td>";
 		echo "<td>" . $worldOccupants[$x]['Last_Event_Time'] . "</td>";
 		echo "<td>" . $playerProvinces . "</td>";
 		echo "<td style='text-align:center;font-size:18px;'>";

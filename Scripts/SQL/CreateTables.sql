@@ -67,7 +67,23 @@ CREATE TABLE province_Occupation(
 Occupation_ID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
 World_Code varchar(16) NOT NULL, /*FK*/
 Province_ID varchar(255) NOT NULL, /*FK*/
-Country_Name varchar(50) NOT NULL /*FK*/
+Country_Name varchar(50) NOT NULL, /*FK*/
+Province_Type varchar(20) NOT NULL, /*Culture,Economic,Military based on highest base cost*/
+Building_Column_1 varchar(2) NOT NULL, /* Starts C0/E0/M0 FK */
+Building_Column_2 varchar(2) NOT NULL /* Starts C0/E0/M0 FK */
+);
+
+/*Culture Province -> Culture/Military */
+/*Economic Province -> Economic/Culture */
+/*Military Province -> Military/Economic */
+
+CREATE TABLE buildings(
+BuildingID varchar(2) PRIMARY KEY, /* C/E/M + 0/1/2/3/4 */
+Building_Name varchar(50),
+Bonus_Mil_Cap int NOT NULL,
+Bonus_Def_Strength int NOT NULL,
+Bonus_Build_Cost int NOT NULL,
+Base_Cost int NOT NULL
 );
 
 CREATE TABLE events(
@@ -175,32 +191,17 @@ add constraint provincesCR_M_To_coastalRegionsCR_O
 foreign key(Coastal_Region)
 references coastalRegions(Coastal_Region);
 
-/* One to Many. Coastal regions cannot have an SQL relationship however as they are self referencial 
+/* Many to One. Many Building_Columns to One building */
 
-ALTER TABLE coastalRegions
-add constraint coastalRegions_Iterative_1
-foreign key(Outbound_Connection_1)
-references coastalRegions(Coastal_Region);
+ALTER TABLE province_Occupation
+add constraint ProvinceOcc_B1_M_To_Buildings_ID_O
+foreign key(Building_Column_1)
+references buildings(BuildingID);
 
-ALTER TABLE coastalRegions
-add constraint coastalRegions_Iterative_2
-foreign key(Outbound_Connection_2)
-references coastalRegions(Coastal_Region);
-
-ALTER TABLE coastalRegions
-add constraint coastalRegions_Iterative_3
-foreign key(Outbound_Connection_3)
-references coastalRegions(Coastal_Region);
-
-ALTER TABLE coastalRegions
-add constraint coastalRegions_Iterative_4
-foreign key(Outbound_Connection_4)
-references coastalRegions(Coastal_Region);
-
-ALTER TABLE coastalRegions
-add constraint coastalRegions_Iterative_5
-foreign key(Outbound_Connection_5)
-references coastalRegions(Coastal_Region); */
+ALTER TABLE province_Occupation
+add constraint ProvinceOcc_B2_M_To_Buildings_ID_O
+foreign key(Building_Column_2)
+references buildings(BuildingID);
 
 INSERT INTO options VALUES(1,'These rebels should be removed from their offices at once',-0.04,0,0.04);
 INSERT INTO options VALUES(2,'Our government must be open to all opinions',0.03,0.02,-0.06);
@@ -226,7 +227,6 @@ INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 'Recently, an obscure village on the fringes of our country have began to develop traditions of their own, many of which contradict our peoples own beliefs. Public outcry has called for us to suppress these so called harmful revolutionaries.',
 40,7,8,9);
 
-
 INSERT INTO options VALUES(10,'Nonsense! These unique and beautiful animals will be our new national animal!',0.04,-0.04,0);
 INSERT INTO options VALUES(11,'Cull the population to acceptable levels',-0.01,0.03,0);
 INSERT INTO options VALUES(12,'This is really not an issue of national importance, they can deal with it how they see fit.',0,0.01,0);
@@ -235,7 +235,6 @@ INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 'Zoologists under our funding have discovered a new species of freshwater fish native to rivers in our nation. Since the discovery of these fish, their population has skyrocketed, harming local ecosystems. Local communities have asked us to intervene to protect their interests in the area.',
 25,10,11,12);
 
-
 INSERT INTO options VALUES(13,'Blockading the nuclear plant is putting them in more danger than any fake symptoms, they must be dispersed by force.',0,0.02,0.03);
 INSERT INTO options VALUES(14,'Agree to demolish the plant to appease the people',0.02,-0.05,-0.02);
 INSERT INTO options VALUES(15,'There cannot be *nothing* causing their illness, fund an investigation into the true causes of the symptoms',0.01,-0.01,-0.01);
@@ -243,7 +242,6 @@ INSERT INTO options VALUES(15,'There cannot be *nothing* causing their illness, 
 INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Placebo Particle',
 'After the installation of a nuclear power plant near a rural town locals have began to complain of frequent headaches and pains, and in some cases even vomiting. Investigation into the matter has cleared any suspicion of radiation-related causes, yet the locals have organised a blockade of the facility in protest, the power company has turned to us for help in this crisis.',
 45,13,14,15);
-
 
 INSERT INTO options VALUES(16,'We cannot allow our children to believe such nonsense',-0.01,0.03,0);
 INSERT INTO options VALUES(17,'Of course! Teaching all sides of a debate teaches children critical thinking skills.',0.02,-0.05,0);
@@ -411,6 +409,24 @@ INSERT INTO governmentTypes VALUES('CommunistRepublic','The Peoples Republic of'
 INSERT INTO governmentTypes VALUES('Oligarchy','The Oligarchical State of',1.1,1,1,100,50,70);
 INSERT INTO governmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0.9,25,25,25);
 INSERT INTO governmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
+
+INSERT INTO buildings VALUES('C0','Administration','0','0','0','0');
+INSERT INTO buildings VALUES('C1','Cathedral','0','0','10','50');
+INSERT INTO buildings VALUES('C2','Train Station','10','0','0','100');
+INSERT INTO buildings VALUES('C3','University','0','10','25','200');
+INSERT INTO buildings VALUES('C4','Airport','15','0','0','400');
+
+INSERT INTO buildings VALUES('E0','Administration','0','0','0','0');
+INSERT INTO buildings VALUES('E1','Bank','0','10','0','50');
+INSERT INTO buildings VALUES('E2','Factory','0','0','15','100');
+INSERT INTO buildings VALUES('E3','Stock Exchange','0','30','0','200');
+INSERT INTO buildings VALUES('E4','International Headquaters','0','0','10','400');
+
+INSERT INTO buildings VALUES('M0','Administration','0','0','0','0');
+INSERT INTO buildings VALUES('M1','Military Base','10','0','0','50');
+INSERT INTO buildings VALUES('M2','Airfield','10','25','0','100');
+INSERT INTO buildings VALUES('M3','Logistics Office','15','0','15','200');
+INSERT INTO buildings VALUES('M4','Command Center','0','50','0','400');
 
 INSERT INTO provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57','188');
 INSERT INTO provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57','188');
@@ -847,6 +863,6 @@ INSERT INTO provinces  VALUES ('Australia_NewZealandWestcoast','904,476','893,47
 INSERT INTO provinces  VALUES ('Australia_NewZealandCanterbury','904,476','874,495','876,482',TRUE,'Christchurch','Forest','Canterbury','South East Asia','>No Information Currently Available','380000','0.931','38675','0','0','0.1','3537.8','365.46425','1292.939424','4.3287','7.3379','7.037','64','82','89','235');
 INSERT INTO provinces  VALUES ('Australia_NewZealandFiordland','859,496','874,495','876,482',TRUE,'Te Anau','Forest','Fiordland','South East Asia','>No Information Currently Available','2900','0.931','38675','0','0','0.1','26.999','371.17125','10.02125258','0.2412','7.3651','0.4612','56','82','62','200');
 
-INSERT INTO worlds VALUES('WORLWORLWORLWORL','Elysium','Earth','20',4);
-INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,events_Stacked) VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','WORLWORLWORLWORL',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
-INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name) VALUES('WORLWORLWORLWORL','China_Beijing','ADMIN');
+INSERT INTO worlds VALUES('EPTR65E23EJ4HFTZ','Elysium','Earth','30',4);
+INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,events_Stacked) VALUES('ADMIN','45961da9ce13da68788eac0836edf79c1a0b510746b26bb471acf8c53a9dd63e', 'Tribe','ECE788','EPTR65E23EJ4HFTZ',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('EPTR65E23EJ4HFTZ','China_Beijing','ADMIN',"Culture","C0","M0");

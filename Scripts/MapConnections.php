@@ -214,7 +214,7 @@ class MapConnections
 		$seaModifier = 1.5;
 		$peaceful = True;
 		$description = "<br> Base military modifier: +50%";
-		
+		$methodDescription = "";
 		if($this->CheckOwner($provinceID) == "No Owner")
 		{
 			$description .= "<br> Province is unowned: +20%";
@@ -234,7 +234,6 @@ class MapConnections
 		if($this->CheckAdjacent($provinceID)) 
 		{
 			$landModifier -= 0.05;
-			$description .= "<br> Province is adjacent: -5%";
 		}
 		else
 		{
@@ -243,7 +242,7 @@ class MapConnections
 		
 		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'])) 
 		{
-			$description .= "<br> Province is available by local oceans: +20%";
+			$methodDescription .= "<br> Province is available by local oceans: +20%";
 			$seaModifier += 0.2;
 		}
 		else
@@ -282,7 +281,7 @@ class MapConnections
 			else
 			{
 				$seaModifier +=1;
-				$description .= "<br> Province is available by faraway oceans: +100%";
+				$methodDescription = "<br> Province is available by faraway oceans: +100%";
 			}
 			
 		}
@@ -293,6 +292,8 @@ class MapConnections
 		
 		if($landCost < $seaCost && $landCost < 9999)
 		{
+			$methodDescription = "<br> Province is adjacent: -5%";
+			$description .= $methodDescription;
 			$description .= "<br><br> Total: +" . strval(($landModifier-1)*100) . "%";
 			
 			return array(($this->database->getPlayerStats($this->_subjectName)['Military_Influence'] >= $landCost),$description,floor($landCost),$peaceful);
@@ -300,6 +301,7 @@ class MapConnections
 		}
 		else if($seaCost < $landCost && $seaCost < 9999)
 		{	
+			$description .= $methodDescription;
 			$description .= "<br><br> Total: +" . strval(($seaModifier-1)*100 . "%");
 			
 			
