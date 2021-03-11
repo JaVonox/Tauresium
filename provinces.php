@@ -15,7 +15,9 @@ if($loadedProvince == "[]") //if the province does not exist
 {
 	header("Location: ErrorPage.php"); 
 }
+$provinceType = $database->GetProvinceType($selectedProvince)[0];
 
+$buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
 ?>
 
 <!DOCTYPE HTML>
@@ -60,8 +62,10 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 <font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Loading...</font>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;"></i>
 	<br>
-	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By: <?php echo $provCountry; ?></i>
+	<font id="ProvType" style="font-family: Romanus;font-size:32px;">PROVINCE TYPE</font>
 	<br><br>
+	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By: <?php echo $provCountry; ?></i>
+	<br>
 	<i id="ProvClimate"></i>
 	<br><br><br>
 </td>
@@ -82,7 +86,11 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 </td>
 </tr>
 </table>
-<br><br>
+<br>
+<table  style="margin-left:auto;margin-right:auto;text-align:center;">
+<tr><td><font id="ProvErrors" style="font-family: Arial;font-size:24px;color:red;">Loading...</font></td></tr>
+</table>
+<br>
 <form id="DetailsForm" method="POST">
 <table id="DetailsTable" style="margin-left:auto;margin-right:auto;">
 </table>
@@ -120,8 +128,11 @@ else
 <script>
 var phpArray = <?php echo $loadedProvince; ?>;
 var selectedProvince = phpArray[0];
+var provType = "<?php echo $provinceType; ?>";
+var pageErrors = "<?php echo $buildError; ?>";
 
 document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
+document.getElementById("ProvType").textContent = "Province Focus: " + provType;
 document.getElementById("ProvRegion").textContent = "," + selectedProvince.Region;
 document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
 document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
@@ -129,6 +140,8 @@ document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.Nati
 document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
 document.getElementById("ProvInfo").textContent = selectedProvince.Description;
 document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
+
+document.getElementById("ProvErrors").textContent = pageErrors;
 
 function _loadDetails()
 {
