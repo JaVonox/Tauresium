@@ -45,10 +45,10 @@ else
 <br><br>
 <img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $playerStats['Culture_Influence'] . " "; ?>
 <img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $playerStats['Economic_Influence'] . " "; ?>
-<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font style="<?php echo ($playerStats['Military_Influence']==$playerStats['MilitaryCapacity']) ? "color:green;" : "color:black;"?>"> <?php echo $playerStats['Military_Influence'] . "/" . $playerStats['MilitaryCapacity']; ?> </font>
+<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font style="<?php echo ($playerStats['Military_Influence']>=$playerStats['MilitaryCapacity']) ? "color:green;" : "color:black;"?>"> <?php echo $playerStats['Military_Influence'] . "/" . $playerStats['MilitaryCapacity']; ?> </font>
 <br>
 <img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $timeLeftFormatted . " "; ?>
-<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo floor($playerStats['Events_Stacked']); ?>/5
+<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font style="<?php echo ($playerStats['Events_Stacked']>=5) ? "color:green;" : "color:black;"?>"> <?php echo floor($playerStats['Events_Stacked']); ?>/5
 <br>	
 </td>
 </tr>

@@ -240,6 +240,15 @@ class MapConnections
 			$landCost = 9999; //unavailable
 		}
 		
+		$buildMod = intval($this->database->GetBuildingDefensiveStrength($provinceID,$this->database->getPlayerStats($this->_subjectName)['World_Code']));
+		
+		if($buildMod != 0) //account for buildings
+		{
+			$landModifier += ($buildMod / 100);
+			$seaModifier += ($buildMod / 100);
+			$description .= "<br> Defensive Buildings: +" . strval($buildMod) . "%";
+		}
+		
 		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'])) 
 		{
 			$methodDescription .= "<br> Province is available by local oceans: +20%";

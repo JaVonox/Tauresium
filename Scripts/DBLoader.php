@@ -234,9 +234,9 @@ class Database{
 		$result = $this->connectionData->query("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM province_Occupation WHERE World_Code = '" . $world_Code . "') ORDER BY RAND() LIMIT 1;") or die(mysqli_error($this->connectionData)); //This needs to be changed to handle when there are no locations left. 
 		$randomCapital = $result->fetch_row()[0];
 		
-		$maxValues = $this->GetProvinceMax($provinceID);
+		$maxValues = $this->GetProvinceType($randomCapital);
 		
-		$sqlExec = "INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "','" . $maxValues[0] . "','" . $maxValues[1] . "','" . $maxValues[2] . "');" or die(mysqli_error($this->connectionData));
+		$sqlExec = "INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "','" . $maxValues[0] . "','" . $maxValues[1][0] . "4','" . $maxValues[2][0] . "4');" or die(mysqli_error($this->connectionData));
 		$this->connectionData->query($sqlExec);
 		
 		return True;
@@ -459,6 +459,7 @@ class Database{
 	{
 		$result = $this->connectionData->query("SELECT (200 + (COUNT(Province_ID) * 15)) FROM province_Occupation WHERE province_Occupation.Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 		$milCap = $result->fetch_row()[0];
+		$milCap = $milCap + $this->GetTotalBuildingMilCap($country);
 		return $milCap;
 	}
 	
@@ -583,30 +584,30 @@ class Database{
 		}
 	}
 	
-	public function GetProvinceMax($provinceID)
+	public function GetProvinceType($provinceID)
 	{
 		$result = $this->connectionData->query("SELECT Culture_Cost,Economic_Cost,Military_Cost FROM provinces WHERE Province_ID = '" . $provinceID . "';") or die(mysqli_error($this->connectionData));
 		$costs = $result->fetch_all(MYSQLI_ASSOC)[0];
 		$maxCosts = array_keys($costs, max($costs))[0];
-		$provinceMax = "";
+		$provinceColumn = "";
 		$buildingType1 = "";
 		$buildingType2 = "";
 		
 		if($maxCosts=="Culture_Cost")
 		{
-			$provinceMax = "Culture";
+			$provinceColumn = "Culture";
 			$buildingType1 = "C0";
 			$buildingType2 = "M0";
 		}
 		else if($maxCosts=="Economic_Cost")
 		{
-			$provinceMax = "Economic";
+			$provinceColumn = "Economic";
 			$buildingType1 = "E0";
 			$buildingType2 = "C0";
 		}
 		else if($maxCosts=="Military_Cost")
 		{
-			$provinceMax = "Military";
+			$provinceColumn = "Military";
 			$buildingType1 = "M0";
 			$buildingType2 = "E0";
 		}
@@ -615,7 +616,7 @@ class Database{
 			die("Error");
 		}
 		
-		return array($provinceMax,$buildingType1,$buildingType2);
+		return array($provinceColumn,$buildingType1,$buildingType2);
 		
 	}
 	
@@ -624,6 +625,154 @@ class Database{
 		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';");
 		$currentBuildings = $result->fetch_row();
 		return $currentBuildings;
+	}
+	
+	public function GetNextBuilding($provinceID,$worldCode,$buildType) //Returns the type of the building.
+	{
+		$buildings = $this->GetCurrentBuilding($provinceID,$worldCode);
+		return ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php"));
+	}
+	
+	public function GetBuildingCost($provinceID,$worldCode,$buildType)
+	{
+		$costModifier = 1 - (intval($this->GetConstructedBonuses($provinceID,$worldCode)["Bonus_Build_Cost"]) / 100);
+		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType);
+		
+		$result = $this->connectionData->query("SELECT Base_Cost FROM buildings WHERE BuildingID = '" . $nextBuilding . "';");
+		$baseCost = $result->fetch_row()[0];
+		$newCost = ceil(intval($baseCost) * $costModifier);
+		return $newCost;
+	}
+	
+	public function GetTotalBuildingMilCap($player)
+	{
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_occupation WHERE Country_Name = '" . $player . "';") or die(mysqli_error($this->connectionData));
+		$unformattedBuildings = $result->fetch_all(MYSQLI_NUM);
+		$formattedBuildings = array();
+		$bonusCapacity = 0;
+		$formattedEntries = 0;
+		
+		for($i=0;$i<count($unformattedBuildings);$i++)
+		{
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][0];
+			$formattedEntries++;
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][1];
+			$formattedEntries++;
+			
+			for($j=intval($unformattedBuildings[$i][0][1])-1;$j>=0;$j--) //Add all buildings before current
+			{
+				$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][0][0] . $j;
+				$formattedEntries++;
+			}
+			
+			for($j=intval($unformattedBuildings[$i][1][1])-1;$j>=0;$j--) //Add all buildings before current
+			{
+				$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][1][0] . $j;
+				$formattedEntries++;
+			}
+		}
+		
+		for($i=0;$i<count($formattedBuildings);$i++)
+		{
+			$result = $this->connectionData->query("SELECT Bonus_Mil_Cap FROM buildings WHERE BuildingID = '" . $formattedBuildings[$i] . "';") or die(mysqli_error($this->connectionData));
+			$bonusCapacity += intval($result->fetch_row()[0]);
+		}
+		
+		return $bonusCapacity;
+	}
+	
+	public function GetBuildingDefensiveStrength($provinceID,$worldCode)
+	{
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND  World_Code = '" . $worldCode ."';") or die(mysqli_error($this->connectionData));
+		$unformattedBuildings = $result->fetch_row();
+		$formattedBuildings = array();
+		$bonusStrength = 0;
+		$formattedEntries = 0;
+		
+		
+		$formattedBuildings[$formattedEntries] = $unformattedBuildings[0];
+		$formattedEntries++;
+		$formattedBuildings[$formattedEntries] = $unformattedBuildings[1];
+		$formattedEntries++;
+		
+		for($j=intval($unformattedBuildings[0][1])-1;$j>=0;$j--) //Add all buildings before current
+		{
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[0][0] . $j;
+			$formattedEntries++;
+		}
+		
+		for($j=intval($unformattedBuildings[1][1])-1;$j>=0;$j--) //Add all buildings before current
+		{
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[1][0] . $j;
+			$formattedEntries++;
+		}
+		
+		for($i=0;$i<count($formattedBuildings);$i++)
+		{
+			$result = $this->connectionData->query("SELECT Bonus_Def_Strength FROM buildings WHERE BuildingID = '" . $formattedBuildings[$i] . "';") or die(mysqli_error($this->connectionData));
+			$bonusStrength += intval($result->fetch_row()[0]);
+		}
+		
+		return strval($bonusStrength);
+	}
+	
+	public function GetBuildingColumn($provinceID,$worldCode,$buildCode)
+	{
+		//Return column of current building (new build with value - 1)
+		$result = $this->connectionData->query("SELECT 1 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_1 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
+		$validColumn = $result->fetch_row()[0];
+
+		if($validColumn == 1)
+		{
+			return "Building_Column_1";
+		}
+		else
+		{
+			$result = $this->connectionData->query("SELECT 1 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_2 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
+			$validColumn = $result->fetch_row()[0];
+			
+			if($validColumn == 1)
+			{
+				return "Building_Column_2";
+			}
+			else
+			{
+				return "NULL";
+			}
+		}
+	}
+	
+	public function ConstructNewBuilding($playerID,$provinceID,$worldCode,$buildType) //Assumes all checks are valid. 
+	{
+		$newBuildCost = $this->GetBuildingCost($provinceID,$worldCode,$buildType);
+		$typeMapping = array("M"=>"Military_Influence", "E"=>"Economic_Influence", "C"=>"Culture_Influence");
+		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType);
+		
+		$influenceType = $typeMapping[$buildType];
+
+		$buildColumn = $this->GetBuildingColumn($provinceID,$worldCode,$nextBuilding);
+		
+		$this->connectionData->query("UPDATE province_Occupation SET " . $buildColumn . " = '" . $nextBuilding . "' WHERE World_Code = '" . $worldCode . "' AND Province_ID = '" . $provinceID . "';") or die(mysqli_error($this->connectionData));
+		$this->connectionData->query("UPDATE players SET " . $influenceType . " = " . $influenceType . " - " . $newBuildCost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
+	}
+	
+	public function CanConstructBuilding($playerID,$provinceID,$worldCode,$buildType)
+	{
+		$errors = array(False,"");
+		($this->GetProvinceOwner($provinceID,$worldCode)!=$playerID) ? $errors=True:"You are not the owner of this location"; //Check player is owner. Also works as a check to see if the location is actually owned, as well as validifying the worldCode
+		
+		$newBuildCost = $this->GetBuildingCost($provinceID,$worldCode,$buildType);
+		$typeMapping = array("M"=>"Military_Influence", "E"=>"Economic_Influence", "C"=>"Culture_Influence");
+		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType); //This checks if the build is valid and redirects to header if its invalid.
+		
+		$influenceType = $typeMapping[$buildType];
+		
+		$result = $this->connectionData->query("SELECT " . $influenceType . " FROM players WHERE Country_Name = '" . $playerID . "';");
+		$playerInfluenceBalance = intval($result->fetch_row()[0]); //Can player afford this
+		
+		(intval($newBuildCost)>$playerInfluenceBalance) ? $errors=array(True,"You have too little influence to purchase this building"):"";
+		
+		return $errors;
 	}
 	
 	public function GetPossibleBuildings($provinceType)
@@ -653,9 +802,39 @@ class Database{
 		return $buildingsWithInfo; //Usage : $buildingsWithInfo[0]['Bonus_Mil_Cap'];
 	}
 	
+	public function GetConstructedBonuses($provinceID,$worldCode)
+	{
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';");
+		$currentBuildings = $result->fetch_row();
+		$building1 = $currentBuildings[0]; //0 = Type, 1=CurTier
+		$building2 = $currentBuildings[1]; //0 = Type, 1=CurTier
+		
+		$totalBonuses = array("Bonus_Mil_Cap"=>"0", "Bonus_Def_Strength"=>"0", "Bonus_Build_Cost"=>"0");
+		
+		for($i=intval($building1[1]);$i>=0;$i--)
+		{
+			$result = $this->connectionData->query("SELECT Bonus_Mil_Cap,Bonus_Def_Strength,Bonus_Build_Cost FROM buildings WHERE BuildingID = '" . $building1[0] . strval($i) . "';")  or die(mysqli_error($this->connectionData));
+			$modifiers = $result->fetch_row();
+			$totalBonuses["Bonus_Mil_Cap"] += $modifiers[0];
+			$totalBonuses["Bonus_Def_Strength"] += $modifiers[1];
+			$totalBonuses["Bonus_Build_Cost"] += $modifiers[2];
+		}
+		
+		for($i=intval($building2[1]);$i>=0;$i--)
+		{
+			$result = $this->connectionData->query("SELECT Bonus_Mil_Cap,Bonus_Def_Strength,Bonus_Build_Cost FROM buildings WHERE BuildingID = '" . $building2[0] . strval($i) . "';")  or die(mysqli_error($this->connectionData));
+			$modifiers = $result->fetch_row();
+			$totalBonuses["Bonus_Mil_Cap"] += $modifiers[0];
+			$totalBonuses["Bonus_Def_Strength"] += $modifiers[1];
+			$totalBonuses["Bonus_Build_Cost"] += $modifiers[2];
+		}
+		
+		return $totalBonuses;
+	}
+	
 	public function AnnexLocationPeaceful($playerID,$provinceID,$pointType,$cost) //$pointType can be either Culture_Influence or Economic_Influence or military if the lcoation is unowned
 	{
-		$maxValues = $this->GetProvinceMax($provinceID);
+		$maxValues = $this->GetProvinceType($provinceID);
 		$this->connectionData->query("INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $this->ReturnWorld($playerID) . "','" . $provinceID . "','" . $playerID ."','" . $maxValues[0] . "','" . $maxValues[1] ."','" . $maxValues[2] . "');") or die(mysqli_error($this->connectionData));
 		$this->connectionData->query("UPDATE players SET " . $pointType . " = " . $pointType . " - " . $cost  . " WHERE Country_Name = '" . $playerID . "';") or die(mysqli_error($this->connectionData));
 	}

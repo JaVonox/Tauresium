@@ -4,9 +4,11 @@ $selectedProvince = $_GET["selectedProvince"]; //Gets from AJAX load.
 
 $database = new Database();
 $db = $database->getConnection();
-$improvementDetails = $database->GetProvinceMax($selectedProvince);
+$improvementDetails = $database->GetProvinceType($selectedProvince);
 $buildEffects = $database->GetPossibleBuildings($improvementDetails[0]);
-$currentBuildings = $database->GetCurrentBuilding($selectedProvince,$database->ReturnWorld($_SESSION['Country']));
+$playerWorld = $database->ReturnWorld($_SESSION['Country']);
+$currentBuildings = $database->GetCurrentBuilding($selectedProvince,$playerWorld);
+$provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -24,43 +26,36 @@ $currentBuildings = $database->GetCurrentBuilding($selectedProvince,$database->R
 </style>
 </head>
 <table style="margin-left:auto;margin-right:auto;width:45%;margin-bottom:30px;">
-<tr style="text-align:center;font-size:24px;"> <td> Province Type : <?php echo $improvementDetails[0]; ?></td></tr>
 <tr><td></td></tr>
-<tr style="text-align:center;font-size:12px;"><td>This province belongs to our country and provides us with the following bonuses:</td></tr>
-<tr><td></td></tr>
-<tr style="text-align:center;font-size:20px;"><td>+0 Military Capacity</td></tr>
-<tr style="text-align:center;font-size:20px;"><td>+0% Local Defensive Strength</td></tr>
-<tr style="text-align:center;font-size:20px;"><td>-0% Local Build Cost</td></tr>
+<tr style="text-align:center;font-size:24px;"><td>This province belongs to our country and provides us with the following bonuses:</td></tr>
+<tr><td><br></td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="MilCapMod">+0 Military Capacity</td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="DefStrMod">+0% Local Defensive Strength</td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="BuildMod">-0% Local Build Cost</td></tr>
 </table>
 
 <table style="border-collapse:seperate;margin-left:auto;margin-right:auto;width:45%;border-spacing:25px;">
 <tr style="text-align:center;font-size:36px;font-family:Romanus;">
 <td style="border-bottom:2px solid black;" id="Col1">Culture Buildings</td>
 <td style="border-bottom:2px solid black;" id="Col2">Economic Buildings</td>
-<td style="border-bottom:2px solid black;">Base Cost</td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td style="text-align:center;font-size:24px;font-family:Romanus;" >50</td>
+<td><a id="Building1Link" ><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><a id="Building6Link"><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td style="text-align:center;font-size:24px;font-family:Romanus;">100</td>
+<td><a id="Building2Link"><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><a id="Building7Link"><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td style="text-align:center;font-size:24px;font-family:Romanus;">200</td>
+<td><a id="Building3Link"><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><a id="Building8Link"><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td style="text-align:center;font-size:24px;font-family:Romanus;">400</td>
+<td><a id="Building4Link"><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><a id="Building9Link"><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
 </tr>
 </table>
-<html>
 
 <div id="PopUpDiv" style="display:none;">
 	<img id="BuildIcon" src="Assets/PlaceholderBox.png" style="display:block;margin-left:auto;margin-right:auto;width:128px;height:128px;"/>
@@ -92,6 +87,10 @@ tippy('.BuildingSlot', {
 <script> //LoadBuildingInfo
 var possibleBuildings = <?php echo json_encode($buildEffects); ?>;
 var currentBuildings = <?php echo json_encode($currentBuildings); ?>;
+var buildingModifiers = <?php echo json_encode($provBonuses); ?>;
+var thisProv = "<?php echo $selectedProvince; ?>";
+var thisWorld = "<?php echo $playerWorld; ?>";
+
 var refCodeLookup = {"C":"Culture","E":"Economic","M":"Military"}
 
 var column1Type = refCodeLookup[currentBuildings[0][0]];
@@ -108,6 +107,9 @@ function _loadBuildings()
 	
 	document.getElementById("Col1").textContent = column1Type + " Buildings";
 	document.getElementById("Col2").textContent = column2Type + " Buildings";
+	document.getElementById("MilCapMod").textContent = "+" + (buildingModifiers.Bonus_Mil_Cap+15) + " Military Capacity";
+	document.getElementById("DefStrMod").textContent = "+" + buildingModifiers.Bonus_Def_Strength + "% Local Defensive Strength";
+	document.getElementById("BuildMod").textContent = "-" + buildingModifiers.Bonus_Build_Cost + "% Local Build Cost";
 	
 	for(i = 1; i < 5;i++)
 	{
@@ -115,13 +117,14 @@ function _loadBuildings()
 		if(i -1 == parseInt(column1Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
+			document.getElementById("Building" + i + "Link").href = "Scripts/AddBuilding.php?Province=" +  thisProv + "&WorldCode=" + thisWorld + "&Type=" + currentBuildings[0][0]; //Allows player to expend points to construct buildings
 		}
 		else if(i - 1< parseInt(column1Tier)) //below build tier
 		{
 			document.getElementById("Building" + i).style.filter = "sepia(1)";
 			document.getElementById("Building" + i).style.border = "5px solid yellow";
 		}
-		else //below build tier
+		else //above build tier
 		{
 			document.getElementById("Building" + i).style.filter = "grayscale(1)";
 			document.getElementById("Building" + i).style.border = "5px solid black";
@@ -134,6 +137,7 @@ function _loadBuildings()
 		if(i - 6 == parseInt(column2Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
+			document.getElementById("Building" + i + "Link").href = "Scripts/AddBuilding.php?Province=" +  thisProv + "&WorldCode=" + thisWorld + "&Type=" + currentBuildings[1][0]; //Allows player to expend points to construct buildings
 		}
 		else if(i - 6< parseInt(column2Tier)) //below build tier
 		{
@@ -154,7 +158,7 @@ function _loadPopupBuilding(evt)
 	var subjectID = evt.slice(evt.length - 1);
 	document.getElementById("BuildIcon").src = "Assets/Buildings/" +  subjectEntry.Building_Name + ".png";
 	document.getElementById("BuildName").textContent = subjectEntry.Building_Name;
-	document.getElementById("BuildCost").textContent = "Cost: " + subjectEntry.Base_Cost;
+	document.getElementById("BuildCost").textContent = "Cost: " + Math.ceil(subjectEntry.Base_Cost * (1-(buildingModifiers.Bonus_Build_Cost/100)));
 	document.getElementById("BuildCap").textContent = "+" + subjectEntry.Bonus_Mil_Cap + " Military Capacity";
 	document.getElementById("BuildDef").textContent = "+" + subjectEntry.Bonus_Def_Strength + "% Local Defensive Strength";
 	document.getElementById("BuildCostMod").textContent = "-" + subjectEntry.Bonus_Build_Cost + "% Local Build Cost";
@@ -197,3 +201,4 @@ function _loadPopupBuilding(evt)
 	}
 }
 </script>
+</html>
