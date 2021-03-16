@@ -33,6 +33,6 @@ if($invalidParams == False)
 }
 else
 {
-	header("Location: ../ErrorPage.php"); //For missing parameters - to be changed to include bad parameters.
+	header("Location: ../ErrorPage.php?Error=BadBuildParams"); //For missing parameters - to be changed to include bad parameters.
 }
 ?>

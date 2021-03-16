@@ -14,7 +14,7 @@ $backgroundParams = "";
 
 if($missingParams)
 {
-	header("Location: ErrorPage.php"); 
+	header("Location: ErrorPage.php?Error=NoEventParams"); 
 }
 else if($cultGenChanges >= $milGenChanges && $cultGenChanges >= $ecoGenChanges)
 {

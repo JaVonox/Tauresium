@@ -164,7 +164,7 @@ else
 	}
 	else
 	{
-		header("Location: ../ErrorPage.php"); 
+		header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
 	}
 	
 }

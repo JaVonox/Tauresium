@@ -4,7 +4,7 @@ include_once "Scripts/MapConnections.php"; //This includes databases
 $selectedProvince = $_GET["ProvinceView"];
 if($selectedProvince == Null)
 {
-	header("Location: ErrorPage.php"); //if no variables were passed.
+	header("Location: ErrorPage.php?Error=NoSelectedProvince"); //if no variables were passed.
 }
 
 $database = new Database();
@@ -13,7 +13,7 @@ $loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
 
 if($loadedProvince == "[]") //if the province does not exist
 {
-	header("Location: ErrorPage.php"); 
+	header("Location: ErrorPage.php?Error=ProvinceDoesNotExist"); 
 }
 $provinceType = $database->GetProvinceType($selectedProvince)[0];
 

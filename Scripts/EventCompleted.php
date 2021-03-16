@@ -7,14 +7,14 @@ $playerName = $_SESSION['Country'];
 $userInfo = $database->GetLoadedEvent($_SESSION['Country']);
 
 if($_POST['invisible-loadedEvent'] == "" || !is_numeric($_POST['invisible-loadedEvent'])){
-	header("Location: ../ErrorPage.php");
+	header("Location: ../ErrorPage.php?Error=InvalidEvent");
 }
 
 $validEvent = $database->ReturnCorrectEvent($_POST['invisible-loadedEvent'],$playerName);
 
 if(!$validEvent)
 {
-	header("Location: ../ErrorPage.php");
+	header("Location: ../ErrorPage.php?Error=IncorrectEvent");
 }
 else
 {
@@ -29,7 +29,7 @@ else
 		$selectedOption = "Option3";
 	}
 	else{
-	header("Location: ../ErrorPage.php"); 
+	header("Location: ../ErrorPage.php?Error=BadEventOption"); 
 	}	
 	
 	$eventChanges = $database->EventResults($userInfo['Country'],$userInfo['LoadedEvent'],$selectedOption);

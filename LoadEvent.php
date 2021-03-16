@@ -26,7 +26,7 @@ if(is_array($LoadedEvent)) //This occurs if there is enough event stacks
 }
 else
 {
-	header("Location: ErrorPage.php"); 
+	header("Location: ErrorPage.php?Error=BadEventLoad"); 
 }
 
 ?>

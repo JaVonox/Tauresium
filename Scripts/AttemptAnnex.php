@@ -5,7 +5,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 if($_POST['invisible-provID'] == ""){
-	header("Location: ../ErrorPage.php");
+	header("Location: ../ErrorPage.php?Error=NoProvince");
 }
 
 $validHidden = $database->ReturnExists($_POST['invisible-provID']);
@@ -13,7 +13,7 @@ $validHidden = $database->ReturnExists($_POST['invisible-provID']);
 
 if(!$validHidden)
 {
-	header("Location: ../ErrorPage.php");
+	header("Location: ../ErrorPage.php?Error=InvalidProvinceID");
 }
 
 if (isset($_POST['CultureAnnex']))

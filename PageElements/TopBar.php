@@ -15,7 +15,7 @@ $timeUntilEventAbsolute = abs((($playerStats['Events_Stacked'] - floor($playerSt
 
 if(intval(gmdate("h",$timeUntilEventAbsolute)) < 12)
 {
-	$timeFormat = "h:i:s";
+	$timeFormat = "H:i:s";
 }
 
 //Time until next event - digits of events_stacked * 1200 = time since last event (20secintervals) change with speed.

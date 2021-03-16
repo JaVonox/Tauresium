@@ -14,7 +14,7 @@ class Database{
 		$conn = new mysqli($this->host, $this->user, $this->password, $this->database);
 		if($conn->connect_error) 
 		{
-			header("Location: ../ErrorPage.php"); //redirects to error page in case of error.
+			header("Location: ../ErrorPage.php?Error=Connection"); //redirects to error page in case of error.
 		} 
 		else 
 		{
@@ -221,7 +221,7 @@ class Database{
 		$culture_Generation =  $governmentProperties['Base_Culture_Generation'];
 		$economic_Influence =  $governmentProperties['Base_Economic_Influence'];
 		$economic_Generation =  $governmentProperties['Base_Economic_Generation'];
-		$LET = date("Y/m/d h:i:s");
+		$LET = date("Y/m/d H:i:s");
 		
 		$passwordHash = hash('sha256',$passwordPreHash,false); // This built in algorithm hashes the password provided using sha256.
 		
@@ -292,7 +292,7 @@ class Database{
 		$result = $this->connectionData->query("SELECT 1 FROM provinces WHERE Province_ID = '" . $Province_ID . "';") or die(mysqli_error($this->connectionData));
 		$provExists = (($result->fetch_row()[0])==1);
 	
-		return ($provExists); //and gate verifies both exist
+		return ($provExists);
 	}
 	
 	public function ReturnCorrectEvent($eventPage,$playerName)
@@ -310,11 +310,11 @@ class Database{
 		
 		$eventSpeed = $this->GetEventSpeed($country);
 		
-		$currentTime = new DateTime(date("Y/m/d h:i:s"));
+		$currentTime = new DateTime(date("Y/m/d H:i:s")); //Timezone is automatically set to the server timezone - hence it does not matter where the player is from, the time will be UTC on the server. This could cause issues at BST however.
 		$lastTime = new DateTime($lastEvent[0]);
-		$formattedLastTime = $lastTime->format("Y/m/d h:i:s");
-		$formattedCurTime = $currentTime->format("Y/m/d h:i:s");
-		$secondsElapsed =  abs(min(strtotime($formattedCurTime) - strtotime($formattedLastTime),28800)); //abs is used because ocassionally the value goes negative for an unknown reason. Its not a perfect solution but its better than nothing
+		$formattedLastTime = $lastTime->format("Y/m/d H:i:s");
+		$formattedCurTime = $currentTime->format("Y/m/d H:i:s");
+		$secondsElapsed =  strtotime($formattedCurTime) - strtotime($formattedLastTime); // int is 64x on this version of php. Should be
 		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); 
 		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 		
@@ -630,7 +630,7 @@ class Database{
 	public function GetNextBuilding($provinceID,$worldCode,$buildType) //Returns the type of the building.
 	{
 		$buildings = $this->GetCurrentBuilding($provinceID,$worldCode);
-		return ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php"));
+		return ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php?Error=BadBuildType"));
 	}
 	
 	public function GetBuildingCost($provinceID,$worldCode,$buildType)
@@ -646,7 +646,7 @@ class Database{
 	
 	public function GetTotalBuildingMilCap($player)
 	{
-		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_occupation WHERE Country_Name = '" . $player . "';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Country_Name = '" . $player . "';") or die(mysqli_error($this->connectionData));
 		$unformattedBuildings = $result->fetch_all(MYSQLI_NUM);
 		$formattedBuildings = array();
 		$bonusCapacity = 0;
@@ -683,7 +683,7 @@ class Database{
 	
 	public function GetBuildingDefensiveStrength($provinceID,$worldCode)
 	{
-		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND  World_Code = '" . $worldCode ."';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND  World_Code = '" . $worldCode ."';") or die(mysqli_error($this->connectionData));
 		$unformattedBuildings = $result->fetch_row();
 		$formattedBuildings = array();
 		$bonusStrength = 0;
@@ -719,7 +719,7 @@ class Database{
 	public function GetBuildingColumn($provinceID,$worldCode,$buildCode)
 	{
 		//Return column of current building (new build with value - 1)
-		$result = $this->connectionData->query("SELECT 1 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_1 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT 1 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_1 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
 		$validColumn = $result->fetch_row()[0];
 
 		if($validColumn == 1)
@@ -728,7 +728,7 @@ class Database{
 		}
 		else
 		{
-			$result = $this->connectionData->query("SELECT 1 FROM province_occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_2 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
+			$result = $this->connectionData->query("SELECT 1 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "' AND Building_Column_2 = '" . $buildCode[0] . (intval($buildCode[1]) - 1) ."';") or die(mysqli_error($this->connectionData));
 			$validColumn = $result->fetch_row()[0];
 			
 			if($validColumn == 1)
