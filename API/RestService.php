@@ -121,7 +121,7 @@ class RestService
 		switch($method) 
 		{
 		  case 'GET':
-			$this->performGet($url, $parameters, $requestBody, $accept);
+			$this->PerformGet($url, $parameters, $requestBody, $accept);
 			break;
 		  //case 'POST':
 			//$this->performPost($url, $parameters, $requestBody, $accept);
