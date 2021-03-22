@@ -39,7 +39,7 @@ function CultAnnex()
 	$db = $database->getConnection();
 	if($adjacent[0]) //Last check to ensure that this is valid. Check includes cost+adjacency
 	{
-		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Culture_Cost']);
+		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])->Base_Culture_Cost);
 		header("Location: ../Main.php");
 	}
 	else
@@ -58,7 +58,7 @@ function EcoAnnex()
 	$db = $database->getConnection();
 	if($coastalConnection[0]) 
 	{
-		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($directCoastalConnection[2]));
+		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])->Base_Economic_Cost) + intval($coastalConnection[2]));
 		header("Location: ../Main.php");
 	}
 	else

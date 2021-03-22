@@ -50,7 +50,7 @@ $visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td id="ProvTableRow" style="width:100%;height:100%;"> 
-		<?php include_once 'PageElements/Maps/Earth.html'?>
+		<?php include_once 'PageElements/Maps/Earth.html'?> <!-- To be changed to dynamic -->
 	</td>
 	</tr>
 	</table>

@@ -60,6 +60,7 @@ else
 	<button style="float:right;margin-right:20px;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';" class="backButton" onclick="document.location='Scripts/KillSession.php'">Logout</button>
 	<button class="menuButton" onclick="document.location='Main.php'">World Map</button>
 	<button class="menuButton" onclick="document.location='SessionStats.php'"><?php echo $playerStats['World_Name']; ?></button>
+	<button class="apiButton" onclick="document.location='APIuse.php'">API</button>
 	<button class="tutorialButton" onclick="document.location='HowToPlay.php'">View Tutorial</button>
 	<button class="eventsButton" <?php echo (floor($playerStats['Events_Stacked']) >= 1 || $playerStats['Active_Event_ID'] != "") ? "onclick=" . '"' . "document.location='LoadEvent.php'" . '"' : "style='pointer-events:none;visibility:hidden;'" ?> >Events (<?php echo ($playerStats['Active_Event_ID'] != "") ? "Resume Event" : "Left: " . floor($playerStats['Events_Stacked'])?>)</button>
 </div>

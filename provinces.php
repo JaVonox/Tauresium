@@ -1,23 +1,23 @@
 <?php
 include_once "Scripts/MapConnections.php"; //This includes databases
+$database = new Database();
+$db = $database->getConnection();
 
 $selectedProvince = $_GET["ProvinceView"];
+
 if($selectedProvince == Null)
 {
 	header("Location: ErrorPage.php?Error=NoSelectedProvince"); //if no variables were passed.
 }
 
-$database = new Database();
-$db = $database->getConnection();
-$loadedProvince = json_encode($database->getProvinceDetail($selectedProvince));
-
-if($loadedProvince == "[]") //if the province does not exist
+if(empty($database->getProvinceDetail($selectedProvince))) //if the province does not exist. Maybe needs modification. TODO
 {
 	header("Location: ErrorPage.php?Error=ProvinceDoesNotExist"); 
 }
-$provinceType = $database->GetProvinceType($selectedProvince)[0];
 
+$provinceType = $database->GetProvinceType($selectedProvince)[0];
 $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
+
 ?>
 
 <!DOCTYPE HTML>
@@ -25,6 +25,7 @@ $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
+<script src="API/APIScripts/BuiltInAPICalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <style>
 table{
@@ -64,7 +65,7 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 	<br>
 	<font id="ProvType" style="font-family: Romanus;font-size:32px;">PROVINCE TYPE</font>
 	<br><br>
-	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">Owned By: <?php echo $provCountry; ?></i>
+	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">No Owner</i>
 	<br>
 	<i id="ProvClimate"></i>
 	<br><br><br>
@@ -101,54 +102,60 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-
 <script>
-var playerName = "<?php echo $playerCountry; ?>";
-
-if(playerName != "<?php echo $provCountry; ?>") //If the player is the owner
-{
-	$(document).ready(function(){
-		$("#DetailsTable").load("PageElements/ProvinceViewTables/Annex.php", function(responseTxt, statusTxt, xhr){
-		if(statusTxt == "success")
-			_loadDetails();
-		});
-	});	
-}
-else
-{
-	$(document).ready(function(){
-		$("#DetailsTable").load("PageElements/ProvinceViewTables/Improve.php?selectedProvince=" + "<?php echo $selectedProvince; ?>", function(responseTxt, statusTxt, xhr){
-		if(statusTxt == "success")
-			_loadDetails();
-		});
-	});	
-}
-</script>
-
-<script>
-var phpArray = <?php echo $loadedProvince; ?>;
-var selectedProvince = phpArray[0];
+var provNameGet = "<?php echo $selectedProvince; ?>";
 var provType = "<?php echo $provinceType; ?>";
 var pageErrors = "<?php echo $buildError; ?>";
 
-document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
-document.getElementById("ProvType").textContent = "Province Focus: " + provType;
-document.getElementById("ProvRegion").textContent = "," + selectedProvince.Region;
-document.getElementById("ProvClimate").textContent = selectedProvince.Climate + " - " + (selectedProvince.Coastal == 1 ? "Coastal - " + selectedProvince.Coastal_Region : "Landlocked");
-document.getElementById("ProvPopulation").textContent = "Population: " + selectedProvince.City_Population_Total;
-document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
-document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
-document.getElementById("ProvInfo").textContent = selectedProvince.Description;
-document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
+var ajaxProvInfo;
+var playerName;
 
 document.getElementById("ProvErrors").textContent = pageErrors;
 
+BIGetProvViaID(provNameGet).then((value => {
+	ajaxProvInfo = value; //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
+	_loadAjax();
+}));
+
+function _loadAjax()
+{
+	playerName = "<?php echo $playerCountry; ?>";
+
+	if(playerName != "<?php echo $provCountry; ?>") //If the player is the owner
+	{
+		$(document).ready(function(){
+			$("#DetailsTable").load("PageElements/ProvinceViewTables/Annex.php", function(responseTxt, statusTxt, xhr){
+			if(statusTxt == "success")
+				_loadDetails();
+			});
+		});	
+	}
+	else
+	{
+		$(document).ready(function(){
+			$("#DetailsTable").load("PageElements/ProvinceViewTables/Improve.php?selectedProvince=" + "<?php echo $selectedProvince; ?>", function(responseTxt, statusTxt, xhr){
+			if(statusTxt == "success")
+				_loadDetails();
+			});
+		});	
+	}
+}
+
 function _loadDetails()
 {
-
+	document.getElementById("ProvCapital").textContent = ajaxProvInfo.Capital;
+	document.getElementById("ProvType").textContent = "Province Focus: " + provType;
+	document.getElementById("ProvRegion").textContent = "," + ajaxProvInfo.Region;
+	document.getElementById("ProvClimate").textContent = ajaxProvInfo.Climate + " - " + (ajaxProvInfo.Coastal == 1 ? "Coastal - " + ajaxProvInfo.Coastal_Region : "Landlocked");
+	document.getElementById("ProvPopulation").textContent = "Population: " + ajaxProvInfo.City_Population_Total;
+	document.getElementById("ProvHDI").textContent = "HDI: " + ajaxProvInfo.National_HDI;
+	document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +ajaxProvInfo.National_Nominal_GDP_per_capita;
+	document.getElementById("ProvInfo").textContent = ajaxProvInfo.Description;
+	document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + ajaxProvInfo.Climate + ".png')";
+	
 	if(playerName == "<?php echo $provCountry; ?>") //If the player is the owner
 	{
-		
+		document.getElementById("ProvOwner").textContent = "Owned By: " + playerName;
 	}
 	else
 	{
@@ -165,14 +172,15 @@ function _loadDetails()
 		document.getElementById("CultureAnnex").setAttribute("style",buttonStyle + "<?php echo $cultureAccess[0] ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>");
 		document.getElementById("EconomicAnnex").setAttribute("style",buttonStyle +"<?php echo $economicAccess[0] ? 'background-color:lightgreen;' : 'background-color:#383838;pointer-events:none;'?>");
 		document.getElementById("MilitaryAnnex").setAttribute("style",buttonStyle +"<?php echo $milAccess[0] ? 'background-color:pink;' : 'background-color:#383838;pointer-events:none;'?>");
-		document.getElementById("invisible-provID").value = "<?php echo $selectedProvince ?>";
+		document.getElementById("invisible-provID").value = ajaxProvInfo.Province_ID;
 		
-		document.getElementById("ProvCulture").textContent = <?php echo $cultureAccess[2] ? 'selectedProvince.Culture_Cost' : '"Infinite"';?>;
-		document.getElementById("ProvEconomic").textContent = (parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>))<1000 ? parseInt(selectedProvince.Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>) : "Infinite";
+		document.getElementById("ProvCulture").textContent = <?php echo $cultureAccess[2] ? 'ajaxProvInfo.Base_Culture_Cost' : '"Infinite"';?>;
+		document.getElementById("ProvEconomic").textContent = (parseInt(ajaxProvInfo.Base_Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>))<1000 ? parseInt(ajaxProvInfo.Base_Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>) : "Infinite";
 		document.getElementById("ProvMilitary").textContent = "<?php echo $milAccess[2] ?>";
-		document.getElementById("CultureModSig").textContent = (selectedProvince.Culture_Modifier * 100) + "%";
-		document.getElementById("EconomicModEnv").textContent = (selectedProvince.Economic_Enviroment_Modifier * 100) + "%";
-		document.getElementById("MilitaryModEnv").textContent = (selectedProvince.Military_Enviroment_Modifier * 100) + "%";
+		document.getElementById("CultureModSig").textContent = (ajaxProvInfo.Culture_Modifier * 100) + "%";
+		document.getElementById("EconomicModEnv").textContent = (ajaxProvInfo.Economic_Enviroment_Modifier * 100) + "%";
+		document.getElementById("MilitaryModEnv").textContent = (ajaxProvInfo.Military_Enviroment_Modifier * 100) + "%";
+
 	}
 }
 </script>

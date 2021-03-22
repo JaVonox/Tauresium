@@ -27,6 +27,7 @@ Password:
 	<button class="menuButton" onclick="document.location='NewSession.php'">Create a new world</button>
 	<button class="menuButton" onclick="document.location='JoinSession.php'">Create a country</button>
 	<button class="tutorialButton" onclick="document.location='HowToPlay.php'">View Tutorial</button>
+	<button class="apiButton" onclick="document.location='APIuse.php'">API</button>
 </div>
 
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>

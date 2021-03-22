@@ -1,4 +1,6 @@
 <?php
+require_once($_SERVER['DOCUMENT_ROOT'] . '/Tauresium/API/APIScripts/CurlScripts.php');
+
 class Database{
 	//Might have to change all of this to use REST API structure
 	
@@ -30,11 +32,10 @@ class Database{
 		return $dataSet;
 	}
 	
-	public function getProvinceDetail($ProvinceIdentity)
+	public function getProvinceDetail($ProvinceIdentity) //Replaced with use of curl on the API
 	{
-		$result = $this->connectionData->query("SELECT Province_ID,Capital,Region,Climate,Description,City_Population_Total,National_HDI,National_Nominal_GDP_per_capita,Culture_Cost,Economic_Cost,Military_Cost,Coastal,Coastal_Region,Culture_Modifier,Economic_Enviroment_Modifier,Military_Enviroment_Modifier FROM provinces WHERE Province_ID = '" . $ProvinceIdentity . "';") or die(mysqli_error($this->connectionData));
-		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
-		return $dataSet;
+		$curlResponse = json_decode(CurlCustGETRequest("Province/" . $ProvinceIdentity));
+		return $curlResponse;
 	}
 	
 	public function verifyIdentity($PlayerIdentity,$hashedPassword)

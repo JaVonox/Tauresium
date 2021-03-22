@@ -87,6 +87,26 @@
 	color: black;
 }
 
+.apiButton {
+	background-color:#9400D3;
+	color: white;
+	text-align: center;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	width:200px;
+	height:30px;
+	border:none;
+	font-family:'Helvetica';
+	float:right;
+}
+
+.apiButton:Hover{
+	background-color:#4B0082;
+	color: white;
+}
+
 .InformationText{
 	font-family:'Tahoma';
 }
