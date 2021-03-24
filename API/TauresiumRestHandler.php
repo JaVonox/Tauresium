@@ -1,27 +1,35 @@
 <?php
-    require "dbinfo.php";
-    require "RestService.php";
-    require "APIAssets/Classes.php";
- 
+require "dbinfo.php";
+require "RestService.php";
+require "APIAssets/Classes.php";
+require "Scripts/MapConnections.php"; //MapConnections includes database - therefore this loads database
+
 class TauresiumRestService extends RestService 
 {
 	private $returnArray;
+	private $database;
+	private $loadedDatabase;
+	
 	public function __construct() 
 	{
 		parent::__construct("TaurAPI");
+		
+		$this->database = new Database();
+		$this->loadedDatabase = $this->database->getConnection();
 	}
 	
 	public function PerformGet($url, $parameters, $requestBody, $accept) 
 	{
 		header('Content-Type: application/json; charset=utf-8');
 		header('no-cache,no-store');
-		//api basic usages
+		//get api basic usages
 		//Province/ProvinceName/WorldCode 
 		//Country/CountryName 
 		//World/WorldCode 
 		//Building/BuildingName 
 		//Government/Government type 
 		//CoastalRegion/CoastalRegion 
+		//Cost/Province/CountryName
 		
 		switch ($parameters[1])
 		{
@@ -59,7 +67,7 @@ class TauresiumRestService extends RestService
 				
 				break;
 
-			case "Country": //add no pull all
+			case "Country":
 				$id="";
 				(!empty($parameters[2]) ? $id = $parameters[2] : $id = "NULL");
 				
@@ -75,7 +83,7 @@ class TauresiumRestService extends RestService
 					$this->notFoundResponse();
 				}
 				break;
-			case "World": //add no pull all
+			case "World":
 				$id = "";
 				(!empty($parameters[2]) ? $id = $parameters[2] : $id = "NULL");
 				
@@ -161,6 +169,36 @@ class TauresiumRestService extends RestService
 						$this->notFoundResponse();
 					}
 
+				}
+				break;
+			case "Cost":
+				$provinceID = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
+				$countryName = (!empty($parameters[3]) ? $parameters[3] : 'NULL');
+				
+				if($provinceID == "NULL")
+				{
+					$this->notFoundResponse();
+				}
+				else
+				{	
+					if($countryName == "NULL")
+					{
+						$this->notFoundResponse();
+						
+					}
+					else
+					{
+						$costInfo = $this->GetJSONCosts($provinceID,$countryName);
+					}
+					
+					if ($costInfo != null)
+					{
+						echo json_encode($costInfo);
+					}
+					else
+					{
+						$this->notFoundResponse();
+					}
 				}
 				break;
 			default:	
@@ -412,25 +450,40 @@ class TauresiumRestService extends RestService
 			$statement->bind_result($Country_Name,$Country_Type,$Colour,$World_Code,$Military_Influence,$Military_Generation,$Culture_Influence,$Culture_Generation,$Economic_Influence,$Economic_Generation,$Events_Stacked,$Last_Event_Time,$Active_Event_ID);
 			$playerWorld = $World_Code;
 			
-			$provQuery = $connection->query("SELECT DISTINCT Province_ID,World_Code FROM province_Occupation WHERE Country_Name = '" . $id . "';"); //Calls to World_Code multiple times are unneccesary - might be worth changing?
-			$ownedProvinces = $provQuery->fetch_all(MYSQLI_NUM);
+			$stateOcc = $connection->prepare("SELECT DISTINCT Province_ID,World_Code FROM province_Occupation WHERE Country_Name = ?;");
+			$stateOcc->bind_param('s', $id);
+			$stateOcc->execute();
+			$result = $stateOcc->get_result();
+			$ownedProvinces = $result->fetch_all(MYSQLI_NUM);
+
 			$playerWorld = (!empty($ownedProvinces) ? $ownedProvinces[0][1] : "NULL");
 			$provinceDetails = array();
+			$oceanPowersArray = array();
 			
 			for($i=0;$i<count($ownedProvinces);$i++)
 			{
 				array_push($provinceDetails,$this->GetJSONProvinceViaIDandWorld($ownedProvinces[$i][0],$playerWorld)); //Appends the province details of each province this player owns.
 			}
+			
+			$playerOceanPowers = $this->database->GetPlayerAllOceanCount($id);
+			
+			foreach($playerOceanPowers as $oceanPower) //This was originally designed for use directly into the HTML - so it still includes tags.
+			{
+				array_push($oceanPowersArray,$oceanPower);
+			}
 
 			if ($statement->fetch())
 			{
-				return new PlayerDetail($Country_Name,$Country_Type,$Colour,$World_Code,$Military_Influence,$Military_Generation,$Culture_Influence,$Culture_Generation,$Economic_Influence,$Economic_Generation,$Events_Stacked,$Last_Event_Time,$Active_Event_ID,$provinceDetails);
+				$PlayerTitle = $this->database->getPlayerStats($Country_Name)['Title'];
+				$PlayerMilCap = $this->database->GetPlayerMilCap($Country_Name);
+				return new PlayerDetail($Country_Name,$PlayerTitle,$Country_Type,$Colour,$World_Code,$PlayerMilCap,$Military_Influence,$Military_Generation,$Culture_Influence,$Culture_Generation,$Economic_Influence,$Economic_Generation,$Events_Stacked,$Last_Event_Time,$Active_Event_ID,$oceanPowersArray,$provinceDetails);
 			}
 			else
 			{
 				return null;
 			}
 			$statement->close();
+			$stateOcc->close();
 			$connection->close();
 		}
 	}	
@@ -455,18 +508,70 @@ class TauresiumRestService extends RestService
 			$statement->store_result();
 			$statement->bind_result($Province_ID, $Capital, $Region,$Vertex_1,$Vertex_2,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier);
 	
+			$buildParams = $this->database->GetProvBuildBonuses($id,$worldCode);
+			
 			if ($statement->fetch())
 			{
-				return new ProvinceHighDetail($Province_ID, $Capital, $Region,$Vertex_1,$Vertex_2,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier);
+				return new ProvinceHighDetail($Province_ID, $Capital, $Region,$Vertex_1 ,$Vertex_2 ,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$buildParams['Mil_Cap'],$buildParams['Def_Strength'],$buildParams['Bonus_Build']);
 			}
 			else
 			{
-				return null;
+				return $this->GetJSONProvinceViaID($id);
 			}
 			
 			$statement->close();
 			$connection->close();
 		}
 	}
+	
+	private function GetJSONCosts($user,$provinceID) //This returns the costs of each province, which is player dependent. This can later be implemented for the POST call for taking provinces
+	{
+		
+		if($this->GetJSONCountryViaID($user) == null || $this->GetJSONProvinceViaID($provinceID) == null) //checks both parameters are valid
+		{
+			return null; //If invalid parameters are provided, cut execution.
+		}
+		
+		$mapConnect = new MapConnections();
+		$mapConnect->init($user);
+		$provInfo = $this->GetJSONProvinceViaID($provinceID);
+		$valueInfo = array("Culture" => "", "Economic" => "","Military" => "");
+		
+		
+		$valueInfo["Culture"] = $mapConnect->CheckCulture($provinceID);
+		$valueInfo["Economic"] = $mapConnect->CheckEconomic($provinceID);
+		$valueInfo["Military"] = $mapConnect->CheckMilitary($provinceID);
+		$owner = $mapConnect->CheckOwner($provinceID);
+		
+		$cultDesc = $valueInfo['Culture'][1];
+		$ecoDesc = $valueInfo['Economic'][1];
+		$milDesc = $valueInfo['Military'][1];
+		$cultCost = "Infinite";
+		$ecoCost = $valueInfo['Economic'][2];
+		$milCost = $valueInfo['Military'][2];
+		
+		$cultPos = $valueInfo['Culture'][0]; //checks if its possible for the player to annex this province (using their current points cost)
+		$ecoPos = $valueInfo['Economic'][0]; 
+		$milPos = $valueInfo['Military'][0]; 
+		
+		if($valueInfo['Culture'][2])
+		{
+			$cultCost = $provInfo->Base_Culture_Cost; //Culture cost is never different from base cost, so its value should just be loaded from the province Info
+		}
+		
+		if($ecoCost >= 9999) //9999 is the eco value for an impossible Cost;
+		{
+			$ecoCost = "Infinite";
+		}
+		else
+		{
+			$ecoDesc = $valueInfo['Economic'][1] . " + " . $valueInfo['Economic'][2];
+			$ecoCost += $provInfo->Base_Economic_Cost; //The pulled ecoCost is the addition value.
+		}
+		
+		//Infinite means not possible.
+		return new ProvinceCost($provinceID,$user,$owner,$cultDesc,$cultCost,$cultPos,$ecoDesc,$ecoCost,$ecoPos,$milDesc,$milCost,$milPos);
+	}
+
 }
 ?>
