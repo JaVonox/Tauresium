@@ -1,6 +1,4 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . '/Tauresium/API/APIScripts/CurlScripts.php');
-
 class Database{
 	//Might have to change all of this to use REST API structure
 	
@@ -10,7 +8,8 @@ class Database{
     private $database  = "tauresium"; 
     private $connectionData;
 	
-	//MODIFY THIS
+	private $milProvValue = 15; //Constant
+	
     public function getConnection()
 	{		
 		$conn = new mysqli($this->host, $this->user, $this->password, $this->database);
@@ -32,17 +31,24 @@ class Database{
 		return $dataSet;
 	}
 	
-	public function getProvinceDetail($ProvinceIdentity) //Replaced with use of curl on the API
-	{
-		$curlResponse = json_decode(CurlCustGETRequest("Province/" . $ProvinceIdentity));
-		return $curlResponse;
+	public function getProvinceDetail($ProvinceIdentity)
+	{			
+		$stmt = $this->connectionData->prepare("SELECT Province_ID,Capital,Region,Climate,Description,City_Population_Total,National_HDI,National_Nominal_GDP_per_capita,Culture_Cost,Economic_Cost,Military_Cost,Coastal,Coastal_Region,Culture_Modifier,Economic_Enviroment_Modifier,Military_Enviroment_Modifier FROM provinces WHERE Province_ID = ?;");
+		$stmt->bind_param('s', $ProvinceIdentity);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
+		return $dataSet;
 	}
 	
 	public function verifyIdentity($PlayerIdentity,$hashedPassword)
-	{
-		$result = $this->connectionData->query("SELECT Country_Name FROM players WHERE Country_Name = '" . $PlayerIdentity . "' AND Hashed_Password = '" . $hashedPassword . "';")or die(mysqli_error($this->connectionData));
+	{		
+		$stmt = $this->connectionData->prepare("SELECT Country_Name FROM players WHERE Country_Name = ? AND Hashed_Password = ?;");
+		$stmt->bind_param('ss', $PlayerIdentity,$hashedPassword);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$return = $result->fetch_row();
-		
+
 		if($return[0] == $PlayerIdentity && $return[0] != "")
 		{
 			return True;
@@ -55,31 +61,55 @@ class Database{
 	
 	public function getPlayerStats($PlayerIdentity)
 	{
-		$result = $this->connectionData->query("SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked,Last_Event_Time,Active_Event_ID FROM players WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+		
+		$stmt = $this->connectionData->prepare("SELECT Country_Name,Country_Type,Colour,World_Code,Military_Influence,Culture_Influence,Economic_Influence,Events_Stacked,Last_Event_Time,Active_Event_ID FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $PlayerIdentity);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_assoc();
 		
-		$result = $this->connectionData->query("SELECT Title FROM governmentTypes WHERE GovernmentForm = '" . $dataSet['Country_Type'] . "';") or die(mysqli_error($this->connectionData));
+		if(empty($dataSet))
+		{
+			return null;
+		}
+		
+		$stmt = $this->connectionData->prepare("SELECT Title FROM governmentTypes WHERE GovernmentForm = ?;");
+		$stmt->bind_param('s', $dataSet['Country_Type']);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet['Title'] = $result->fetch_assoc()['Title'];
 		
 		$dataSet['MilitaryCapacity'] = $this->GetPlayerMilCap($PlayerIdentity);
 		
-		$result = $this->connectionData->query("SELECT World_Name FROM worlds WHERE World_Code = '" . $dataSet['World_Code'] . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT World_Name FROM worlds WHERE World_Code = ?;");
+		$stmt->bind_param('s', $dataSet['World_Code']);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet['World_Name'] = $result->fetch_assoc()['World_Name'];
 		
 		if(intval($dataSet['Military_Influence'])>intval($dataSet['MilitaryCapacity']))
 		{
-			$this->connectionData->query("UPDATE players SET Military_Influence = " . intval($dataSet['MilitaryCapacity']) . " WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+			
+			$stmt = $this->connectionData->prepare("UPDATE players SET Military_Influence = ? WHERE Country_Name = ?;");
+			$stmt->bind_param('is', intval($dataSet['MilitaryCapacity']),$PlayerIdentity);
+			$stmt->execute();
 			$dataSet['Military_Influence'] = intval($dataSet['MilitaryCapacity']);
 		}
 		return $dataSet;
 	}
 	
 	public function GetSessionStats($PlayerIdentity)
-	{
-		$result = $this->connectionData->query("SELECT World_Code FROM players WHERE Country_Name = '" . $PlayerIdentity . "';") or die(mysqli_error($this->connectionData));
+	{	
+		$stmt = $this->connectionData->prepare("SELECT World_Code FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $PlayerIdentity);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$worldCode = $result->fetch_row()[0];
 		
-		$result = $this->connectionData->query("SELECT * FROM worlds WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT * FROM worlds WHERE World_Code = ?;");
+		$stmt->bind_param('s', $worldCode);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_assoc();
 		
 		return $dataSet;
@@ -87,7 +117,10 @@ class Database{
 	
 	public function GetSessionPlayers($worldCode)
 	{
-		$result = $this->connectionData->query("SELECT Country_Name,Colour,Last_Event_Time FROM players WHERE World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Country_Name,Colour,Last_Event_Time FROM players WHERE World_Code = ?;");
+		$stmt->bind_param('s', $worldCode);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_all(MYSQLI_ASSOC);
 		
 		return $dataSet;
@@ -95,7 +128,10 @@ class Database{
 	
 	public function GetPlayerProvinceCount($countryName)
 	{
-		$result = $this->connectionData->query("SELECT Count(Country_Name) FROM province_Occupation WHERE Country_Name = '" . $countryName . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Count(Country_Name) FROM province_Occupation WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $countryName);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_row()[0];
 		
 		return $dataSet;
@@ -103,10 +139,16 @@ class Database{
 		
 	public function GetPlayerOceanPower($countryName,$oceanName)
 	{
-		$result = $this->connectionData->query("SELECT Count(Country_Name) FROM province_Occupation WHERE Country_Name = '" . $countryName . "' AND Province_ID IN (SELECT Province_ID FROM provinces WHERE Coastal_Region = '" . $oceanName ."' AND Coastal = 1);") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Count(Country_Name) FROM province_Occupation WHERE Country_Name = ? AND Province_ID IN (SELECT Province_ID FROM provinces WHERE Coastal_Region = ? AND Coastal = 1);");
+		$stmt->bind_param('ss', $countryName,$oceanName);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$oceanprovinces = $result->fetch_row();
 		
-		$result = $this->connectionData->query("SELECT Minimum_Colony_provinces From coastalRegions WHERE Coastal_Region = '" . $oceanName ."';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Minimum_Colony_provinces From coastalRegions WHERE Coastal_Region = ?;");
+		$stmt->bind_param('s', $oceanName);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$requiredOceanprovinces = $result->fetch_row();
 		
 		return $oceanprovinces[0] . "/" . $requiredOceanprovinces[0];
@@ -142,41 +184,63 @@ class Database{
 	}
 	
 	public function ConvertCoastalTitleToCoastalRegion($colonialTitle)
-	{
-		$result = $this->connectionData->query("SELECT Coastal_Region FROM coastalRegions WHERE Colonial_Title = '" . $colonialTitle ."';") or die(mysqli_error($this->connectionData));
+	{	
+		$stmt = $this->connectionData->prepare("SELECT Coastal_Region FROM coastalRegions WHERE Colonial_Title = ?;");
+		$stmt->bind_param('s', $colonialTitle);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$coastalTitle = $result->fetch_row();
+		
 		return $coastalTitle[0];
 	}
 	
 	public function ReturnOutboundConnections($coastalRegion)
 	{
-		$result = $this->connectionData->query("SELECT Outbound_Connection_1,Outbound_Connection_2,Outbound_Connection_3,Outbound_Connection_4,Outbound_Connection_5 FROM coastalRegions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Outbound_Connection_1,Outbound_Connection_2,Outbound_Connection_3,Outbound_Connection_4,Outbound_Connection_5 FROM coastalRegions WHERE Coastal_Region = ?;");
+		$stmt->bind_param('s', $coastalRegion);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$outboundConnections = $result->fetch_all(MYSQLI_NUM);
+		
 		return $outboundConnections;
 	}
 	
 	public function ReturnOverseasBonusCost($provinceID,$local) //local (True) = not across oceans, colonial (False) = across oceans
-	{
-		$result = $this->connectionData->query("SELECT Coastal_Region FROM provinces WHERE Province_ID = '" . $provinceID ."';") or die(mysqli_error($this->connectionData));
+	{		
+		$stmt = $this->connectionData->prepare("SELECT Coastal_Region FROM provinces WHERE Province_ID = ?;");
+		$stmt->bind_param('s', $provinceID);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$coastalRegion = $result->fetch_row()[0];
+		
 		
 		if($local)
 		{
-			$result = $this->connectionData->query("SELECT Short_Range_Penalty FROM coastalRegions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+			$stmt = $this->connectionData->prepare("SELECT Short_Range_Penalty FROM coastalRegions WHERE Coastal_Region = ?;");
+			$stmt->bind_param('s', $coastalRegion);
+			$stmt->execute();
+			$result = $stmt->get_result();
 			return $result->fetch_row()[0];
 		}
 		else
-		{
-			$result = $this->connectionData->query("SELECT Colonial_Penalty FROM coastalRegions WHERE Coastal_Region = '" . $coastalRegion ."';") or die(mysqli_error($this->connectionData));
+		{	
+			$stmt = $this->connectionData->prepare("SELECT Colonial_Penalty FROM coastalRegions WHERE Coastal_Region = ?;");
+			$stmt->bind_param('s', $coastalRegion);
+			$stmt->execute();
+			$result = $stmt->get_result();
 			return $result->fetch_row()[0];
+			
 		}
 	}
 	
 	public function getValidWorldCode($WorldCode)
 	{
-		$result = $this->connectionData->query("SELECT 1 FROM worlds WHERE World_Code = '" . $WorldCode . "' AND Capacity > 0;") or die(mysqli_error($this->connectionData));
-		$return = $result->fetch_row(); //fetches an array
-
+		$stmt = $this->connectionData->prepare("SELECT 1 FROM worlds WHERE World_Code = ? AND Capacity > 0;");
+		$stmt->bind_param('s', $WorldCode);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		$return = $result->fetch_row();
+		
 		if($return[0] == "1")
 		{
 			return True;
@@ -189,7 +253,10 @@ class Database{
 	
 	public function getDuplicateplayers($countryName)
 	{
-		$result = $this->connectionData->query("SELECT players.Country_Name FROM players WHERE players.Country_Name = '" . $countryName . "';")or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT players.Country_Name FROM players WHERE players.Country_Name = ?;");
+		$stmt->bind_param('s', $countryName);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_row();
 		
 		if($dataSet[0] == $countryName && $dataSet[0] != "")
@@ -205,15 +272,22 @@ class Database{
 
 	public function getColoursInWorld($worldCode)
 	{
-		$result = $this->connectionData->query("SELECT players.Colour FROM players WHERE players.World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT players.Colour FROM players WHERE players.World_Code = ?;");
+		$stmt->bind_param('s', $worldCode);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$dataSet = $result->fetch_row();
+		
 		return $dataSet;
 	}
 	
 	public function addNewCountry($countryName,$passwordPreHash,$government,$colour,$world_Code)
 	{
 		
-		$result = $this->connectionData->query("SELECT Base_Military_Generation,Base_Culture_Generation,Base_Economic_Generation,Base_Military_Influence,Base_Culture_Influence,Base_Economic_Influence FROM governmentTypes WHERE GovernmentForm = '" . $government . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Base_Military_Generation,Base_Culture_Generation,Base_Economic_Generation,Base_Military_Influence,Base_Culture_Influence,Base_Economic_Influence FROM governmentTypes WHERE GovernmentForm = ?;");
+		$stmt->bind_param('s', $government);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$governmentProperties = $result->fetch_assoc();
 		
 		$military_Influence = $governmentProperties['Base_Military_Influence'];
@@ -226,19 +300,27 @@ class Database{
 		
 		$passwordHash = hash('sha256',$passwordPreHash,false); // This built in algorithm hashes the password provided using sha256.
 		
+		$stmt = $this->connectionData->prepare("INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,3);");
+		$stmt->bind_param('sssssisisiss', $countryName,$passwordHash, $government, $colour,$world_Code,$military_Influence,$military_Generation,$culture_Influence,$culture_Generation,$economic_Influence,$economic_Generation,$LET);
+		$stmt->execute();
+
 		
-		$sqlExec = "INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES('" . $countryName . "','" . $passwordHash . "','" . $government . "','" . $colour . "','" . $world_Code . "'," . $military_Influence . "," . $military_Generation . "," . $culture_Influence . "," . $culture_Generation . "," . $economic_Influence . "," . $economic_Generation . ",'" .$LET . "',3);" or die(mysqli_error($this->connectionData));
-		$this->connectionData->query($sqlExec);
+		$stmt = $this->connectionData->prepare("UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = ?;");
+		$stmt->bind_param('s', $world_Code);
+		$stmt->execute();
 		
-		$this->connectionData->query("UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = '" . $world_Code . "';") or die(mysqli_error($this->connectionData));
-		
-		$result = $this->connectionData->query("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM province_Occupation WHERE World_Code = '" . $world_Code . "') ORDER BY RAND() LIMIT 1;") or die(mysqli_error($this->connectionData)); //This needs to be changed to handle when there are no locations left. 
+		$stmt = $this->connectionData->prepare("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM province_Occupation WHERE World_Code = ?) ORDER BY RAND() LIMIT 1;");
+		$stmt->bind_param('s', $world_Code);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$randomCapital = $result->fetch_row()[0];
 		
 		$maxValues = $this->GetProvinceType($randomCapital);
 		
-		$sqlExec = "INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('" . $world_Code . "','" . $randomCapital . "','" . $countryName . "','" . $maxValues[0] . "','" . $maxValues[1][0] . "4','" . $maxValues[2][0] . "4');" or die(mysqli_error($this->connectionData));
-		$this->connectionData->query($sqlExec);
+		
+		$stmt = $this->connectionData->prepare("INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES(?,?,?,?,?,?);");
+		$stmt->bind_param('ssssss', $world_Code,$randomCapital,$countryName,$maxValues[0],strval(strval($maxValues[1][0]) . "4"),strval(strval($maxValues[2][0]) . "4"));
+		$stmt->execute();
 		
 		return True;
 	}
@@ -266,8 +348,11 @@ class Database{
 			$checksum = $checksum % 33;
 			$ID = $ID . $characterArray[$checksum];
 			
-			$result = $this->connectionData->query("SELECT 1 FROM worlds WHERE World_Code = '" . $ID . "';") or die(mysqli_error($this->connectionData));
-			$return = $result->fetch_row(); //fetches an array
+			$stmt = $this->connectionData->prepare("SELECT 1 FROM worlds WHERE World_Code = ?;");
+			$stmt->bind_param('s', $ID);
+			$stmt->execute();
+			$result = $stmt->get_result();
+			$return = $result->fetch_row();
 
 			if($return[0] != "1")
 			{
@@ -276,29 +361,42 @@ class Database{
 			}
 		}
 		
-		$this->connectionData->query("INSERT INTO worlds VALUES('" . $worldCode . "','" . $worldName . "','" . $mapType . "'," . $speedMapping[$gameSpeed] . ",5);") or die(mysqli_error($this->connectionData));
-		
+		$stmt = $this->connectionData->prepare("INSERT INTO worlds VALUES(?,?,?,?,5);");
+		$stmt->bind_param('sssi', $worldCode,$worldName,$mapType,$speedMapping[$gameSpeed]);
+		$stmt->execute();
+			
 		return $worldCode;
 	}
 
 	public function ReturnWorld($loadedUser)
-	{
-		$result = $this->connectionData->query("SELECT World_Code FROM players WHERE Country_Name = '" . $loadedUser . "';") or die(mysqli_error($this->connectionData));
+	{		
+		$stmt = $this->connectionData->prepare("SELECT World_Code FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $loadedUser);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		return $result->fetch_row()[0];
+		
 	}
 
 	public function ReturnExists($Province_ID)
 	{
 		//This function is used to ensure the user has not entered modified values into hidden fields
-		$result = $this->connectionData->query("SELECT 1 FROM provinces WHERE Province_ID = '" . $Province_ID . "';") or die(mysqli_error($this->connectionData));
+		
+		$stmt = $this->connectionData->prepare("SELECT 1 FROM provinces WHERE Province_ID = ?;");
+		$stmt->bind_param('s', $Province_ID);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$provExists = (($result->fetch_row()[0])==1);
 	
 		return ($provExists);
 	}
 	
 	public function ReturnCorrectEvent($eventPage,$playerName)
-	{
-		$result = $this->connectionData->query("SELECT 1 FROM players WHERE Country_Name = '" . $playerName . "' AND Active_Event_ID = " . $eventPage .";") or die(mysqli_error($this->connectionData));
+	{	
+		$stmt = $this->connectionData->prepare("SELECT 1 FROM players WHERE Country_Name = ? AND Active_Event_ID = ?;");
+		$stmt->bind_param('ss', $playerName,$eventPage);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$validEvent = (($result->fetch_row()[0])==1);
 		
 		return $validEvent;
@@ -306,7 +404,10 @@ class Database{
 	public function UpdateEventTimer($country)
 	{
 		
-		$result = $this->connectionData->query("SELECT Last_Event_Time FROM players WHERE Country_Name = '" . $country . "';");
+		$stmt = $this->connectionData->prepare("SELECT Last_Event_Time FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $country);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$lastEvent = $result->fetch_row();
 		
 		$eventSpeed = $this->GetEventSpeed($country);
@@ -317,14 +418,19 @@ class Database{
 		$formattedCurTime = $currentTime->format("Y/m/d H:i:s");
 		$secondsElapsed =  strtotime($formattedCurTime) - strtotime($formattedLastTime); // int is 64x on this version of php. Should be
 		$eventsAdded = $secondsElapsed / ($eventSpeed * 60); 
-		$this->connectionData->query("UPDATE players SET Last_Event_Time = '". $formattedCurTime . "', Events_Stacked = Events_Stacked + " . $eventsAdded . " WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
+
+		$stmt = $this->connectionData->prepare("UPDATE players SET Last_Event_Time = ?, Events_Stacked = Events_Stacked + ? WHERE Country_Name = ?;");
+		$stmt->bind_param('sds', $formattedCurTime,$eventsAdded,$country);
+		$stmt->execute();
 		
-		$this->connectionData->query("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = '" . $country . "' AND Events_Stacked > 5;") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("UPDATE players SET Events_Stacked = 5 WHERE Country_Name = ? AND Events_Stacked > 5;");
+		$stmt->bind_param('s', $country);
+		$stmt->execute();
 	}
 	
 	public function GetEventSpeed($userLogin)
 	{
-		$result = $this->connectionData->query("SELECT Speed FROM worlds WHERE World_Code = '" . $this->ReturnWorld($userLogin) . "';");
+		$result = $this->connectionData->query("SELECT Speed FROM worlds WHERE World_Code = '" . $this->ReturnWorld($userLogin) . "';"); //This parameter is uneditable by the user and therefore does not need to be prepared
 		$eventSpeed = $result->fetch_row();
 		return intval($eventSpeed[0]);
 	}
@@ -332,20 +438,26 @@ class Database{
 	public function GetEvent($country)
 	{
 		
-		$result = $this->connectionData->query("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = '" . $country . "';");
+		$stmt = $this->connectionData->prepare("SELECT Events_Stacked,Active_Event_ID FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $country);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$playerevents = $result->fetch_assoc();
+		
 		
 		if($playerevents['Events_Stacked'] >= 1 && $playerevents['Active_Event_ID'] == "")
 		{
 			
-			$result = $this->connectionData->query("SELECT Count(Event_ID) FROM events;");
+			$result = $this->connectionData->query("SELECT Count(Event_ID) FROM events;"); 
 			$eventsCount = $result->fetch_row();
-			$LoadEvent = rand(1,$eventsCount[0]);
+			$LoadEvent = rand(1,$eventsCount[0]); //Safe parameter - no prepared statements needed for interactions with this object.
 			
-			$this->connectionData->query("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = '" . $LoadEvent . "' WHERE Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
+			$stmt = $this->connectionData->prepare("UPDATE players SET Events_Stacked = Events_Stacked - 1, Active_Event_ID = ? WHERE Country_Name = ?");
+			$stmt->bind_param('ss', $LoadEvent,$country);
+			$stmt->execute();
 			
 			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $LoadEvent . "';") or die(mysqli_error($this->connectionData));
-			$dataSet = $result->fetch_assoc();
+			$dataSet = $result->fetch_assoc(); //Safe parameter by extension
 		
 			$result = $this->connectionData->query("SELECT Option_Description FROM options WHERE Option_ID = '" . $dataSet['Option_1_ID'] . "';") or die(mysqli_error($this->connectionData));
 			$dataSet['Option_1_Desc'] = $result->fetch_assoc()['Option_Description'];
@@ -359,8 +471,10 @@ class Database{
 			return $dataSet;
 			
 		}
-		else if($playerevents['Active_Event_ID'] != "")
+		else if($playerevents['Active_Event_ID'] != "") 
 		{
+			//All safe parameters
+			
 			$result = $this->connectionData->query("SELECT Event_ID,Title,Description,Option_1_ID,Option_2_ID,Option_3_ID FROM events WHERE Event_ID = '" . $playerevents['Active_Event_ID'] . "';") or die(mysqli_error($this->connectionData));
 			$dataSet = $result->fetch_assoc();
 		
@@ -386,7 +500,10 @@ class Database{
 	{
 		$userData['Country'] = $country;
 		
-		$result = $this->connectionData->query("SELECT Active_Event_ID FROM players WHERE Country_Name = '" . $userData['Country'] . "';") or die(mysqli_error($this->connectionData));
+		$stmt = $this->connectionData->prepare("SELECT Active_Event_ID FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $userData['Country']);
+		$stmt->execute();
+		$result = $stmt->get_result();
 		$userData['LoadedEvent'] = $result->fetch_row()[0];
 		
 		return $userData;
@@ -456,9 +573,9 @@ class Database{
 		return $ownedprovinces;
 	}
 	
-	public function GetPlayerMilCap($country)
+	public function GetPlayerMilCap($country) //Excludes buildings
 	{
-		$result = $this->connectionData->query("SELECT (200 + (COUNT(Province_ID) * 15)) FROM province_Occupation WHERE province_Occupation.Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
+		$result = $this->connectionData->query("SELECT (200 + (COUNT(Province_ID) * " . $this->milProvValue . ")) FROM province_Occupation WHERE province_Occupation.Country_Name = '" . $country . "';") or die(mysqli_error($this->connectionData));
 		$milCap = $result->fetch_row()[0];
 		$milCap = $milCap + $this->GetTotalBuildingMilCap($country);
 		return $milCap;
@@ -574,7 +691,7 @@ class Database{
 	{
 		$result = $this->connectionData->query("SELECT Country_Name FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';");
 		$provOwners = $result->fetch_row();
-		
+
 		if(mysqli_num_rows($result) == 0)
 		{
 			return "NULL";
@@ -631,7 +748,16 @@ class Database{
 	public function GetNextBuilding($provinceID,$worldCode,$buildType) //Returns the type of the building.
 	{
 		$buildings = $this->GetCurrentBuilding($provinceID,$worldCode);
-		return ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php?Error=BadBuildType"));
+		$nextBuildID = ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php?Error=BadBuildType"));
+		//This script checks the buildtype and increments the second part of the current build ID to get the next build ID. 
+		if(intval($nextBuildID[1]) > 4) //This script ensures that the build does not exceed the cap of 4 (There are 5 possible buildings, from 0-4)
+		{
+			header("Location: ../ErrorPage.php?Error=BuildingDoesNotExist");
+		}
+		else
+		{
+			return $nextBuildID;
+		}
 	}
 	
 	public function GetBuildingCost($provinceID,$worldCode,$buildType)
@@ -660,13 +786,13 @@ class Database{
 			$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][1];
 			$formattedEntries++;
 			
-			for($j=intval($unformattedBuildings[$i][0][1])-1;$j>=0;$j--) //Add all buildings before current
+			for($j=intval($unformattedBuildings[$i][0][1])-1;$j>=0;$j--) 
 			{
 				$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][0][0] . $j;
 				$formattedEntries++;
 			}
 			
-			for($j=intval($unformattedBuildings[$i][1][1])-1;$j>=0;$j--) //Add all buildings before current
+			for($j=intval($unformattedBuildings[$i][1][1])-1;$j>=0;$j--) 
 			{
 				$formattedBuildings[$formattedEntries] = $unformattedBuildings[$i][1][0] . $j;
 				$formattedEntries++;
@@ -680,6 +806,40 @@ class Database{
 		}
 		
 		return $bonusCapacity;
+	}
+	
+	public function GetProvBuildBonuses($provinceID,$worldCode) //Returns all the bonuses for one province.
+	{
+		$result = $this->connectionData->query("SELECT Building_Column_1,Building_Column_2 FROM province_Occupation WHERE Province_ID = '" . $provinceID . "' AND World_Code = '" . $worldCode . "';") or die(mysqli_error($this->connectionData));
+		$unformattedBuildings = $result->fetch_row();
+		$formattedBuildings = array();
+		$bonusCapacity = 0;
+		$bonusDef = 0;
+		$bonusBuild = 0;
+		$formattedEntries = 0;
+		
+		for($j=intval($unformattedBuildings[0][1]);$j>=0;$j--) 
+		{
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[0][0] . $j;
+			$formattedEntries++;
+		}
+		
+		for($j=intval($unformattedBuildings[1][1]);$j>=0;$j--) 
+		{
+			$formattedBuildings[$formattedEntries] = $unformattedBuildings[1][0] . $j;
+			$formattedEntries++;
+		}
+		
+		for($i=0;$i<count($formattedBuildings);$i++)
+		{
+			$result = $this->connectionData->query("SELECT Bonus_Mil_Cap,Bonus_Def_Strength,Bonus_Build_Cost FROM buildings WHERE BuildingID = '" . $formattedBuildings[$i] . "';") or die(mysqli_error($this->connectionData));
+			$pulledBonuses = $result->fetch_row();
+			$bonusCapacity += intval($pulledBonuses[0]);
+			$bonusDef += intval($pulledBonuses[1]);
+			$bonusBuild += intval($pulledBonuses[2]);
+		}
+		
+		return array("Mil_Cap" => ($bonusCapacity + $this->milProvValue),"Def_Strength" => $bonusDef, "Bonus_Build" => $bonusBuild);
 	}
 	
 	public function GetBuildingDefensiveStrength($provinceID,$worldCode)

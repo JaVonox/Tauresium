@@ -6,9 +6,9 @@
 <table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
-<td align="center"><img src="Assets/CultureIcon.png" id="CultureIcon" /> </td>
-<td align="center"><img src="Assets/EconomicIcon.png" id="EconomicIcon" /> </td>
-<td align="center"><img src="Assets/MilitaryIcon.png" id="MilitaryIcon" /> </td>
+<td align="center"><img src="Assets/CultureIcon.png" id="CultureIcon" style="display:none;"/> </td>
+<td align="center"><img src="Assets/EconomicIcon.png" id="EconomicIcon" style="display:none;"/> </td>
+<td align="center"><img src="Assets/MilitaryIcon.png" id="MilitaryIcon" style="display:none;"/> </td>
 </tr>
 <tr id="EnviromentalModifier" style="text-align:center;">
 <td>Enviroment:</td>
@@ -30,15 +30,15 @@
 </tr>
 <tr style="border-top:1px solid black;">
 <td></td>
-<td align="center"><b id="ProvCulture" style="font-size:42px"> Infinite</b></td>
-<td align="center"><b id="ProvEconomic" style="font-size:42px"> Infinite</b></td>
-<td align="center"><b id="ProvMilitary" style="font-size:42px">Infinite</b></td>
+<td align="center"><b id="ProvCulture" style="font-size:42px"></b></td>
+<td align="center"><b id="ProvEconomic" style="font-size:42px">Loading... </b></td>
+<td align="center"><b id="ProvMilitary" style="font-size:42px"></b></td>
 </tr>
 <tr>
 <td></td>
-<td> <button type="submit" name="CultureAnnex" id="CultureAnnex" >Annex Diplomatically</button> </td>
-<td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" >Annex Economically</button>  </td>
-<td><button type="submit" name="MilAnnex" id="MilitaryAnnex" >Annex Militarily</button> </td>
+<td> <button type="submit" name="CultureAnnex" id="CultureAnnex" style="display:none;">Annex Diplomatically</button> </td>
+<td> <button type="submit" name="EcoAnnex" id="EconomicAnnex" style="display:none;">Annex Economically</button>  </td>
+<td><button type="submit" name="MilAnnex" id="MilitaryAnnex" style="display:none;">Annex Militarily</button> </td>
 <input type="hidden" style="display:none"  id="invisible-provID" name="invisible-provID">
 </tr>
 </table>

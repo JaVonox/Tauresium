@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPICalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <style>
 polygon{
@@ -17,13 +19,16 @@ Tauresium - Game Page
 <body style="background-color:white;margin:0px;">
 
 <?php include_once 'Scripts/PageUpdate.php'?>
-<?php include_once "Scripts/DBLoader.php";?>
+<?php include_once "Scripts/MapConnections.php";?>
 <?php include_once "Scripts/CheckLogin.php";?>
 <?php
 /* Session already exists */
+$mapConnect = new MapConnections();
+$mapConnect->init($_SESSION['Country']);
+$playerCountry = $_SESSION['Country'];
+
 $database = new Database();
 $db = $database->getConnection();
-$provinceSet = json_encode($database->getProvinceArray());
 $occupiedSet = json_encode($database->GetOccupation($_SESSION['Country']));
 $visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 ?>
@@ -47,22 +52,30 @@ $visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 	<br>
 	<font id="ProvGDP">Nominal GDP per Capita: Zero</font>
 	<br><br>
-	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">View/Annex Province</button>
+	<div id="ProvCost" style="margin-left:auto;margin-right:auto;width:max-content;"></div>
+	<br>
+	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;margin-bottom:10px;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td id="ProvTableRow" style="width:100%;height:100%;"> 
-		<?php include_once 'PageElements/Maps/Earth.html'?> <!-- To be changed to dynamic -->
 	</td>
 	</tr>
 	</table>
 </div>
 
+<script src="Libraries/SvgPanZoom/svg-pan-zoom.js"></script>
+
 <script>
 var selectedRegion = "Ocean";
-var provinceArray = <?php echo $provinceSet ?>;
-var occupiedArray = <?php echo $occupiedSet ?>;
-var invisibleProvinces = <?php echo $visibilitySet?>;
+var provinceArray; 
+var occupiedArray = <?php echo $occupiedSet; ?>;
+var invisibleProvinces = <?php echo $visibilitySet;?>;
+var playerName = "<?php echo $playerCountry;?>";
 
-_DrawProvinces();
+BIGetAllProvs().then((value => {
+	provinceArray = value; //Returns all provinces via ajax HTTP call
+	_DrawSVG();
+	_DrawProvinces();
+}));
 
 function _clickEvent(evt) 
 {
@@ -82,6 +95,7 @@ function _clickEvent(evt)
 		document.getElementById("ProvPopulation").textContent = "City Population: Zero";
 		document.getElementById("ProvHDI").textContent = "HDI: Zero";
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: Zero";
+		document.getElementById("ProvCost").textContent = "";
 		document.getElementById("ProvExamine").onclick = "";
 		document.getElementById("ProvExamine").style.visibility = "hidden";
 		
@@ -93,7 +107,8 @@ function _clickEvent(evt)
 	{
 		_DrawProvinces();
 		selectedRegion = event.target.id;
-		var selectedProvince = provinceArray.find(element => element.Province_ID == selectedRegion);
+
+		var selectedProvince = provinceArray[selectedRegion];
 		var selectedProvinceOwner = occupiedArray.find(element => element.Province_ID == selectedRegion);
 		
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
@@ -117,6 +132,11 @@ function _clickEvent(evt)
 		document.getElementById("ProvHDI").textContent = "HDI: " + selectedProvince.National_HDI;
 		document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +selectedProvince.National_Nominal_GDP_per_capita;
 		
+		document.getElementById("ProvCost").textContent = "Loading...";
+		BIGetProvCosts(selectedProvince.Province_ID,playerName).then((value => {
+			_LoadProvCosts(value);
+		}));
+
 		document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
 		document.getElementById("ProvExamine").style.visibility = "visible";
 		
@@ -147,41 +167,123 @@ function _DrawProvinces()
 	}
 	
 }
-</script>
 
-<script src="Libraries/SvgPanZoom/svg-pan-zoom.js"></script>
+function _LoadProvCosts(value) //This script loads the values for the province costs - which are now displayed on the map.
+{
+	var tableString ='<table><tr><td>';
+	var anyAccess = false; //This value becomes true if the player meets the conditions, aside from cost, to take the province.
+	
+	if(value.Culture_Cost != "Infinite")
+	{
+		tableString += '<img src="Assets/CultureIcon.png" id="CultureIcon" style="width:24px;height:24px;' + (value.Culture_Possible==false?"filter:grayscale(1);":"") +'"/>'; //These statements grayscale the image if the player does not have enough points
+		anyAccess = true;
+	}
+	
+	tableString +="</td><td>";
+	
+	if(value.Economic_Cost != "Infinite")
+	{
+		tableString += '<img src="Assets/EconomicIcon.png" id="EconomicIcon" style="width:24px;height:24px;'+ (value.Economic_Possible==false?"filter:grayscale(1);":"") +'"/>';
+		anyAccess = true;
+	}
 
-<script>
+	tableString +="</td><td>";
+	
+	if(value.Military_Cost != "Infinite")
+	{
+		tableString += '<img src="Assets/MilitaryIcon.png" id="MilitaryIcon" style="width:24px;height:24px;' + (value.Military_Possible==false?"filter:grayscale(1);":"") +'"/>';
+		anyAccess = true;
+	}
+	
+	tableString += '</td></tr>';
+	tableString += '<tr><td>';
+	
+	if(value.Culture_Cost != "Infinite")
+	{
+		tableString += value.Culture_Cost
+	}
+	
+	tableString +="</td><td>";
+	
+	if(value.Economic_Cost != "Infinite")
+	{
+		tableString += value.Economic_Cost
+	}
 
-beforePan = function(oldPan, newPan){ //This function is sourced from an example in the svg-pan-zoom documentation. 
-  var stopHorizontal = false
-	, stopVertical = false
-	, gutterWidth = 940
-	, gutterHeight = 532
-	, sizes = this.getSizes()
-	, leftLimit = -((sizes.viewBox.x + sizes.viewBox.width) * sizes.realZoom) + gutterWidth
-	, rightLimit = sizes.width - gutterWidth - (sizes.viewBox.x * sizes.realZoom)
-	, topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight
-	, bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom)
-
-  customPan = {}
-  customPan.x = Math.max(leftLimit, Math.min(rightLimit, newPan.x))
-  customPan.y = Math.max(topLimit, Math.min(bottomLimit, newPan.y))
-
-  return customPan
+	tableString +="</td><td>";
+	
+	if(value.Military_Cost != "Infinite")
+	{
+		tableString += value.Military_Cost;
+	}
+	
+	tableString += '</td>';
+	tableString += '</tr></table>';
+	
+	if(value.Province_ID == selectedRegion) //Resynchronises the pull. If this statement is not true then the player has clicked on a different location.
+	{
+		if(anyAccess == false)
+		{
+			document.getElementById("ProvCost").textContent = "--Inaccessible--";
+		}
+		else
+		{
+			document.getElementById("ProvCost").innerHTML = tableString;
+		}
+	}
+	else if(selectedRegion == "Ocean") //Prevents the program from displaying reloading when ocean is selected. 
+	{
+		document.getElementById("ProvCost").innerHTML = ""; 
+	}
+	else
+	{
+		document.getElementById("ProvCost").innerHTML = "Reloading..."; //This notifies the user that the program is going to reload the information for the new province.
+	}
 }
 
+function _DrawSVG() //This dynamically loads all the province info from the API, and then allows for the use of the svgpanzoom library
+{
+	var inHTMLstring = "<svg id='SvgProvID' class='Provinces' onclick='_clickEvent()' style='background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;'>"
+	
+	for(var element in provinceArray){
+	inHTMLstring += "<polygon id='" + provinceArray[element]['Province_ID'] +"' points='"+ provinceArray[element]['Vertex1'] +" "+ provinceArray[element]['Vertex2'] +" "+ provinceArray[element]['Vertex3'] +"'/>";
+	}
+	
+	inHTMLstring += "</svg>";
+	
+	document.getElementById("ProvTableRow").innerHTML = inHTMLstring;
+	
+	beforePan = function(oldPan, newPan){ //This function is sourced from an example in the svg-pan-zoom documentation. 
+	  var stopHorizontal = false
+		, stopVertical = false
+		, gutterWidth = 940
+		, gutterHeight = 532
+		, sizes = this.getSizes()
+		, leftLimit = -((sizes.viewBox.x + sizes.viewBox.width) * sizes.realZoom) + gutterWidth
+		, rightLimit = sizes.width - gutterWidth - (sizes.viewBox.x * sizes.realZoom)
+		, topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight
+		, bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom)
 
-var ProvinceZoom = svgPanZoom('#SvgProvID',{
-  zoomScaleSensitivity: 0.5
-, panEnabled: true
-, dblClickZoomEnabled: false
-, minZoom: 1
-, maxZoom: 10
-, beforePan: beforePan
-});
- //This uses the svg-pan-zoom library (https://github.com/ariutta/svg-pan-zoom)
+	  customPan = {}
+	  customPan.x = Math.max(leftLimit, Math.min(rightLimit, newPan.x))
+	  customPan.y = Math.max(topLimit, Math.min(bottomLimit, newPan.y))
+
+	  return customPan
+	}
+
+
+	var ProvinceZoom = svgPanZoom('#SvgProvID',{
+	  zoomScaleSensitivity: 0.5
+	, panEnabled: true
+	, dblClickZoomEnabled: false
+	, minZoom: 1
+	, maxZoom: 10
+	, beforePan: beforePan
+	});
+	 //This uses the svg-pan-zoom library (https://github.com/ariutta/svg-pan-zoom)
+}
 </script>
+
 
 <?php include "PageElements/Disclaimer.html" ?>
 

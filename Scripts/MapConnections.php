@@ -1,12 +1,6 @@
 <?php
 include_once "DBLoader.php";
 
-if(!isset($_SESSION)) 
-{ 
-   session_start(); 
-} 
-
-
 class MapConnections
 {
 	private $_nationVertexes = ["0","0","0"];
@@ -35,13 +29,13 @@ class MapConnections
 		return $flatArray;
 	}
 	
-	public function init()
+	public function init($country)
 	{
 		
 		$this->database = new Database();
 		$this->db = $this->database->getConnection();
-		$tmpVert = $this->database->GetPlayerVertexes($_SESSION['Country']);
-		$this->_subjectName = $_SESSION['Country'];
+		$tmpVert = $this->database->GetPlayerVertexes($country);
+		$this->_subjectName = $country;
 		$this->_nationVertexes = $this->FlattenArray($tmpVert,3); 
 		return $this->_nationVertexes;
 	}
@@ -94,7 +88,7 @@ class MapConnections
 		$playerCoastalPower = $this->database->GetPlayerOceanPower($this->_subjectName,$coastalRegion);
 		
 		$explodedPower = explode("/",$playerCoastalPower);
-		if($explodedPower[0] > 0 && ($this->database->getProvinceDetail($provinceID)->Coastal == 1))
+		if($explodedPower[0] > 0 && ($this->database->getProvinceDetail($provinceID)[0]['Coastal']) == 1)
 		{
 			return True;
 		}
@@ -122,7 +116,7 @@ class MapConnections
 	{
 		if($this->CheckAdjacent($provinceID) && $this->CheckOwner($provinceID) == "No Owner") 
 		{
-			if($this->database->getPlayerStats($this->_subjectName)['Culture_Influence'] >= $this->database->getProvinceDetail($provinceID)->Base_Culture_Cost)
+			if($this->database->getPlayerStats($this->_subjectName)['Culture_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Culture_Cost'])
 			{
 				return array(True,"Province is adjacent to one of our cities",True); //Cult = Can be annexed, desc, Display cost
 			}
@@ -146,7 +140,6 @@ class MapConnections
 	
 	public function CheckColonial($provinceID,$dominantLocations) //Any unowned coastal with connected colonial region
 	{
-		$curlDetails = $this->database->getProvinceDetail($provinceID);
 		$outboundConnectionsCollated = array();
 		
 		foreach($dominantLocations as $ocean)
@@ -163,9 +156,9 @@ class MapConnections
 		{
 			for($j=0;$j < count($outboundConnectionsCollated[$i]);$j++)
 			{
-				if($outboundConnectionsCollated[$i][$j] == $curlDetails->Coastal_Region && $curlDetails->Coastal == 1 && $this->CheckOwner($provinceID) == "No Owner")
+				if($outboundConnectionsCollated[$i][$j] == $this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'] && $this->database->getProvinceDetail($provinceID)[0]['Coastal'] == 1 && $this->CheckOwner($provinceID) == "No Owner")
 				{
-					if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $curlDetails->Base_Economic_Cost + $this->database->ReturnOverseasBonusCost($provinceID,False))
+					if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Economic_Cost'] + $this->database->ReturnOverseasBonusCost($provinceID,False))
 					{
 						return array(True,"Province is in a far away region",$this->database->ReturnOverseasBonusCost($provinceID,False));
 					}
@@ -189,11 +182,9 @@ class MapConnections
 	
 	public function CheckEconomic($provinceID) //Any unowned coastal within the same coastal region. Also add additional cost via table
 	{
-		$curlDetails = $this->database->getProvinceDetail($provinceID);
-		
-		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$curlDetails->Coastal_Region) && $this->CheckOwner($provinceID) == "No Owner") 
+		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$this->database->getProvinceDetail($provinceID)[0]['Coastal_Region']) && $this->CheckOwner($provinceID) == "No Owner") 
 		{
-			if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $curlDetails->Base_Economic_Cost + $this->database->ReturnOverseasBonusCost($provinceID,True))
+			if($this->database->getPlayerStats($this->_subjectName)['Economic_Influence'] >= $this->database->getProvinceDetail($provinceID)[0]['Economic_Cost'] + $this->database->ReturnOverseasBonusCost($provinceID,True))
 			{
 				return array(True,"Province is in a local region",$this->database->ReturnOverseasBonusCost($provinceID,True));
 			}
@@ -210,10 +201,9 @@ class MapConnections
 	
 	public function CheckMilitary($provinceID) //this can occur over land or ocean using the same conditions as the other checks. It can be used to take over owned land and unowned land, but has penalties for unowned and coastal invasions.
 	{
-		$curlDetails = $this->database->getProvinceDetail($provinceID);
 		//Chose the cheaper military cost
-		$landCost = $curlDetails->Base_Military_Cost;
-		$seaCost = $curlDetails->Base_Military_Cost;
+		$landCost = $this->database->getProvinceDetail($provinceID)[0]['Military_Cost'];
+		$seaCost = $this->database->getProvinceDetail($provinceID)[0]['Military_Cost'];
 		$landModifier = 1.5;
 		$seaModifier = 1.5;
 		$peaceful = True;
@@ -253,7 +243,7 @@ class MapConnections
 			$description .= "<br> Defensive Buildings: +" . strval($buildMod) . "%";
 		}
 		
-		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$curlDetails->Coastal_Region)) 
+		if($this->CheckIfCoastalInSameCoastalRegion($provinceID,$this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'])) 
 		{
 			$methodDescription .= "<br> Province is available by local oceans: +20%";
 			$seaModifier += 0.2;
@@ -279,7 +269,7 @@ class MapConnections
 			{
 				for($j=0;$j < count($outboundConnectionsCollated[$i]);$j++)
 				{
-					if($outboundConnectionsCollated[$i][$j] == $curlDetails->Coastal_Region && $curlDetails->Coastal == 1)
+					if($outboundConnectionsCollated[$i][$j] == $this->database->getProvinceDetail($provinceID)[0]['Coastal_Region'] && $this->database->getProvinceDetail($provinceID)[0]['Coastal'] == 1)
 					{
 						$numOfConnections +=1;
 						break 2;

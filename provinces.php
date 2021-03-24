@@ -3,7 +3,7 @@ include_once "Scripts/MapConnections.php"; //This includes databases
 $database = new Database();
 $db = $database->getConnection();
 
-$selectedProvince = $_GET["ProvinceView"];
+$selectedProvince = $_GET["ProvinceView"]; //Use for API calls.
 
 if($selectedProvince == Null)
 {
@@ -25,6 +25,7 @@ $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="API/APIScripts/BuiltInAPICalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <style>
@@ -44,15 +45,11 @@ Tauresium - Province
 <?php include_once 'Scripts/CheckLogin.php'?>
 <?php
 $mapConnect = new MapConnections();
-$mapConnect->init();
+$mapConnect->init($_SESSION['Country']);
 $sessionID = session_id();
 $playerCountry = $_SESSION['Country'];
 
-$provCountry = $mapConnect->CheckOwner($selectedProvince); //This could be modified to add title + json stuff
-
-$cultureAccess = $mapConnect->CheckCulture($selectedProvince); //For culture
-$economicAccess = $mapConnect->CheckEconomic($selectedProvince); //For economic 
-$milAccess = $mapConnect->CheckMilitary($selectedProvince);
+$provCountry = $mapConnect->CheckOwner($selectedProvince);
 ?>
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 <div id="MainDiv" style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
@@ -63,9 +60,9 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 <font id="ProvCapital" style="font-family: Romanus;font-size:72px;"> Loading...</font>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:48px;"></i>
 	<br>
-	<font id="ProvType" style="font-family: Romanus;font-size:32px;">PROVINCE TYPE</font>
+	<font id="ProvType" style="font-family: Romanus;font-size:32px;"></font>
 	<br><br>
-	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;">No Owner</i>
+	<i id="ProvOwner" style="font-family: Romanus;font-size:32px;"></i>
 	<br>
 	<i id="ProvClimate"></i>
 	<br><br><br>
@@ -100,7 +97,6 @@ $milAccess = $mapConnect->CheckMilitary($selectedProvince);
 </div>
 <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
 <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
 var provNameGet = "<?php echo $selectedProvince; ?>";
@@ -127,6 +123,7 @@ function _loadAjax()
 			$("#DetailsTable").load("PageElements/ProvinceViewTables/Annex.php", function(responseTxt, statusTxt, xhr){
 			if(statusTxt == "success")
 				_loadDetails();
+				_loadAnnexButtons();
 			});
 		});	
 	}
@@ -152,36 +149,36 @@ function _loadDetails()
 	document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +ajaxProvInfo.National_Nominal_GDP_per_capita;
 	document.getElementById("ProvInfo").textContent = ajaxProvInfo.Description;
 	document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + ajaxProvInfo.Climate + ".png')";
-	
-	if(playerName == "<?php echo $provCountry; ?>") //If the player is the owner
-	{
-		document.getElementById("ProvOwner").textContent = "Owned By: " + playerName;
-	}
-	else
-	{
-		var iconStyle = "width:64px;height:64px;vertical-align:middle;float:center;"
-		var buttonStyle = "color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;";
+	document.getElementById("ProvOwner").textContent = "Owned By: " + "<?php echo $provCountry; ?>";
+}
+
+function _loadAnnexButtons()
+{
+	var iconStyle = "width:64px;height:64px;vertical-align:middle;float:center;"
+	var buttonStyle = "color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;";
+		
+	BIGetProvCosts(provNameGet,playerName).then((apiReturn => {
 		document.getElementById("DetailsForm").action = "Scripts/AttemptAnnex.php";
 		
-		document.getElementById("CultureIcon").setAttribute("style",iconStyle + "<?php echo $cultureAccess[0] ? '' : 'filter:grayscale(1);'?>");
-		document.getElementById("EconomicIcon").setAttribute("style",iconStyle + "<?php echo $economicAccess[0] ? '' : 'filter:grayscale(1);'?>");
-		document.getElementById("MilitaryIcon").setAttribute("style",iconStyle + "<?php echo $milAccess[0] ? '' : 'filter:grayscale(1);'?>");
-		document.getElementById("CultureModDyn").innerHTML  = '<?php echo $cultureAccess[1];?>';
-		document.getElementById("EconomicModDyn").innerHTML  = '<?php echo $economicAccess[1] . (": +" . $economicAccess[2] . "<br>")?>';
-		document.getElementById("MilitaryModDyn").innerHTML  = '<?php echo "<br>" .$milAccess[1];?>';
-		document.getElementById("CultureAnnex").setAttribute("style",buttonStyle + "<?php echo $cultureAccess[0] ? 'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'?>");
-		document.getElementById("EconomicAnnex").setAttribute("style",buttonStyle +"<?php echo $economicAccess[0] ? 'background-color:lightgreen;' : 'background-color:#383838;pointer-events:none;'?>");
-		document.getElementById("MilitaryAnnex").setAttribute("style",buttonStyle +"<?php echo $milAccess[0] ? 'background-color:pink;' : 'background-color:#383838;pointer-events:none;'?>");
+		//Possible property checks if the player has enough points to annex
+		document.getElementById("CultureIcon").setAttribute("style",iconStyle + (apiReturn.Culture_Possible==false?"filter:grayscale(1);":""));
+		document.getElementById("EconomicIcon").setAttribute("style",iconStyle + (apiReturn.Economic_Possible==false?"filter:grayscale(1);":""));
+		document.getElementById("MilitaryIcon").setAttribute("style",iconStyle + (apiReturn.Military_Possible==false?"filter:grayscale(1);":""));
+		document.getElementById("CultureModDyn").innerHTML  = apiReturn.Culture_Desc;
+		document.getElementById("EconomicModDyn").innerHTML  = apiReturn.Economic_Desc;
+		document.getElementById("MilitaryModDyn").innerHTML  = apiReturn.Military_Desc;
+		document.getElementById("CultureAnnex").setAttribute("style",buttonStyle + (apiReturn.Culture_Possible!=false?'background-color:lightblue;' : 'background-color:#383838;pointer-events:none;'));
+		document.getElementById("EconomicAnnex").setAttribute("style",buttonStyle + (apiReturn.Economic_Possible!=false?'background-color:lightgreen;' : 'background-color:#383838;pointer-events:none;'));
+		document.getElementById("MilitaryAnnex").setAttribute("style",buttonStyle +(apiReturn.Military_Possible!=false?'background-color:pink;' : 'background-color:#383838;pointer-events:none;'));
 		document.getElementById("invisible-provID").value = ajaxProvInfo.Province_ID;
 		
-		document.getElementById("ProvCulture").textContent = <?php echo $cultureAccess[2] ? 'ajaxProvInfo.Base_Culture_Cost' : '"Infinite"';?>;
-		document.getElementById("ProvEconomic").textContent = (parseInt(ajaxProvInfo.Base_Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>))<1000 ? parseInt(ajaxProvInfo.Base_Economic_Cost) + parseInt(<?php echo $economicAccess[2]; ?>) : "Infinite";
-		document.getElementById("ProvMilitary").textContent = "<?php echo $milAccess[2] ?>";
+		document.getElementById("ProvCulture").textContent = apiReturn.Culture_Cost;
+		document.getElementById("ProvEconomic").textContent = apiReturn.Economic_Cost;
+		document.getElementById("ProvMilitary").textContent = apiReturn.Military_Cost;
 		document.getElementById("CultureModSig").textContent = (ajaxProvInfo.Culture_Modifier * 100) + "%";
 		document.getElementById("EconomicModEnv").textContent = (ajaxProvInfo.Economic_Enviroment_Modifier * 100) + "%";
 		document.getElementById("MilitaryModEnv").textContent = (ajaxProvInfo.Military_Enviroment_Modifier * 100) + "%";
-
-	}
+	}));
 }
 </script>
 

@@ -1,5 +1,11 @@
 <?php
 include_once "../../Scripts/MapConnections.php"; 
+
+if(!isset($_SESSION)) 
+{ 
+   session_start(); 
+} 
+
 $selectedProvince = $_GET["selectedProvince"]; //Gets from AJAX load.
 
 $database = new Database();
