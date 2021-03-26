@@ -3,6 +3,8 @@ require "dbinfo.php";
 require "RestService.php";
 require "APIAssets/Classes.php";
 require "Scripts/MapConnections.php"; //MapConnections includes database - therefore this loads database
+require "APIScripts/NewCountry.php";
+require "APIScripts/NewWorld.php";
 
 class TauresiumRestService extends RestService 
 {
@@ -206,6 +208,33 @@ class TauresiumRestService extends RestService
 		}
 	}
 	
+	public function PerformPost($url, $parameters, $requestBody, $accept) 
+	{
+		header('Content-Type: application/json; charset=utf-8');
+		header('no-cache,no-store');
+		
+		switch ($parameters[1])
+		{
+			//Country/username/password/worldCode/governmentType/colourHex
+			//World/Name/mapType/speed
+			case "Country":
+				$username = (!empty($parameters[2]) ? $parameters[2] : '');
+				$password = (!empty($parameters[3]) ? $parameters[3] : '');
+				$worldCode = (!empty($parameters[4]) ? $parameters[4] : '');
+				$governmentType = (!empty($parameters[5]) ? $parameters[5] : '');
+				$colour = (!empty($parameters[6]) ? $parameters[6] : '');
+				
+				return $this->PostNewCountry($username,$password,$worldCode,$governmentType,$colour);
+			case "World":
+				$worldName = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
+				$mapType = (!empty($parameters[3]) ? $parameters[3] : 'NULL');
+				$speed = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
+				
+				return $this->PostNewWorld($worldName,$mapType,$speed);
+			default:
+				$this->methodNotAllowedResponse();
+		}
+	}
 
     private function GetAllJSONProvinces()
     {
@@ -571,6 +600,36 @@ class TauresiumRestService extends RestService
 		
 		//Infinite means not possible.
 		return new ProvinceCost($provinceID,$user,$owner,$cultDesc,$cultCost,$cultPos,$ecoDesc,$ecoCost,$ecoPos,$milDesc,$milCost,$milPos);
+	}
+	
+	private function PostNewCountry($username,$password,$worldCode,$governmentType,$colour) //Creates new country via POST request. Might be insecure due to sending of password.
+	{
+		$parameters = _CreateNewCountry($worldCode,$username,$password,$governmentType,$colour);
+		
+		//Responses
+		if($parameters[0]) //Occurs when errors occured
+		{
+			header("HTTP/1.1 400 Error occured. Code:" . $parameters[1]); //TODO - interpret error string.
+		}
+		else
+		{
+			header("HTTP/1.1 200 Successfully made country");
+		}
+	}
+	
+	private function PostNewWorld($worldName,$mapType,$speed) //Creates new world via POST request.
+	{
+		$parameters = _CreateNewWorld($worldName,$mapType,$speed);
+		
+		//Responses
+		if($parameters[0]) //Occurs when errors occured
+		{
+			header("HTTP/1.1 400 Error occured. Code:" . $parameters[1]); //TODO - interpret error string.
+		}
+		else
+		{
+			header("HTTP/1.1 200 Successfully made new world. World Code: " . $parameters[1]);
+		}
 	}
 
 }

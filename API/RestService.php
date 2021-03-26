@@ -58,7 +58,7 @@ class RestService
 
     public function __construct($apiStringToMatch) 
     {
-		$this->supportedMethods = "GET"; //, PUT, POST, DELETE";
+		$this->supportedMethods = "GET,POST"; //, PUT, POST, DELETE";
 		$this->apiStringToMatch = $apiStringToMatch;
     }
 
@@ -123,9 +123,9 @@ class RestService
 		  case 'GET':
 			$this->PerformGet($url, $parameters, $requestBody, $accept);
 			break;
-		  //case 'POST':
-			//$this->performPost($url, $parameters, $requestBody, $accept);
-			//break;
+		  case 'POST':
+			$this->PerformPost($url, $parameters, $requestBody, $accept);
+			break;
 		  //case 'PUT':
 			//$this->performPut($url, $parameters, $requestBody, $accept);
 			//break;
@@ -167,12 +167,12 @@ class RestService
 
 	// Override the following methods to provide the appropriate functionality
 	
-	public function performGet($url, $parameters, $requestBody, $accept) 
+	public function PerformGet($url, $parameters, $requestBody, $accept) 
 	{
 		$this->methodNotAllowedResponse();
 	}
 
-	public function performPost($url, $parameters, $requestBody, $accept) 
+	public function PerformPost($url, $parameters, $requestBody, $accept) 
 	{
 		$this->methodNotAllowedResponse();
 	}

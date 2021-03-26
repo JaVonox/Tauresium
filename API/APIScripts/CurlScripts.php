@@ -1,5 +1,5 @@
 <?php
-//Currently unused. TO BE REMOVED.
+//Currently unused.
 
 //Usage example:
 //$curlResponse = json_decode(CurlCustGETRequest("Province/" . $selectedProvince)); 
@@ -19,4 +19,3 @@ function CurlCustGETRequest($parameters) //uses curl to submit a custom request 
 	
 	return $curlOutput;
 }
-?>
