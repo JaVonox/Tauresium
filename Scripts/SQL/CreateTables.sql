@@ -271,7 +271,7 @@ INSERT INTO options VALUES(26,'The device could not even have been invented with
 INSERT INTO options VALUES(27,'This is an invention of our country, and the production rights belong to our country alone.',-0.03,0.04,0.04);
 
 INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Technophilia',
-'One of our top national universities has unveiled a startling invention - a prosthetic limb capable of perfect one to one motion, with joints perfectly capable of recreating human level movement. The team behind this revolutionary technology primarily consists of foreign scholarship students, who have requested the exclusive production rights be granted to their home country.',
+'One of our top national universities has unveiled a startling invention - a prosthetic limb capable of perfect one to one motion, with joints perfectly capable of recreating natural movement. The team behind this revolutionary technology primarily consists of foreign scholarship students, who have requested the exclusive production rights be granted to their home country.',
 50,25,26,27);
 
 INSERT INTO options VALUES(28,'Who says it has to be purely defensive? This technology could give us the upper hand in global conflicts...',-0.02,-0.03,0.06);
@@ -385,6 +385,46 @@ INSERT INTO options VALUES(69,'Plant replacements and allow the theft to go unpu
 INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Piracy On The High Trees',
 'In certain regions of our nation, there have been reports of small scale deforestation as more citizens begin to steal trees for use in winter traditions. There has not yet been significant enviromental impact, but the forestry industry has come to us for help, citing a loss in profits due to the thieves.',
 20,67,68,69);
+
+INSERT INTO options VALUES(70,'Shark hunting is not an adequate use of government time or resources',-0.04,0.05,-0.01);
+INSERT INTO options VALUES(71,'We can hire some poachers to take care of the threat to our people',0.03,-0.02,0.01);
+INSERT INTO options VALUES(72,'This is a urgent matter. Send a military division to wipe out any dangerous creatures along the river',0.06,-0.05,0.05);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('He Was A Shark Who Fought The Law',
+'Our nation was shocked recently with the news that two schoolchildren were attacked by a shark while playing in a lake near the capital. The attacker was a bullshark, a species of shark able to survive in both freshwater and saltwater enviroments, who quickly fled downstream when witnesses came to aid the boys. Since then, the parents of the children have used their newfound fame to request we send hunters to find and kill the beast.',
+30,70,71,72);
+
+INSERT INTO options VALUES(73,'Divert funds into building storm protection for cities across the nation',0.05,-0.03,0);
+INSERT INTO options VALUES(74,'We cant possibly afford to protect the entire homeland, we will have to let smaller cities fend for themselves',-0.03,0.03,-0.01);
+INSERT INTO options VALUES(75,'If they are wrong about this, it could cost our country a fortune. Perhaps we can just see what the damage done is, and pay for reconstruction?',-0.06,0.01,0);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('See You Monsoon',
+'Meteorologists working for our biggest news network have released an emergency broadcast claiming that our heartlands will soon be hit with a potentially catastrophic series of storms, with wind speeds reaching levels high enough to uproot trees.',
+40,73,74,75);
+
+INSERT INTO options VALUES(76,'This was blatant discrimination. The party onboard the float needs to be tried for this hate crime.',0.04,-0.01,0.02);
+INSERT INTO options VALUES(77,'The float was wrong to use the parade to insult another group, but the audience response caused physical harm. Everyone involved should be punished.',-0.05,0,0.04);
+INSERT INTO options VALUES(78,'Rivalry between different cultural groups is a fact of life, but toppling a moving vehicle with people inside is assault. The spectators need to be identified and arrested.',0.04,-0.01,0.02);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Cultural Rivalry',
+'During a parade celebrating the many cultures in our nation, a float designed by one of our larger minority groups was decorated with a large sign insulting another ethnic group. While the instigators insist the comment was made as a joke, the statement was inflammatory enough that a group of spectators toppled the float, injuring the party onboard. With the controversial nature of the situation, our government is expected to issue a response.',
+50,76,77,78);
+
+INSERT INTO options VALUES(79,'This scandalous priest clearly did not believe in his own preachings. The government should have the right to vet important religious figures to prevent things like this from happening again.',0.02,-0.03,0.05);
+INSERT INTO options VALUES(80,'It is not the right of the state to interfere with the church.',0.03,0,-0.02);
+INSERT INTO options VALUES(81,'For the sake of our people, this event needs to be censored as much as possible. Even though he didnt believe in his words, his words still meant something to our people.',0.05,-0.04,0.04);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Deicide',
+'The spiritual head of a major religion within our country was recently bedridden with a terminal illness. On his deathbed, surrounded by vulture like reporters eager to get recordings of his final words, he told believers across the country that their god was a lie, before passing into eternal rest. News of this has quickly spread nationwide, and has lead to much discussion about the authority of religious figures in our nation.',
+60,79,80,81);
+
+INSERT INTO options VALUES(82,'By accepting ownership of the business, he is responsible for the company. Whether or not this was some form of trap, he must pay his debts.',-0.03,0.06,0.03);
+INSERT INTO options VALUES(83,'All existing obligations of the company died with the original owner, allow the heir to discard his inheritance.',0.03,-0.06,0.03);
+INSERT INTO options VALUES(84,'Taking any stance will financially ruin someone, be it the inheritor or his creditors. The government must step in and pay off the companies debts.',0.07,-0.04,-0.04);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('White Elephant',
+'After the death of a fairly wealthy businessmen, he suprised his associates by naming an estranged son as the sole heir to his unlimited liability company. Very soon after the transferal, the share price of the business plummeted, forcing the heir to file for bankrupcy. The son now claims the inheritance was a revenge plot, intended to ruin him financially, and has asked courts to retroactively revoke his inheritence, and thus responsibility for the company.',
+35,82,83,84);
 
 INSERT INTO coastalRegions VALUES ("America North",50,5,30,"American Artic Ocean","America West","North Atlantic",NULL,NULL,NULL);
 INSERT INTO coastalRegions VALUES ("America East",70,4,20,"Sargasso Sea","Europe","North Atlantic",NULL,NULL,NULL);

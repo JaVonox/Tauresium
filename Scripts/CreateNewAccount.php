@@ -1,171 +1,30 @@
 <?php
-include_once "DBLoader.php";
-$database = new Database();
-$db = $database->getConnection();
-
-$countryName = "";
-$countryPass = "";
-$worldCode = "";
-$governmentType = "";
-$countryColour = "";
-$errorCode = "?";
-
-$errorsOccured = False; //If this is false by the end no errors occured
-$possibleGovernmentTypes = ['Sultanate','Horde','ElectoralMonarchy','Theocracy','Monarchy','Libertarian','Colonial','Democracy','MerchantRepublic','ClassicRepublic','Dictatorship','CommunistRepublic','Oligarchy','Anarchy','Tribe'];
-$possibleColours = ['ff0000','e67800','008000','1a88ff','ee82ee','5725c7'];
-
-$validWorldCode = False;
-$occupiedColours = ['DUMMY'];
-
-if($_POST['WorldCodeInput'] != "" && isset($_POST['WorldCodeInput']))
-{
-	$worldCode = $_POST['WorldCodeInput'];
-	
-	if(strlen($worldCode) != 16 || !ctype_alnum($worldCode))
-	{
-		$errorCode = $errorCode . "WorldCodeInput=INVALID" . $worldCode  . "&";
-		$errorsOccured = True;
-	}
-	else
-	{		
-		//Check if world code is valid
-		$validWorldCode = $database->getValidWorldCode($worldCode);
-		
-		if(!$validWorldCode) //add checksum here to stop breakin attempts
-		{
-			$errorCode = $errorCode . "WorldCodeInput=OCCUPIED" . $worldCode  . "&";
-			$errorsOccured = True;
-		}
-		else
-		{
-			$errorCode = $errorCode . "WorldCodeInput=" . $worldCode  . "&";
-			$occupiedColours = $database->getColoursInWorld($worldCode);
-		}
-		
-	}
-	
-}
-else
-{
-	$errorCode = $errorCode . "WorldCodeInput=MISSING&";
-	$errorsOccured = True;
-}
-
-if($_POST['CountryNameInput'] != "" && isset($_POST['CountryNameInput']))
-{
-	$countryName = $_POST['CountryNameInput'];
-	
-	if(strlen($countryName) > 20 || !ctype_alpha($countryName))
-	{
-		$errorCode = $errorCode . "NationName=INVALID" . $countryName  . "&";
-		$errorsOccured = True;
-	}
-	else 
-	{
-		
-		if(!$database->getDuplicatePlayers($countryName))
-		{
-			$errorCode = $errorCode . "NationName=" . $countryName  . "&";
-		}
-		else
-		{
-			$errorCode = $errorCode . "NationName=OCCUPIED" . $countryName  . "&";
-			$errorsOccured = True;
-		}
-	}
-}
-else
-{
-	$errorCode = $errorCode . "NationName=MISSING&";
-	$errorsOccured = True;
-}
-
-if(isset($_POST['CountryPassInput']) && $_POST['CountryPassInput'] != "")
-{
-	$countryPass = $_POST['CountryPassInput'];
-	
-	if(strlen($countryPass) > 25)
-	{
-		$errorCode = $errorCode . "Password=INVALID&";
-		$errorsOccured = True;
-	}
-}
-else
-{
-	$errorCode = $errorCode . "Password=INVALID&";
-	$errorsOccured = True;
-}
-
-if(isset($_POST['GovernmentType']))
-{
-	$governmentType = $_POST['GovernmentType'];
-	
-	if(!in_array($governmentType,$possibleGovernmentTypes)) //this needs to be not for some reason??
-	{
-		$errorCode = $errorCode . "GovernmentType=INVALID&"; //only should occur if user has been messing with the source code
-		$errorsOccured = True;
-	}
-	else
-	{
-		$errorCode = $errorCode . "GovernmentType=" . $governmentType  . "&";
-	}
-}
-else
-{
-	$errorCode = $errorCode . "GovernmentType=MISSING&";
-	$errorsOccured = True;
-}
-
-if(isset($_POST['CountryColour']))
-{
-	$countryColour = $_POST['CountryColour'];
-	
-	if(!in_array($countryColour,$possibleColours)) 
-	{
-		$errorCode = $errorCode . "CountryColour=INVALID&"; //only should occur if user has been messing with the source code
-		$errorsOccured = True;
-	}
-	else if($validWorldCode)
-	{
-		if(!in_array($countryColour,$occupiedColours))
-		{
-			$errorCode = $errorCode . "CountryColour=" . $countryColour  . "&";
-		}
-		else
-		{
-			$errorCode = $errorCode . "CountryColour=OCCUPIED" . $countryColour  . "&";
-			$errorsOccured = True;
-		}
-	}
-	else
-	{
-		$errorCode = $errorCode . "CountryColour=" . $countryColour  . "&";
-	}
-	
-}
-else
-{
-	$errorCode = $errorCode . "CountryColour=MISSING&";
-	$errorsOccured = True;
-}
+require "../API/APIScripts/NewCountry.php"; //runs API POST script directly.
+require "DBLoader.php";
 
 
-if($errorsOccured == True)
+$worldCode = (!isset($_POST['WorldCodeInput']) ? "" : $_POST['WorldCodeInput'] );
+$countryName = (!isset($_POST['CountryNameInput']) ? "" : $_POST['CountryNameInput'] );
+$countryPass = (!isset($_POST['CountryPassInput']) ? "" : $_POST['CountryPassInput'] );
+$countryColour = (!isset($_POST['CountryColour']) ? "" : $_POST['CountryColour'] );
+$governmentType = (!isset($_POST['GovernmentType']) ? "" : $_POST['GovernmentType'] );
+
+$parameters = _CreateNewCountry($worldCode,$countryName,$countryPass,$governmentType,$countryColour);
+
+$errorsOccured = $parameters[0];
+$errorCode = $parameters[1];
+
+if($errorsOccured == True && $errorCode !=  "EtcFail")
 {
 	$errorCode = rtrim($errorCode,"&"); 
 	header("Location: ../JoinSession.php" . $errorCode); //redirects to the joinsession page with the arguments
 }
-else
+else if($errorsOccured == True && $errorCode == "EtcFail")
 {
-	$accountSuccess = $database->addNewCountry($countryName,$countryPass,$governmentType,$countryColour,$worldCode);
-	if($accountSuccess)
-	{
-		header("Location: ../SessionSuccess.php?Type=Country"); 
-	}
-	else
-	{
-		header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
-	}
-	
+	header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
+}
+else //TODO reorder to place this condition first and unknown error last.
+{
+	header("Location: ../SessionSuccess.php?Type=Country"); 	
 }
 ?>
