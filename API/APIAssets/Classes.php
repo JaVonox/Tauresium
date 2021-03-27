@@ -268,4 +268,30 @@ class ProvinceCost
 		$this->Military_Possible = $mPos;
 	}
 }
+
+class EventDetail
+{
+	public $Event_ID;
+	public $Event_Title;
+	public $Event_Description;
+	public $Option1ID;
+	public $Option1Desc;
+	public $Option2ID;
+	public $Option2Desc;
+	public $Option3ID;
+	public $Option3Desc;
+	
+	public function __construct($eventID,$title,$desc,$op1,$op1D,$op2,$op2D,$op3,$op3D)
+	{
+		$this->Event_ID = $eventID;
+		$this->Event_Title = $title;
+		$this->Event_Description = $desc;
+		$this->Option1ID = $op1;
+		$this->Option1Desc = $op1D;
+		$this->Option2ID = $op2;
+		$this->Option2Desc = $op2D;
+		$this->Option3ID = $op3;
+		$this->Option3Desc = $op3D;
+	}
+}
 ?>

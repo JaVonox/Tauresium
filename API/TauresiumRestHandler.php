@@ -41,7 +41,6 @@ class TauresiumRestService extends RestService
 				
 				if($provinceID == "NULL")
 				{
-					
 					$this->GetAllJSONProvinces();
 					echo json_encode($this->returnArray);
 				}
@@ -203,8 +202,21 @@ class TauresiumRestService extends RestService
 					}
 				}
 				break;
+			case "Event":
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
+				
+				if($playerCountry != "NULL")
+				{
+					echo json_encode($this->GetJSONEvent($playerCountry));
+				}
+				else
+				{
+					header("HTTP/1.1 401 No API key Supplied.");
+				}
+				break;
 			default:	
 				$this->methodNotAllowedResponse();
+				break;
 		}
 	}
 	
@@ -213,10 +225,11 @@ class TauresiumRestService extends RestService
 		header('Content-Type: application/json; charset=utf-8');
 		header('no-cache,no-store');
 		
+		//Country/username/password/worldCode/governmentType/colourHex
+		//World/Name/mapType/speed
+			
 		switch ($parameters[1])
 		{
-			//Country/username/password/worldCode/governmentType/colourHex
-			//World/Name/mapType/speed
 			case "Country":
 				$username = (!empty($parameters[2]) ? $parameters[2] : '');
 				$password = (!empty($parameters[3]) ? $parameters[3] : '');
@@ -224,15 +237,44 @@ class TauresiumRestService extends RestService
 				$governmentType = (!empty($parameters[5]) ? $parameters[5] : '');
 				$colour = (!empty($parameters[6]) ? $parameters[6] : '');
 				
-				return $this->PostNewCountry($username,$password,$worldCode,$governmentType,$colour);
+				$this->PostNewCountry($username,$password,$worldCode,$governmentType,$colour);
+				break;
 			case "World":
 				$worldName = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
 				$mapType = (!empty($parameters[3]) ? $parameters[3] : 'NULL');
 				$speed = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
 				
-				return $this->PostNewWorld($worldName,$mapType,$speed);
+				$this->PostNewWorld($worldName,$mapType,$speed);
+				break;
 			default:
 				$this->methodNotAllowedResponse();
+				break;
+		}
+	}
+	
+	public function PerformPut($url, $parameters, $requestBody, $accept) 
+	{
+		header('Content-Type: application/json; charset=utf-8');
+		header('no-cache,no-store');
+
+		//Event/APIKEY (Refreshes the event timer for a player and loads event if not already loaded)
+		switch ($parameters[1])
+		{
+			case "Event":
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
+				
+				if($playerCountry != "NULL")
+				{
+					$this->PutEventTimer($playerCountry);
+				}
+				else
+				{
+					header("HTTP/1.1 401 No API key Supplied.");
+				}
+				break;
+			default:
+				$this->methodNotAllowedResponse();
+				break;
 		}
 	}
 
@@ -602,6 +644,23 @@ class TauresiumRestService extends RestService
 		return new ProvinceCost($provinceID,$user,$owner,$cultDesc,$cultCost,$cultPos,$ecoDesc,$ecoCost,$ecoPos,$milDesc,$milCost,$milPos);
 	}
 	
+	private function GetJSONEvent($countryName)
+	{
+		$activeEventID = $this->database->GetLoadedEvent($countryName); //The get event method can make modifications to the database. To stop this from occuring we can check if the player has an event active at the moment
+		
+
+		if($activeEventID['LoadedEvent'] == "")
+		{
+			header("HTTP/1.1 404 Country entered has no active event"); //TODO - Maybe add verification for this step? like make sure it actually goes through
+		}
+		else
+		{
+			$eventInfo = $this->database->GetEvent($countryName);
+			return new EventDetail($eventInfo['Event_ID'],$eventInfo['Title'],$eventInfo['Description'],$eventInfo['Option_1_ID'],$eventInfo['Option_1_Desc'],$eventInfo['Option_2_ID'],$eventInfo['Option_2_Desc'],$eventInfo['Option_3_ID'],$eventInfo['Option_3_Desc']);
+		}
+
+	}
+	
 	private function PostNewCountry($username,$password,$worldCode,$governmentType,$colour) //Creates new country via POST request. Might be insecure due to sending of password.
 	{
 		$parameters = _CreateNewCountry($worldCode,$username,$password,$governmentType,$colour);
@@ -609,7 +668,7 @@ class TauresiumRestService extends RestService
 		//Responses
 		if($parameters[0]) //Occurs when errors occured
 		{
-			header("HTTP/1.1 400 Error occured. Code:" . $parameters[1]); //TODO - interpret error string.
+			header("HTTP/1.1 400 Error occured. Code: " . $parameters[1]); //TODO - interpret error string.
 		}
 		else
 		{
@@ -630,6 +689,36 @@ class TauresiumRestService extends RestService
 		{
 			header("HTTP/1.1 200 Successfully made new world. World Code: " . $parameters[1]);
 		}
+	}
+	
+	private function InterpretAPIKey($apiKey)
+	{
+		$country = $this->database->ReturnCountryFromAPIKey($apiKey);
+		
+		if(empty($country))
+		{
+			header("HTTP/1.1 401 Bad API key Supplied.");
+		}
+		else
+		{
+			return $country;
+		}
+	}
+	
+	private function PutEventTimer($countryName)
+	{
+		$this->database->UpdateEventTimer($countryName);
+		$eventInfo = $this->database->GetEvent($countryName);
+		
+		if($eventInfo == False)
+		{
+			header("HTTP/1.1 200 Updated last online time. No event could be loaded."); //TODO - Maybe add verification for this step? like make sure it actually goes through
+		}
+		else
+		{
+			header("HTTP/1.1 200 Updated last online time. Loaded new event.");
+		}
+
 	}
 
 }
