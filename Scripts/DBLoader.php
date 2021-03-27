@@ -299,15 +299,17 @@ class Database{
 		$LET = date("Y/m/d H:i:s");
 		
 		$passwordHash = hash('sha256',$passwordPreHash,false); // This built in algorithm hashes the password provided using sha256.
+		$apiKey = $this->NewKey();
 		
-		$stmt = $this->connectionData->prepare("INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,3);");
-		$stmt->bind_param('sssssisisiss', $countryName,$passwordHash, $government, $colour,$world_Code,$military_Influence,$military_Generation,$culture_Influence,$culture_Generation,$economic_Influence,$economic_Generation,$LET);
+		$stmt = $this->connectionData->prepare("INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,Events_Stacked,Api_key) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,3,?);");
+		$stmt->bind_param('sssssisisisss', $countryName,$passwordHash, $government, $colour,$world_Code,$military_Influence,$military_Generation,$culture_Influence,$culture_Generation,$economic_Influence,$economic_Generation,$LET,$apiKey);
 		$stmt->execute();
 
 		
 		$stmt = $this->connectionData->prepare("UPDATE worlds SET Capacity = Capacity - 1 WHERE World_Code = ?;");
 		$stmt->bind_param('s', $world_Code);
 		$stmt->execute();
+		
 		
 		$stmt = $this->connectionData->prepare("SELECT Province_ID FROM provinces WHERE Province_ID NOT IN (SELECT Province_ID FROM province_Occupation WHERE World_Code = ?) ORDER BY RAND() LIMIT 1;");
 		$stmt->bind_param('s', $world_Code);
@@ -328,8 +330,19 @@ class Database{
 	public function addNewWorld($worldName,$mapType,$gameSpeed)
 	{
 		$speedMapping = array("VeryQuick"=>30,"Quick"=>60,"Normal"=>120,"Slow"=>240);
+		
+		$worldCode = $this->NewKey();
+		$stmt = $this->connectionData->prepare("INSERT INTO worlds VALUES(?,?,?,?,5);");
+		$stmt->bind_param('sssi', $worldCode,$worldName,$mapType,$speedMapping[$gameSpeed]);
+		$stmt->execute();
+			
+		return $worldCode;
+	}
+
+	public function NewKey() //Makes a 16 character code for th
+	{
 		$characterArray = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9'];
-		$worldCode = "";
+		$code = "";
 		
 		While(True)
 		{
@@ -348,26 +361,38 @@ class Database{
 			$checksum = $checksum % 33;
 			$ID = $ID . $characterArray[$checksum];
 			
-			$stmt = $this->connectionData->prepare("SELECT 1 FROM worlds WHERE World_Code = ?;");
-			$stmt->bind_param('s', $ID);
+			$stmt = $this->connectionData->prepare("SELECT 1 FROM worlds,players WHERE worlds.World_Code = ? OR players.Api_Key = ?;");
+			$stmt->bind_param('ss', $ID,$ID);
 			$stmt->execute();
 			$result = $stmt->get_result();
 			$return = $result->fetch_row();
 
 			if($return[0] != "1")
 			{
-				$worldCode = $ID;
-				break;
+				$code = $ID;
+				return $code;
 			}
 		}
-		
-		$stmt = $this->connectionData->prepare("INSERT INTO worlds VALUES(?,?,?,?,5);");
-		$stmt->bind_param('sssi', $worldCode,$worldName,$mapType,$speedMapping[$gameSpeed]);
-		$stmt->execute();
-			
-		return $worldCode;
 	}
-
+	
+	public function ReturnAPIKey($loadedUser) //gets the API key of a player. This information is supposed to be secure so any calls to this method need to be secure.
+	{
+		$stmt = $this->connectionData->prepare("SELECT Api_Key FROM players WHERE Country_Name = ?;");
+		$stmt->bind_param('s', $loadedUser);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		return $result->fetch_row()[0];
+	}
+	
+	public function ReturnCountryFromAPIKey($apiKey) //gets the user with the assigned API KEY
+	{
+		$stmt = $this->connectionData->prepare("SELECT Country_Name FROM players WHERE Api_Key = ?;");
+		$stmt->bind_param('s', $apiKey);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		return $result->fetch_row()[0];
+	}
+	
 	public function ReturnWorld($loadedUser)
 	{		
 		$stmt = $this->connectionData->prepare("SELECT World_Code FROM players WHERE Country_Name = ?;");

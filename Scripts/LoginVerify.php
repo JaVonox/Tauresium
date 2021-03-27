@@ -12,6 +12,7 @@ if($returnBool == True)
 {
 	session_start();
 	$_SESSION['Country'] = $loginRequest; //Session variables are serverside
+	$_SESSION['APIKEY'] = $database->ReturnAPIKey($_SESSION['Country']); //This API key will be used when sending any requests via the API.  
 	header("Location: ../Main.php");
 }
 else

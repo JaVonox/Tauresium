@@ -40,7 +40,8 @@ Economic_Influence int NOT NULL,
 Economic_Generation FLOAT NOT NULL,
 Last_Event_Time DATETIME NOT NULL,
 events_Stacked FLOAT NOT NULL,
-Active_Event_ID int /*FK*/
+Active_Event_ID int, /*FK*/
+Api_Key varchar(16) NOT NULL
 );
 
 CREATE TABLE worlds(
@@ -911,5 +912,5 @@ INSERT INTO provinces  VALUES ('Australia_NewZealandCanterbury','904,476','874,4
 INSERT INTO provinces  VALUES ('Australia_NewZealandFiordland','859,496','874,495','876,482',TRUE,'Te Anau','Forest','Fiordland','South East Asia','>No Information Currently Available','2900','0.931','38675','0','0','0.1','26.999','371.17125','10.02125258','0.2412','7.3651','0.4612','56','82','62');
 
 INSERT INTO worlds VALUES('EPTR65E23EJ4HFTZ','Elysium','Earth','30',4);
-INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,events_Stacked) VALUES('ADMIN','16a31e1e410ad60975f5f789dcb2ba3498a810ee1dd0b386057057fe2277af27', 'Tribe','ee82ee','EPTR65E23EJ4HFTZ',150,1,150,1,150,1,'2021-02-15 17:34:00',0);
+INSERT INTO players (Country_Name,Hashed_Password,Country_Type,Colour,World_Code,Military_Influence,Military_Generation,Culture_Influence,Culture_Generation,Economic_Influence,Economic_Generation,Last_Event_Time,events_Stacked,Api_Key) VALUES('ADMIN','16a31e1e410ad60975f5f789dcb2ba3498a810ee1dd0b386057057fe2277af27', 'Tribe','ee82ee','EPTR65E23EJ4HFTZ',150,1,150,1,150,1,'2021-02-15 17:34:00',0,'YG5YDTTTHM819CAK');
 INSERT INTO province_Occupation (World_Code,Province_ID,Country_Name,Province_Type,Building_Column_1,Building_Column_2) VALUES('EPTR65E23EJ4HFTZ','China_Beijing','ADMIN',"Culture","C4","M4");
