@@ -47,7 +47,7 @@ else if(substr($WorldCodeError,0,7) == "INVALID")
 }
 else if(substr($WorldCodeError,0,8) == "OCCUPIED")
 {
-	$ErrorMessage = $ErrorMessage . "The selected world is full. <br>";
+	$ErrorMessage = $ErrorMessage . "The selected world is full or does not exist. <br>";
 	$WorldCodeValue = substr($WorldCodeError,8,strlen($WorldCodeError));
 }
 else

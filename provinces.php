@@ -17,7 +17,6 @@ if(empty($database->getProvinceDetail($selectedProvince))) //if the province doe
 
 $provinceType = $database->GetProvinceType($selectedProvince)[0];
 $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
-
 ?>
 
 <!DOCTYPE HTML>
@@ -48,6 +47,8 @@ $mapConnect = new MapConnections();
 $mapConnect->init($_SESSION['Country']);
 $sessionID = session_id();
 $playerCountry = $_SESSION['Country'];
+$playerWorld = $database->ReturnWorld($_SESSION['Country']);
+$provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 
 $provCountry = $mapConnect->CheckOwner($selectedProvince);
 ?>
@@ -90,7 +91,16 @@ $provCountry = $mapConnect->CheckOwner($selectedProvince);
 </table>
 <br>
 <form id="DetailsForm" method="POST">
+<table style="margin-left:auto;margin-right:auto;width:45%;margin-bottom:30px;">
+<tr><td></td></tr>
+<tr style="text-align:center;font-size:24px;"><td>The infrastructure in this location provides the following bonuses to its owner:</td></tr>
+<tr><td><br></td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="MilCapMod">+0 Military Capacity</td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="DefStrMod">+0% Local Defensive Strength</td></tr>
+<tr style="text-align:center;font-size:20px;"><td id="BuildMod">-0% Local Build Cost</td></tr>
+</table>
 <table id="DetailsTable" style="margin-left:auto;margin-right:auto;">
+
 </table>
 </form>
 </div>
@@ -102,6 +112,7 @@ $provCountry = $mapConnect->CheckOwner($selectedProvince);
 var provNameGet = "<?php echo $selectedProvince; ?>";
 var provType = "<?php echo $provinceType; ?>";
 var pageErrors = "<?php echo $buildError; ?>";
+var buildingModifiers = <?php echo json_encode($provBonuses); ?>;
 
 var ajaxProvInfo;
 var playerName;
@@ -150,6 +161,10 @@ function _loadDetails()
 	document.getElementById("ProvInfo").textContent = ajaxProvInfo.Description;
 	document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + ajaxProvInfo.Climate + ".png')";
 	document.getElementById("ProvOwner").textContent = "Owned By: " + "<?php echo $provCountry; ?>";
+	
+	document.getElementById("MilCapMod").textContent = "+" + (buildingModifiers.Bonus_Mil_Cap+15) + " Military Capacity";
+	document.getElementById("DefStrMod").textContent = "+" + buildingModifiers.Bonus_Def_Strength + "% Local Defensive Strength";
+	document.getElementById("BuildMod").textContent = "-" + buildingModifiers.Bonus_Build_Cost + "% Local Build Cost";
 }
 
 function _loadAnnexButtons()

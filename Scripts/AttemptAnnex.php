@@ -43,6 +43,7 @@ function CultAnnex()
 	
 	$database = new Database();
 	$db = $database->getConnection();
+	
 	if($adjacent[0]) //Last check to ensure that this is valid. Check includes cost+adjacency
 	{
 		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Culture_Cost']);

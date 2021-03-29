@@ -14,7 +14,6 @@ $improvementDetails = $database->GetProvinceType($selectedProvince);
 $buildEffects = $database->GetPossibleBuildings($improvementDetails[0]);
 $playerWorld = $database->ReturnWorld($_SESSION['Country']);
 $currentBuildings = $database->GetCurrentBuilding($selectedProvince,$playerWorld);
-$provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -31,19 +30,11 @@ $provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 }
 </style>
 </head>
-<table style="margin-left:auto;margin-right:auto;width:45%;margin-bottom:30px;">
-<tr><td></td></tr>
-<tr style="text-align:center;font-size:24px;"><td>This province belongs to our country and provides us with the following bonuses:</td></tr>
-<tr><td><br></td></tr>
-<tr style="text-align:center;font-size:20px;"><td id="MilCapMod">+0 Military Capacity</td></tr>
-<tr style="text-align:center;font-size:20px;"><td id="DefStrMod">+0% Local Defensive Strength</td></tr>
-<tr style="text-align:center;font-size:20px;"><td id="BuildMod">-0% Local Build Cost</td></tr>
-</table>
 
 <table style="border-collapse:seperate;margin-left:auto;margin-right:auto;width:45%;border-spacing:25px;">
 <tr style="text-align:center;font-size:36px;font-family:Romanus;">
-<td style="border-bottom:2px solid black;" id="Col1">Culture Buildings</td>
-<td style="border-bottom:2px solid black;" id="Col2">Economic Buildings</td>
+<td style="border-bottom:2px solid black;" id="Col1">Buildings</td>
+<td style="border-bottom:2px solid black;" id="Col2">Buildings</td>
 </tr>
 <tr style="text-align:center;">
 <td><a id="Building1Link" ><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
@@ -93,7 +84,6 @@ tippy('.BuildingSlot', {
 <script> //LoadBuildingInfo
 var possibleBuildings = <?php echo json_encode($buildEffects); ?>;
 var currentBuildings = <?php echo json_encode($currentBuildings); ?>;
-var buildingModifiers = <?php echo json_encode($provBonuses); ?>;
 var thisProv = "<?php echo $selectedProvince; ?>";
 var thisWorld = "<?php echo $playerWorld; ?>";
 
@@ -113,9 +103,6 @@ function _loadBuildings()
 	
 	document.getElementById("Col1").textContent = column1Type + " Buildings";
 	document.getElementById("Col2").textContent = column2Type + " Buildings";
-	document.getElementById("MilCapMod").textContent = "+" + (buildingModifiers.Bonus_Mil_Cap+15) + " Military Capacity";
-	document.getElementById("DefStrMod").textContent = "+" + buildingModifiers.Bonus_Def_Strength + "% Local Defensive Strength";
-	document.getElementById("BuildMod").textContent = "-" + buildingModifiers.Bonus_Build_Cost + "% Local Build Cost";
 	
 	for(i = 1; i < 5;i++)
 	{
@@ -162,9 +149,11 @@ function _loadPopupBuilding(evt)
 {
 	var subjectEntry = possibleBuildings[evt.slice(evt.length - 1)]; //Last character of id = building in array
 	var subjectID = evt.slice(evt.length - 1);
+	var costType = refCodeLookup[subjectEntry.BuildingID[0]];
+	
 	document.getElementById("BuildIcon").src = "Assets/Buildings/" +  subjectEntry.Building_Name + ".png";
 	document.getElementById("BuildName").textContent = subjectEntry.Building_Name;
-	document.getElementById("BuildCost").textContent = "Cost: " + Math.ceil(subjectEntry.Base_Cost * (1-(buildingModifiers.Bonus_Build_Cost/100)));
+	document.getElementById("BuildCost").textContent = "Cost: " + Math.ceil(subjectEntry.Base_Cost * (1-(buildingModifiers.Bonus_Build_Cost/100))) + " " + costType + " Influence";
 	document.getElementById("BuildCap").textContent = "+" + subjectEntry.Bonus_Mil_Cap + " Military Capacity";
 	document.getElementById("BuildDef").textContent = "+" + subjectEntry.Bonus_Def_Strength + "% Local Defensive Strength";
 	document.getElementById("BuildCostMod").textContent = "-" + subjectEntry.Bonus_Build_Cost + "% Local Build Cost";
