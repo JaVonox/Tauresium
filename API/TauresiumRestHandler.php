@@ -32,6 +32,7 @@ class TauresiumRestService extends RestService
 		//Government/Government type 
 		//CoastalRegion/CoastalRegion 
 		//Cost/Province/CountryName
+		//Event/APIKEY
 		
 		switch ($parameters[1])
 		{
@@ -227,7 +228,8 @@ class TauresiumRestService extends RestService
 		
 		//Country/username/password/worldCode/governmentType/colourHex
 		//World/Name/mapType/speed
-			
+		//Event/APIKEY/OptionNum{1,2,3} (Answer the event)
+		
 		switch ($parameters[1])
 		{
 			case "Country":
@@ -245,6 +247,19 @@ class TauresiumRestService extends RestService
 				$speed = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
 				
 				$this->PostNewWorld($worldName,$mapType,$speed);
+				break;
+			case "Event":
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
+				$optionNum = "Option" . (!empty($parameters[3]) ? $parameters[3] : 'NULL');
+
+				if($playerCountry != "NULL")
+				{
+					echo json_encode($this->PostAnswerEvent($playerCountry,$optionNum));
+				}
+				else
+				{
+					header("HTTP/1.1 401 No API key Supplied.");
+				}
 				break;
 			default:
 				$this->methodNotAllowedResponse();
@@ -651,7 +666,8 @@ class TauresiumRestService extends RestService
 
 		if($activeEventID['LoadedEvent'] == "")
 		{
-			header("HTTP/1.1 404 Country entered has no active event"); //TODO - Maybe add verification for this step? like make sure it actually goes through
+			header("HTTP/1.1 404 Player has no active event"); //TODO - Maybe add verification for this step? like make sure it actually goes through
+			return "null";
 		}
 		else
 		{
@@ -691,6 +707,37 @@ class TauresiumRestService extends RestService
 		}
 	}
 	
+	private function PostAnswerEvent($countryName,$optionType)
+	{
+		$eventLoad = $this->GetJSONEvent($countryName);
+		
+		if($eventLoad == "null")
+		{
+			header("HTTP/1.1 400 Player event ID is invalid. Is there an event loaded?"); 
+		}
+		else
+		{
+			$eventIDLoaded = $eventLoad->Event_ID;
+			
+			$selectedOption = "";
+			if($optionType == 'Option1'){
+				$selectedOption = "Option1";
+			}
+			else if($optionType == 'Option2'){
+				$selectedOption = "Option2";
+			}
+			else if($optionType == 'Option3'){
+				$selectedOption = "Option3";
+			}
+			else{
+				header("HTTP/1.1 400 Invalid Event Option"); 
+			}	
+			
+			$eventChanges = $this->database->EventResults($countryName,$eventIDLoaded,$selectedOption);
+			return new EventResults(strval($eventIDLoaded),$eventChanges['Title'],$eventChanges['Option_ID'],$eventChanges['Option_Description'],$eventChanges['Military_Gen_Modifier'],$eventChanges['Economic_Gen_Modifier'],$eventChanges['Culture_Gen_Modifier'],$eventChanges['AddMil'],$eventChanges['AddEco'],$eventChanges['AddCult']);
+		}
+	}
+	
 	private function InterpretAPIKey($apiKey)
 	{
 		$country = $this->database->ReturnCountryFromAPIKey($apiKey);
@@ -720,6 +767,7 @@ class TauresiumRestService extends RestService
 		}
 
 	}
+	
 
 }
 ?>

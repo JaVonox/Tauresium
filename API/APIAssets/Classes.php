@@ -294,4 +294,32 @@ class EventDetail
 		$this->Option3Desc = $op3D;
 	}
 }
+
+class EventResults
+{
+	public $Event_ID;
+	public $Event_Title;
+	public $Option_ID;
+	public $Option_Desc;
+	public $Military_Gen_Modifier;
+	public $Economic_Gen_Modifier;
+	public $Culture_Gen_Modifier;
+	public $Added_Military_Influence;
+	public $Added_Economic_Influence;
+	public $Added_Culture_Influence;
+	
+	public function __construct($eventID,$eventTitle,$optionID,$optionDesc,$milGenMod,$ecoGenMod,$cultGenMod,$addMil,$addEco,$addCult)
+	{
+		$this->Event_ID = $eventID;
+		$this->Event_Title = $eventTitle;
+		$this->Option_ID = $optionID;
+		$this->Option_Desc = $optionDesc;
+		$this->Military_Gen_Modifier = $milGenMod;
+		$this->Economic_Gen_Modifier = $ecoGenMod;
+		$this->Culture_Gen_Modifier = $cultGenMod;
+		$this->Added_Military_Influence = $addMil;
+		$this->Added_Economic_Influence = $addEco;
+		$this->Added_Culture_Influence = $addCult;
+	}
+}
 ?>
