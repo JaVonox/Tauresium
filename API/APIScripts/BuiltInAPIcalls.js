@@ -44,10 +44,21 @@ function BIGetWorldStats(worldName)
 
 function BIGetProvCosts(provID,countryName)
 {
-	//Gets world info for session stats page
+	//Gets province costs
 	  return $.ajax({
         url: 'TaurAPI/Cost/' + countryName + "/" + provID,
         type: 'GET',
+        cache: false,
+        dataType: 'json'
+	});
+}
+
+function BIPostBuild(provID,apiKey,buildType)
+{
+	//Sends the build request
+	  return $.ajax({
+        url: 'TaurAPI/Building/' + provID + "/" + apiKey + "/" + buildType,
+        type: 'POST',
         cache: false,
         dataType: 'json'
 	});

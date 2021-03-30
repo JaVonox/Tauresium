@@ -5,6 +5,7 @@ require "APIAssets/Classes.php";
 require "Scripts/MapConnections.php"; //MapConnections includes database - therefore this loads database
 require "APIScripts/NewCountry.php";
 require "APIScripts/NewWorld.php";
+require "APIScripts/NewBuild.php";
 
 class TauresiumRestService extends RestService 
 {
@@ -204,15 +205,15 @@ class TauresiumRestService extends RestService
 				}
 				break;
 			case "Event":
-				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
 				
-				if($playerCountry != "NULL")
+				if($playerCountry != "BAD")
 				{
 					echo json_encode($this->GetJSONEvent($playerCountry));
 				}
 				else
 				{
-					header("HTTP/1.1 401 No API key Supplied.");
+					header("HTTP/1.1 401 Bad API key supplied");
 				}
 				break;
 			default:	
@@ -229,6 +230,7 @@ class TauresiumRestService extends RestService
 		//Country/username/password/worldCode/governmentType/colourHex
 		//World/Name/mapType/speed
 		//Event/APIKEY/OptionNum{1,2,3} (Answer the event)
+		//Building/ProvinceID/APIKEY/buildType{C,E,M}
 		
 		switch ($parameters[1])
 		{
@@ -249,16 +251,30 @@ class TauresiumRestService extends RestService
 				$this->PostNewWorld($worldName,$mapType,$speed);
 				break;
 			case "Event":
-				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
-				$optionNum = "Option" . (!empty($parameters[3]) ? $parameters[3] : 'NULL');
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
+				$optionNum = "Option" . (!empty($parameters[3]) ? $parameters[3] : 'NULL'); //Error handling for this is in the answer event script.
 
-				if($playerCountry != "NULL")
+				if($playerCountry != "BAD")
 				{
 					echo json_encode($this->PostAnswerEvent($playerCountry,$optionNum));
 				}
 				else
 				{
-					header("HTTP/1.1 401 No API key Supplied.");
+					header("HTTP/1.1 401 Bad API key supplied");
+				}
+				break;
+			case "Building":
+				$provinceID = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
+				$playerCountry = (!empty($parameters[3]) ? $this->InterpretAPIKey($parameters[3]) : 'BAD');
+				$buildType = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
+				
+				if($playerCountry != "BAD")
+				{
+					$this->PostNewBuild($provinceID,$playerCountry,$buildType);
+				}
+				else
+				{
+					header("HTTP/1.1 401 Bad API key supplied");
 				}
 				break;
 			default:
@@ -276,15 +292,41 @@ class TauresiumRestService extends RestService
 		switch ($parameters[1])
 		{
 			case "Event":
-				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'NULL');
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
 				
-				if($playerCountry != "NULL")
+				if($playerCountry != "BAD")
 				{
 					$this->PutEventTimer($playerCountry);
 				}
 				else
 				{
-					header("HTTP/1.1 401 No API key Supplied.");
+					header("HTTP/1.1 401 Bad API key supplied");
+				}
+				break;
+			default:
+				$this->methodNotAllowedResponse();
+				break;
+		}
+	}
+	
+	public function PerformDelete($url, $parameters, $requestBody, $accept) 
+	{
+		header('Content-Type: application/json; charset=utf-8');
+		header('no-cache,no-store');
+
+		//Event/APIKEY (Skips current active event. API only feature.)
+		switch ($parameters[1])
+		{
+			case "Event":
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
+				
+				if($playerCountry != "BAD")
+				{
+					$this->DeleteCurrentEvent($playerCountry);
+				}
+				else
+				{
+					header("HTTP/1.1 401 Bad API key supplied");
 				}
 				break;
 			default:
@@ -738,13 +780,28 @@ class TauresiumRestService extends RestService
 		}
 	}
 	
+	private function PostNewBuild($provinceID,$countryName,$buildType)
+	{
+		$parameters = _CreateNewBuild($countryName,$provinceID,$buildType);
+		
+		//Responses
+		if($parameters[0]) //Occurs when errors occured
+		{
+			header("HTTP/1.1 400 " . $parameters[1]); //TODO - interpret error string.
+		}
+		else
+		{
+			header("HTTP/1.1 200 Sucessfully constructed building");
+		}
+	}
+	
 	private function InterpretAPIKey($apiKey)
 	{
 		$country = $this->database->ReturnCountryFromAPIKey($apiKey);
 		
 		if(empty($country))
 		{
-			header("HTTP/1.1 401 Bad API key Supplied.");
+			return "BAD"; //Tells program that bad API is supplied
 		}
 		else
 		{
@@ -765,7 +822,24 @@ class TauresiumRestService extends RestService
 		{
 			header("HTTP/1.1 200 Updated last online time. Loaded new event.");
 		}
-
+	}
+	
+	private function DeleteCurrentEvent($countryName)
+	{
+		//This should only set event to null, loading the event is what removes the event stack.
+		global $dbserver, $dbusername, $dbpassword, $dbdatabase;
+		
+		$connection = new mysqli($dbserver, $dbusername, $dbpassword, $dbdatabase);
+		
+		if (!$connection->connect_error)
+		{
+			$stmt = $connection->prepare("UPDATE players SET Active_Event_ID = null WHERE Country_Name = ?;"); 
+			$stmt->bind_param('s', $countryName);
+			$stmt->execute();
+			$stmt->close();
+			
+			header("HTTP/1.1 200 Skipped event if applicable");
+		}
 	}
 	
 
