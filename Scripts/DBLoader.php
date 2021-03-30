@@ -872,11 +872,16 @@ class Database{
 	public function GetNextBuilding($provinceID,$worldCode,$buildType) //Returns the type of the building.
 	{
 		$buildings = $this->GetCurrentBuilding($provinceID,$worldCode);
-		$nextBuildID = ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : header("Location: ../ErrorPage.php?Error=BadBuildType"));
+		$nextBuildID = ($buildings[0][0]==$buildType) ? ($buildings[0][0] . (intval($buildings[0][1]) + 1))  : (($buildings[1][0]==$buildType) ? ($buildings[1][0] . (intval($buildings[1][1]) + 1)) : $nextBuildID = "BAD");
 		//This script checks the buildtype and increments the second part of the current build ID to get the next build ID. 
+		if($nextBuildID == "BAD")
+		{
+			return "BAD";
+		}
+		
 		if(intval($nextBuildID[1]) > 4) //This script ensures that the build does not exceed the cap of 4 (There are 5 possible buildings, from 0-4)
 		{
-			header("Location: ../ErrorPage.php?Error=BuildingDoesNotExist");
+			return "BAD";
 		}
 		else
 		{
@@ -888,6 +893,11 @@ class Database{
 	{
 		$costModifier = 1 - (intval($this->GetConstructedBonuses($provinceID,$worldCode)["Bonus_Build_Cost"]) / 100);
 		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType);
+		
+		if($nextBuilding == "BAD")
+		{
+			return "BAD";
+		}
 		
 		$stmt = $this->connectionData->prepare("SELECT Base_Cost FROM buildings WHERE BuildingID = ?;");
 		$stmt->bind_param('s', $nextBuilding);
@@ -1065,8 +1075,18 @@ class Database{
 		$typeMapping = array("M"=>"Military_Influence", "E"=>"Economic_Influence", "C"=>"Culture_Influence");
 		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType);
 		
+		if($nextBuilding == "BAD" || $newBuildCost == "BAD")
+		{
+			return "BAD";
+		}
+		
+		if($buildType != "C" && $buildType != "E" && $buildType != "M")
+		{
+			return "BAD";
+		}
+		
 		$influenceType = $typeMapping[$buildType];
-
+		
 		$buildColumn = $this->GetBuildingColumn($provinceID,$worldCode,$nextBuilding);
 		
 		$stmt = $this->connectionData->prepare("UPDATE province_Occupation SET " . $buildColumn . " = ? WHERE World_Code = ? AND Province_ID = ?;");
@@ -1083,11 +1103,21 @@ class Database{
 	public function CanConstructBuilding($playerID,$provinceID,$worldCode,$buildType)
 	{
 		$errors = array(False,"");
-		($this->GetProvinceOwner($provinceID,$worldCode)!=$playerID) ? $errors=True:"You are not the owner of this location"; //Check player is owner. Also works as a check to see if the location is actually owned, as well as validifying the worldCode
+		($this->GetProvinceOwner($provinceID,$worldCode)!=$playerID) ? $errors=array(True,"You are not the owner of this location"):""; //Check player is owner. Also works as a check to see if the location is actually owned, as well as validifying the worldCode
 		
 		$newBuildCost = $this->GetBuildingCost($provinceID,$worldCode,$buildType);
 		$typeMapping = array("M"=>"Military_Influence", "E"=>"Economic_Influence", "C"=>"Culture_Influence");
 		$nextBuilding = $this->GetNextBuilding($provinceID,$worldCode,$buildType); //This checks if the build is valid and redirects to header if its invalid.
+		
+		if($nextBuilding == "BAD" || $newBuildCost == "BAD")
+		{
+			$errors = array(True,"Invalid Building");
+		}
+		
+		if($buildType != "C" && $buildType != "E" && $buildType != "M")
+		{
+			return array(True,"Invalid Building Type");
+		}
 		
 		$influenceType = $typeMapping[$buildType];
 		

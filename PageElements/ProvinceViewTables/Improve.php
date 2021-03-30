@@ -37,20 +37,20 @@ $currentBuildings = $database->GetCurrentBuilding($selectedProvince,$playerWorld
 <td style="border-bottom:2px solid black;" id="Col2">Buildings</td>
 </tr>
 <tr style="text-align:center;">
-<td><a id="Building1Link" ><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
-<td><a id="Building6Link"><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><a id="Building2Link"><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
-<td><a id="Building7Link"><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><a id="Building3Link"><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
-<td><a id="Building8Link"><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><a id="Building4Link"><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
-<td><a id="Building9Link"><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></a></td>
+<td><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
 </tr>
 </table>
 
@@ -110,7 +110,7 @@ function _loadBuildings()
 		if(i -1 == parseInt(column1Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
-			document.getElementById("Building" + i + "Link").href = "Scripts/AddBuilding.php?Province=" +  thisProv + "&WorldCode=" + thisWorld + "&Type=" + currentBuildings[0][0]; //Allows player to expend points to construct buildings
+			document.getElementById("Building" + i).onclick =  function() {_CreateBuild(thisProv,currentBuildings[0][0]);};
 		}
 		else if(i - 1< parseInt(column1Tier)) //below build tier
 		{
@@ -130,7 +130,7 @@ function _loadBuildings()
 		if(i - 6 == parseInt(column2Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
-			document.getElementById("Building" + i + "Link").href = "Scripts/AddBuilding.php?Province=" +  thisProv + "&WorldCode=" + thisWorld + "&Type=" + currentBuildings[1][0]; //Allows player to expend points to construct buildings
+			document.getElementById("Building" + i).onclick = function(){ _CreateBuild(thisProv,currentBuildings[1][0]);};//Allows player to expend points to construct buildings
 		}
 		else if(i - 6< parseInt(column2Tier)) //below build tier
 		{
@@ -194,6 +194,23 @@ function _loadPopupBuilding(evt)
 			document.getElementById("BuildConstruct").textContent = "Cannot Be Constructed";
 		}
 	}
+}
+
+function _CreateBuild(provID,type)
+{
+	//document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
+	BIPostBuild(provID,"<?php echo $_SESSION['APIKEY'];?>",type).fail((apiReturn =>{ //for some reason this script returns true for both an unsuccessful and successful POST request. 
+		if(apiReturn.statusText == "Sucessfully constructed building")
+		{
+			window.location.href = 'provinces.php?ProvinceView=' + provID;
+		}
+		else
+		{
+			window.location.href = 'provinces.php?ProvinceView=' + provID + "&Errors=" + apiReturn.statusText;
+		}
+	}));
+	
+	//TODO - switch this to not use page redirects unless necessary.
 }
 </script>
 </html>
