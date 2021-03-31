@@ -6,6 +6,7 @@ require "Scripts/MapConnections.php"; //MapConnections includes database - there
 require "APIScripts/NewCountry.php";
 require "APIScripts/NewWorld.php";
 require "APIScripts/NewBuild.php";
+require "APIScripts/AnnexScript.php";
 
 class TauresiumRestService extends RestService 
 {
@@ -231,6 +232,7 @@ class TauresiumRestService extends RestService
 		//World/Name/mapType/speed
 		//Event/APIKEY/OptionNum{1,2,3} (Answer the event)
 		//Building/ProvinceID/APIKEY/buildType{C,E,M}
+		//Province/ProvinceID/APIKEY/pointType{C,E,M}
 		
 		switch ($parameters[1])
 		{
@@ -279,6 +281,21 @@ class TauresiumRestService extends RestService
 				break;
 			default:
 				$this->methodNotAllowedResponse();
+				break;
+			case "Province":
+				$provinceID = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
+				$playerCountry = (!empty($parameters[3]) ? $this->InterpretAPIKey($parameters[3]) : 'BAD');
+				$pointType = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
+				
+				if($playerCountry != "BAD" && $pointType != 'NULL' && $provinceID != 'NULL')
+				{
+					$this->PostAnnex($provinceID,$playerCountry,$pointType);
+				}
+				else
+				{
+					header("HTTP/1.1 401 Bad Parameters");
+				}
+				
 				break;
 		}
 	}
@@ -524,7 +541,7 @@ class TauresiumRestService extends RestService
 		}
 	}	
 	
-	private function GetJSONWorldInfo($worldParam) //SQL UNSAFE
+	private function GetJSONWorldInfo($worldParam) //SQL UNSAFE TODO fix this
     {
 		global $dbserver, $dbusername, $dbpassword, $dbdatabase;
 		
@@ -792,6 +809,25 @@ class TauresiumRestService extends RestService
 		else
 		{
 			header("HTTP/1.1 200 Sucessfully constructed building");
+		}
+	}
+	
+	private function PostAnnex($provinceID,$playerCountry,$pointType)
+	{
+		$returnArg = _AnnexLocation($provinceID,$playerCountry,$pointType);
+		
+		//Responses
+		if($returnArg == "SUCCESS") //Occurs when errors occured
+		{
+			header("HTTP/1.1 200 Sucessfully annexed location");
+		}
+		else if($returnArg == "INVALID")
+		{
+			header("HTTP/1.1 401 Not enough points or no access to this location"); 
+		}
+		else if($returnArg == "BAD")
+		{
+			header("HTTP/1.1 400 Bad arguments supplied"); 
 		}
 	}
 	
