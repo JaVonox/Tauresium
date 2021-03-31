@@ -1,5 +1,7 @@
 <?php
-include_once "MapConnections.php"; 
+require "../API/APIScripts/AnnexScript.php"; 
+require "DBLoader.php";
+require "MapConnections.php"; 
 
 if(!isset($_SESSION)) 
 { 
@@ -9,95 +11,45 @@ if(!isset($_SESSION))
 $database = new Database();
 $db = $database->getConnection();
 
+$countryName = (!isset($_SESSION['Country']) ? "" : $_SESSION['Country'] ); //This should never be an invalid country
+$provID = (!isset($_POST['invisible-provID']) ? "" : $_POST['invisible-provID']);
+
 if($_POST['invisible-provID'] == ""){
 	header("Location: ../ErrorPage.php?Error=NoProvince");
 }
 
 $validHidden = $database->ReturnExists($_POST['invisible-provID']);
 
-
-
-if(!$validHidden)
+if(!$validHidden && $countryName != "")
 {
 	header("Location: ../ErrorPage.php?Error=InvalidProvinceID");
 }
 
+$returnArgs = "";
 if (isset($_POST['CultureAnnex']))
 {
-	CultAnnex();
+	$returnArgs = _AnnexLocation($provID,$countryName,"C");
 }
 else if(isset($_POST['EcoAnnex']))
 {
-	EcoAnnex();
+	$returnArgs = _AnnexLocation($provID,$countryName,"E");
 }
 else if(isset($_POST['MilAnnex']))
 {
-	MilAnnex();
+	$returnArgs = _AnnexLocation($provID,$countryName,"M");
+}
+else
+{
+	header("Location: ../ErrorPage.php?Error=InvalidPointType");
 }
 
-function CultAnnex()
+if($returnArgs == "SUCCESS")
 {
-	$mapConnect = new MapConnections();
-	$mapConnect->init($_SESSION['Country']);
-	$adjacent = $mapConnect->CheckCulture($_POST['invisible-provID']); 
-	
-	$database = new Database();
-	$db = $database->getConnection();
-	
-	if($adjacent[0]) //Last check to ensure that this is valid. Check includes cost+adjacency
-	{
-		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Culture_Influence", $database->getProvinceDetail($_POST['invisible-provID'])[0]['Culture_Cost']);
-		header("Location: ../Main.php");
-	}
-	else
-	{
-		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself"); //Probably noone will ever see this but its funny to me
-	}
+	$returnCode = rtrim($returnCode,"&"); 
+	header("Location: ../Main.php");
 }
-
-function EcoAnnex()
+else
 {
-	$mapConnect = new MapConnections();
-	$mapConnect->init($_SESSION['Country']);
-	$coastalConnection = $mapConnect->CheckEconomic($_POST['invisible-provID']); 
-
-	$database = new Database();
-	$db = $database->getConnection();
-	if($coastalConnection[0]) 
-	{
-		$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Economic_Influence", intval($database->getProvinceDetail($_POST['invisible-provID'])[0]['Economic_Cost']) + intval($coastalConnection[2]));
-		header("Location: ../Main.php");
-	}
-	else
-	{
-		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself");
-	}
-}
-
-function MilAnnex()
-{
-	$mapConnect = new MapConnections();
-	$mapConnect->init($_SESSION['Country']);
-	$milConnection = $mapConnect->CheckMilitary($_POST['invisible-provID']); 
-
-	$database = new Database();
-	$db = $database->getConnection();
-	if($milConnection[0]) 
-	{
-		if($milConnection[3])
-		{
-			$database->AnnexLocationPeaceful($_SESSION['Country'],$_POST['invisible-provID'],"Military_Influence", $milConnection[2]); 
-			header("Location: ../Main.php");
-		}
-		else
-		{
-			$database->AnnexLocationForceful($_SESSION['Country'],$_POST['invisible-provID'],"Military_Influence", $milConnection[2]);
-			header("Location: ../Main.php");
-		}
-	}
-	else
-	{
-		header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself");
-	}
+	header("Location: ../ErrorPage.php?HeyGuy=You_cheated_not_only_the_game_but_yourself"); //Probably noone will ever see this but its funny to me
 }
 ?>

@@ -198,8 +198,19 @@ function _loadPopupBuilding(evt)
 
 function _CreateBuild(provID,type)
 {
-	//document.getElementById("ProvExamine").onclick = function() { document.location='provinces.php?ProvinceView=' + selectedProvince.Province_ID; } //change from index
-	BIPostBuild(provID,"<?php echo $_SESSION['APIKEY'];?>",type).fail((apiReturn =>{ //for some reason this script returns true for both an unsuccessful and successful POST request. 
+	//for some reason this script returns true for both an unsuccessful and successful POST request.
+	
+	BIPostBuild(provID,"<?php echo $_SESSION['APIKEY'];?>",type).done((apiReturn =>{ 
+		if(apiReturn.statusText == "Sucessfully constructed building")
+		{
+			window.location.href = 'provinces.php?ProvinceView=' + provID;
+		}
+		else
+		{
+			window.location.href = 'provinces.php?ProvinceView=' + provID + "&Errors=" + apiReturn.statusText;
+		}
+		}))
+		.fail((apiReturn =>{ 
 		if(apiReturn.statusText == "Sucessfully constructed building")
 		{
 			window.location.href = 'provinces.php?ProvinceView=' + provID;
