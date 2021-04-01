@@ -6,11 +6,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="API/APIScripts/BuiltInAPICalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
-<style>
-polygon{
-		fill:#FFE7AB;stroke:black;stroke-width:1;
-}
-</style>
 
 <title>
 Tauresium - Game Page
@@ -23,21 +18,14 @@ Tauresium - Game Page
 <?php include_once "Scripts/CheckLogin.php";?>
 <?php
 /* Session already exists */
-$mapConnect = new MapConnections();
-$mapConnect->init($_SESSION['Country']);
 $playerCountry = $_SESSION['Country'];
-
-$database = new Database();
-$db = $database->getConnection();
-$occupiedSet = json_encode($database->GetOccupation($_SESSION['Country']));
-$visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 ?>
 
 <div id="MapBack" style="background-color:lightgrey;min-height:600px;overflow:auto;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 	<table style="width:100%;height:100%;table-layout:fixed;overflow:auto;">
 	<tr>
 	<td style="width:400px;background-color:lightgrey;text-align:center;margin-left:auto;margin-right:auto;border: 5px solid grey;border-radius:15px;vertical-align:top;position:relative;left:30px;">
-	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h2>
+	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h1>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:20px;">Ocean</i>
 	<br>
 	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
@@ -54,7 +42,7 @@ $visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 	<br><br>
 	<div id="ProvCost" style="margin-left:auto;margin-right:auto;width:max-content;"></div>
 	<br>
-	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;margin-bottom:10px;" onclick="document.location='Main.php'">View/Annex Province</button>
+	<button id="ProvExamine" class="gameButton" style="visibility:hidden;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';margin-bottom:10px;" onclick="document.location='Main.php'">View/Annex Province</button>
 	</td>
 	<td id="ProvTableRow" style="width:100%;height:100%;"> 
 	</td>
@@ -67,14 +55,12 @@ $visibilitySet = json_encode($database->GetVisibility($_SESSION['Country']));
 <script>
 var selectedRegion = "Ocean";
 var provinceArray; 
-var occupiedArray = <?php echo $occupiedSet; ?>;
-var invisibleProvinces = <?php echo $visibilitySet;?>;
 var playerName = "<?php echo $playerCountry;?>";
 
-BIGetAllProvs().then((value => {
+BIGetAllProvs("<?php echo $_SESSION['APIKEY'] ?>").then((value => {
 	provinceArray = value; //Returns all provinces via ajax HTTP call
 	_DrawSVG();
-	_DrawProvinces();
+	_PanZoom();
 }));
 
 function _clickEvent(evt) 
@@ -101,25 +87,25 @@ function _clickEvent(evt)
 		
 		document.getElementById("ProvinceImage").src = "Assets/Ocean.png";
 		document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png')";
-		_DrawProvinces();
+		_RedrawProvinces();
 	}
 	else
 	{
-		_DrawProvinces();
+		_RedrawProvinces();
 		selectedRegion = event.target.id;
 
 		var selectedProvince = provinceArray[selectedRegion];
-		var selectedProvinceOwner = occupiedArray.find(element => element.Province_ID == selectedRegion);
+		var selectedProvinceOwner = selectedProvince.Owner;
 		
 		document.getElementById("ProvCapital").textContent = selectedProvince.Capital;
 		document.getElementById("ProvRegion").textContent = selectedProvince.Region;
 		
-		if(selectedProvinceOwner !== undefined)
+		if(selectedProvinceOwner !== "NULL")
 		{
 			document.getElementById("ProvOwner").textContent = "Owned By: " + selectedProvinceOwner.Title + " " + selectedProvinceOwner.Country_Name;
-			var redComponent = ((parseInt(selectedProvinceOwner.Colour[0],16) * 16) + parseInt(selectedProvinceOwner.Colour[1],16));
-			var greenComponent = ((parseInt(selectedProvinceOwner.Colour[2],16) * 16) + parseInt(selectedProvinceOwner.Colour[3],16));
-			var blueComponent = ((parseInt(selectedProvinceOwner.Colour[4],16) * 16) + parseInt(selectedProvinceOwner.Colour[5],16));
+			var redComponent = ((parseInt(selectedProvince.Colour[0],16) * 16) + parseInt(selectedProvince.Colour[1],16));
+			var greenComponent = ((parseInt(selectedProvince.Colour[2],16) * 16) + parseInt(selectedProvince.Colour[3],16));
+			var blueComponent = ((parseInt(selectedProvince.Colour[4],16) * 16) + parseInt(selectedProvince.Colour[5],16));
 			document.getElementById("MapBack").style.backgroundImage = "linear-gradient(to bottom, rgba(" + redComponent + ", " + greenComponent + ", " + blueComponent + ", 0.30), rgba(" + redComponent + ", " + greenComponent + ", " + blueComponent + ", 0.60)),url('Backgroundimages/" + selectedProvince.Climate + ".png')";
 		}
 		else
@@ -143,29 +129,6 @@ function _clickEvent(evt)
 		document.getElementById(event.target.id).style.fill = "#abc3ff";
 		document.getElementById("ProvinceImage").src = "Assets/" + selectedProvince.Climate + ".png";
 	}
-}
-
-function _DrawProvinces()
-{
-	for (i = 0; i < Object.keys(occupiedArray).length; i++)
-	{
-		document.getElementById(occupiedArray[i].Province_ID).style.fill = "#" + occupiedArray[i].Colour;
-	}
-	
-	for (i = 0; i < Object.keys(invisibleProvinces).length; i++)
-	{
-		if(occupiedArray.some(occupiedArray => occupiedArray.Province_ID === invisibleProvinces[i].Province_ID)) //This checks if the invisible province is one that is supposed to be invisible, and draws it darkened if it is.
-		{
-			document.getElementById(invisibleProvinces[i].Province_ID).style.filter = 'brightness(35%)'; 
-		}
-		else
-		{ 
-			//This is more or less a "fog of war" system, but mostly serves to show players where they can go.
-			document.getElementById(invisibleProvinces[i].Province_ID).style.fill = "#303030";
-			document.getElementById(invisibleProvinces[i].Province_ID).style.filter = 'brightness(60%)'; 
-		}
-	}
-	
 }
 
 function _LoadProvCosts(value) //This script loads the values for the province costs - which are now displayed on the map.
@@ -241,18 +204,69 @@ function _LoadProvCosts(value) //This script loads the values for the province c
 	}
 }
 
-function _DrawSVG() //This dynamically loads all the province info from the API, and then allows for the use of the svgpanzoom library
+function _RedrawProvinces()
+{
+	for(var element in provinceArray)
+	{
+		if(provinceArray[element]['Colour'] != "NULL")
+		{
+			document.getElementById(provinceArray[element]['Province_ID']).style.fill = '#' + provinceArray[element]['Colour'];
+		}
+
+		if(provinceArray[element]['Visible'] == false) //This checks if the invisible province is one that is supposed to be invisible, and draws it darkened if it is.
+		{
+			if(provinceArray[element]['Colour'] != "NULL")
+			{
+				document.getElementById(provinceArray[element]['Province_ID']).style.filter = 'brightness(35%)'; 
+			}
+			else
+			{
+				//This is more or less a "fog of war" system, but mostly serves to show players where they can go.
+				document.getElementById(provinceArray[element]['Province_ID']).style.fill = "#303030";
+				document.getElementById(provinceArray[element]['Province_ID']).style.filter = 'brightness(60%)'; 
+			}
+		}
+	}
+	
+}
+
+function _DrawSVG() //This dynamically loads all the province info from the API
 {
 	var inHTMLstring = "<svg id='SvgProvID' class='Provinces' onclick='_clickEvent()' style='background-color:#E6BF83;width:950px;height:562px;display:block;margin:auto;border:5px solid #966F33;'>"
 	
 	for(var element in provinceArray){
-	inHTMLstring += "<polygon id='" + provinceArray[element]['Province_ID'] +"' points='"+ provinceArray[element]['Vertex1'] +" "+ provinceArray[element]['Vertex2'] +" "+ provinceArray[element]['Vertex3'] +"'/>";
+	inHTMLstring += "<polygon id='" + provinceArray[element]['Province_ID'] +"' points='"+ provinceArray[element]['Vertex1'] +" "+ provinceArray[element]['Vertex2'] +" "+ provinceArray[element]['Vertex3'] +"' style='stroke:black;stroke-width:1;";
+	
+	if(provinceArray[element]['Colour'] != "NULL")
+	{
+		inHTMLstring += 'fill:#' + provinceArray[element]['Colour'] + ';';
+	}
+	else
+	{
+		inHTMLstring += 'fill:#FFE7AB;';
 	}
 	
+	if(provinceArray[element]['Visible'] == false)
+	{
+		if(provinceArray[element]['Colour'] != "NULL")
+		{
+			inHTMLstring += 'filter:brightness(35%);'; 
+		}
+		else
+		{
+			inHTMLstring += 'fill:#303030;filter:brightness(60%);'; 
+		}
+	}
+	
+	inHTMLstring += "'/>";
+	}
 	inHTMLstring += "</svg>";
 	
 	document.getElementById("ProvTableRow").innerHTML = inHTMLstring;
-	
+}
+
+function _PanZoom()
+{
 	beforePan = function(oldPan, newPan){ //This function is sourced from an example in the svg-pan-zoom documentation. 
 	  var stopHorizontal = false
 		, stopVertical = false
