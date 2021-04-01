@@ -28,6 +28,7 @@ class TauresiumRestService extends RestService
 		header('no-cache,no-store');
 		//get api basic usages
 		//Province/ProvinceName/WorldCode 
+		//View/APIKEY
 		//Country/CountryName 
 		//World/WorldCode 
 		//Building/BuildingName 
@@ -49,7 +50,7 @@ class TauresiumRestService extends RestService
 				}
 				else
 				{	
-					if($worldCode == "NULL")
+					if($worldCode == "NULL") //No API key supplied
 					{
 						$prov = $this->GetJSONProvinceViaID($provinceID);
 						
@@ -70,7 +71,21 @@ class TauresiumRestService extends RestService
 				}
 				
 				break;
-
+			case "View": //Used to return the visibility + ownership of each location.
+				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
+				
+				if($playerCountry == "BAD") 
+				{
+					$this->notFoundResponse();
+					
+				}
+				else
+				{
+					$this->GetJSonView($playerCountry);
+					echo json_encode($this->returnArray);
+				}
+				
+				break;
 			case "Country":
 				$id="";
 				(!empty($parameters[2]) ? $id = $parameters[2] : $id = "NULL");
@@ -667,6 +682,50 @@ class TauresiumRestService extends RestService
 			$statement->close();
 			$connection->close();
 		}
+	}
+	
+	private function GetJSONView($countryName) //Gets visibility + owner
+	{
+		global $dbserver, $dbusername, $dbpassword, $dbdatabase;
+		
+		$playerWorldCode = $this->database->ReturnWorld($countryName);
+		$connection = new mysqli($dbserver, $dbusername, $dbpassword, $dbdatabase);
+				
+		$query = "SELECT Province_ID,Capital,Region,Vertex_1,Vertex_2,Vertex_3,Climate,City_Population_Total,National_HDI,National_Nominal_GDP_per_capita,Coastal,Coastal_Region,Culture_Cost,Economic_Cost,Military_Cost,Description,Culture_Modifier,Economic_Enviroment_Modifier,Military_Enviroment_Modifier FROM provinces;";
+		$occupiedSet = $this->database->GetOccupation($countryName); //Stores all the provinces owned on the map.
+		$visibilitySet = $this->database->GetVisibility($countryName); //Stores all provinces that should be hidden
+		
+		if ($result = $connection->query($query))
+		{
+			while ($selectedInfo = $result->fetch_assoc())
+			{	
+				$colourVal = "NULL";
+				$visible = true;
+				$ownerVal = "NULL";
+				
+				foreach($occupiedSet as $occupiedLocation)
+				{
+					if($occupiedLocation['Province_ID'] == $selectedInfo['Province_ID'])
+					{
+						$colourVal = $occupiedLocation['Colour'];
+						$ownerVal = array("Country_Name" => $occupiedLocation['Country_Name'],"Title" => $occupiedLocation['Title']);
+					}
+				}
+				
+				foreach($visibilitySet as $visibleLocation)
+				{
+					if($visibleLocation['Province_ID'] == $selectedInfo['Province_ID'])
+					{
+						$visible = false;
+					}
+				}
+
+				$this->returnArray[$selectedInfo['Province_ID']] = new ProvinceViewMode($selectedInfo["Province_ID"], $selectedInfo["Capital"], $selectedInfo["Region"],$selectedInfo['Vertex_1'],$selectedInfo['Vertex_2'],$selectedInfo['Vertex_3'], $selectedInfo["Climate"], $selectedInfo["City_Population_Total"], $selectedInfo["National_HDI"], $selectedInfo["National_Nominal_GDP_per_capita"], $selectedInfo["Coastal"], $selectedInfo["Coastal_Region"],$selectedInfo['Culture_Cost'],$selectedInfo['Economic_Cost'],$selectedInfo['Military_Cost'],$selectedInfo['Description'],$selectedInfo['Culture_Modifier'],$selectedInfo['Economic_Enviroment_Modifier'],$selectedInfo['Military_Enviroment_Modifier'],$colourVal,$visible,$ownerVal);
+			}
+			
+		}
+			
+		$connection->close();
 	}
 	
 	private function GetJSONCosts($user,$provinceID) //This returns the costs of each province, which is player dependent. This can later be implemented for the POST call for taking provinces

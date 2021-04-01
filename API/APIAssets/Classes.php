@@ -103,6 +103,59 @@ class ProvinceHighDetail //Includes Building and Owner - World dependent.
 	}
 }
 
+class ProvinceViewMode //Values to be rendered. Player dependent.
+{
+	public $Province_ID;
+	public $Capital;
+	public $Region;
+	public $Vertex1;
+	public $Vertex2;
+	public $Vertex3;
+	public $Climate;
+	public $City_Population_Total;
+	public $National_HDI;
+	public $National_Nominal_GDP_per_capita;
+	public $Coastal;
+	public $Coastal_Region;
+	public $Base_Culture_Cost;
+	public $Base_Economic_Cost;
+	public $Base_Military_Cost;
+	public $Description;
+	public $Culture_Modifier;
+	public $Economic_Enviroment_Modifier;
+	public $Military_Enviroment_Modifier;
+	public $Colour;
+	public $Visible;
+	public $Owner;
+	
+    public function __construct($Province_ID, $Capital, $Region,$Vert1,$Vert2,$Vert3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Culture_Cost,$Economic_Cost,$Military_Cost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$Colour,$Visible,$Owner)
+    {
+        $this->Province_ID = $Province_ID;
+        $this->Capital = $Capital;
+        $this->Region = $Region;
+		$this->Vertex1 = $Vert1;
+		$this->Vertex2 = $Vert2;
+		$this->Vertex3 = $Vert3;
+        $this->Climate = $Climate;
+        $this->City_Population_Total = $City_Population_Total;
+        $this->National_HDI = $National_HDI;
+        $this->National_Nominal_GDP_per_capita = $National_Nominal_GDP_per_capita;
+		$this->Coastal = $Coastal;
+		$this->Coastal_Region = $Coastal_Region;
+		$this->Base_Culture_Cost = $Culture_Cost;
+		$this->Base_Economic_Cost = $Economic_Cost;
+		$this->Base_Military_Cost = $Military_Cost;
+		$this->Description = $Description;
+		$this->Culture_Modifier = $Culture_Modifier;
+		$this->Economic_Enviroment_Modifier = $Economic_Enviroment_Modifier;
+		$this->Military_Enviroment_Modifier = $Military_Enviroment_Modifier;
+		$this->Colour = $Colour;
+		$this->Visible = $Visible;
+		$this->Owner = $Owner;
+	}
+}
+
+
 class PlayerDetail
 {
 	public $Country_Name;

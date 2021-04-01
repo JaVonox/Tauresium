@@ -9,7 +9,18 @@
 	});
 }
 
-function BIGetAllProvs()
+function BIGetAllProvs(ApiKey)
+{
+	//Gets all the province info for the main page
+    return $.ajax({
+        url: 'TaurAPI/View/' + ApiKey,
+        type: 'GET',
+        cache: false,
+        dataType: 'json'
+	});
+}
+
+function BIGetAllProvsInfo()
 {
 	//Gets all the province info for the main page
     return $.ajax({
