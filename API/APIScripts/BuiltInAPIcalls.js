@@ -11,7 +11,7 @@
 
 function BIGetAllProvs(ApiKey)
 {
-	//Gets all the province info for the main page
+	//Gets the province map for the mainpage
     return $.ajax({
         url: 'TaurAPI/View/' + ApiKey,
         type: 'GET',
@@ -64,12 +64,34 @@ function BIGetProvCosts(provID,countryName)
 	});
 }
 
+function BIGetPlayerEvent(ApiKey)
+{
+	//Gets province costs
+	  return $.ajax({
+        url: 'TaurAPI/Event/' + ApiKey,
+        type: 'GET',
+        cache: false,
+        dataType: 'json'
+	});
+}
+
 function BIPostBuild(provID,apiKey,buildType)
 {
 	//Sends the build request
 	  return $.ajax({
         url: 'TaurAPI/Building/' + provID + "/" + apiKey + "/" + buildType,
         type: 'POST',
+        cache: false,
+        dataType: 'json'
+	});
+}
+
+function BIPutEvent(ApiKey)
+{
+	//Gets province costs
+	  return $.ajax({
+		url: 'TaurAPI/Event/' + ApiKey,
+        type: 'PUT',
         cache: false,
         dataType: 'json'
 	});

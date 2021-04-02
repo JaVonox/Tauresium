@@ -258,20 +258,20 @@ class TauresiumRestService extends RestService
 				$governmentType = (!empty($parameters[5]) ? $parameters[5] : '');
 				$colour = (!empty($parameters[6]) ? $parameters[6] : '');
 				
-				$this->PostNewCountry($username,$password,$worldCode,$governmentType,$colour);
+				echo $this->PostNewCountry($username,$password,$worldCode,$governmentType,$colour);
 				break;
 			case "World":
 				$worldName = (!empty($parameters[2]) ? $parameters[2] : 'NULL');
 				$mapType = (!empty($parameters[3]) ? $parameters[3] : 'NULL');
 				$speed = (!empty($parameters[4]) ? $parameters[4] : 'NULL');
 				
-				$this->PostNewWorld($worldName,$mapType,$speed);
+				echo $this->PostNewWorld($worldName,$mapType,$speed);
 				break;
 			case "Event":
 				$playerCountry = (!empty($parameters[2]) ? $this->InterpretAPIKey($parameters[2]) : 'BAD');
 				$optionNum = "Option" . (!empty($parameters[3]) ? $parameters[3] : 'NULL'); //Error handling for this is in the answer event script.
 
-				if($playerCountry != "BAD")
+				if($playerCountry != "BAD" && $optionNum != "NULL")
 				{
 					echo json_encode($this->PostAnswerEvent($playerCountry,$optionNum));
 				}
@@ -803,10 +803,12 @@ class TauresiumRestService extends RestService
 		if($parameters[0]) //Occurs when errors occured
 		{
 			header("HTTP/1.1 400 Error occured. Code: " . $parameters[1]); //TODO - interpret error string.
+			return json_encode($parameters);
 		}
 		else
 		{
 			header("HTTP/1.1 200 Successfully made country");
+			return json_encode($parameters);
 		}
 	}
 	
@@ -817,11 +819,13 @@ class TauresiumRestService extends RestService
 		//Responses
 		if($parameters[0]) //Occurs when errors occured
 		{
-			header("HTTP/1.1 400 Error occured. Code:" . $parameters[1]); //TODO - interpret error string.
+			header("HTTP/1.1 400 Error occured. See JSON for details."); //TODO - interpret error string.
+			return json_encode($parameters);
 		}
 		else
 		{
-			header("HTTP/1.1 200 Successfully made new world. World Code: " . $parameters[1]);
+			header("HTTP/1.1 200 Successfully made new world. See JSON for World Code");
+			return json_encode($parameters);
 		}
 	}
 	
@@ -832,6 +836,7 @@ class TauresiumRestService extends RestService
 		if($eventLoad == "null")
 		{
 			header("HTTP/1.1 400 Player event ID is invalid. Is there an event loaded?"); 
+			return "null";
 		}
 		else
 		{
@@ -849,6 +854,7 @@ class TauresiumRestService extends RestService
 			}
 			else{
 				header("HTTP/1.1 400 Invalid Event Option"); 
+				return "null";
 			}	
 			
 			$eventChanges = $this->database->EventResults($countryName,$eventIDLoaded,$selectedOption);
@@ -915,7 +921,7 @@ class TauresiumRestService extends RestService
 		}
 		else
 		{
-			header("HTTP/1.1 200 Updated last online time. Loaded new event.");
+			header("HTTP/1.1 201 Updated last online time. Loaded new event.");
 		}
 	}
 	

@@ -14,7 +14,7 @@ function _CreateNewWorld($_worldName,$_mapType,$_speed)
 	$possibleMaps = ['Earth'];
 	$possibleSpeeds = ['VeryQuick','Quick','Normal','Slow'];
 
-	if($_worldName != "" && isset($_worldName))
+	if($_worldName != "NULL" && isset($_worldName))
 	{
 		$worldName = $_worldName;
 		
@@ -35,7 +35,7 @@ function _CreateNewWorld($_worldName,$_mapType,$_speed)
 		$errorsOccured = True;
 	}
 
-	if(isset($_mapType))
+	if($_mapType != "NULL" && isset($_mapType))
 	{
 		$mapType = $_mapType;
 		
@@ -56,7 +56,7 @@ function _CreateNewWorld($_worldName,$_mapType,$_speed)
 		$errorsOccured = True;
 	}
 
-	if(isset($_speed))
+	if($_speed != "NULL")
 	{
 		$speed = $_speed;
 		
@@ -76,7 +76,8 @@ function _CreateNewWorld($_worldName,$_mapType,$_speed)
 		$errorCode = $errorCode . "GameSpeed=MISSING&";
 		$errorsOccured = True;
 	}
-	
+
+
 	if($errorsOccured == True)
 	{
 		$errorCode = rtrim($errorCode,"&"); 

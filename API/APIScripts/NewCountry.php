@@ -19,7 +19,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 	$validWorldCode = False;
 	$occupiedColours = ['DUMMY'];
 
-	if($_worldCode != "" && isset($_worldCode))
+	if($_worldCode != "NULL")
 	{
 		$worldCode = $_worldCode;
 		
@@ -53,7 +53,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		$errorsOccured = True;
 	}
 
-	if($_countryName != "" && isset($_countryName))
+	if($_countryName != "NULL")
 	{
 		$countryName = $_countryName;
 		
@@ -82,7 +82,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		$errorsOccured = True;
 	}
 
-	if(isset($_password) && $_password != "")
+	if($_password != "NULL")
 	{
 		$countryPass = $_password;
 		
@@ -98,7 +98,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		$errorsOccured = True;
 	}
 
-	if(isset($_governmentType))
+	if($_governmentType != "NULL")
 	{
 		$governmentType = $_governmentType;
 		
@@ -118,7 +118,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		$errorsOccured = True;
 	}
 
-	if(isset($_countryColour))
+	if($_countryColour != "NULL")
 	{
 		$countryColour = $_countryColour;
 		
