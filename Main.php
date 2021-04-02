@@ -14,7 +14,6 @@ Tauresium - Game Page
 <body style="background-color:white;margin:0px;">
 
 <?php include_once 'Scripts/PageUpdate.php'?>
-<?php include_once "Scripts/MapConnections.php";?>
 <?php include_once "Scripts/CheckLogin.php";?>
 <?php
 /* Session already exists */

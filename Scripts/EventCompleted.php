@@ -1,40 +1,30 @@
 <?php
-include_once "DBLoader.php";
-session_start();
-$database = new Database();
-$db = $database->getConnection();
-$playerName = $_SESSION['Country'];
-$userInfo = $database->GetLoadedEvent($_SESSION['Country']);
+require "CallAPICurl.php";
 
-if($_POST['invisible-loadedEvent'] == "" || !is_numeric($_POST['invisible-loadedEvent'])){
-	header("Location: ../ErrorPage.php?Error=InvalidEvent");
+if(!isset($_SESSION))
+{
+	session_start();
 }
 
-$validEvent = $database->ReturnCorrectEvent($_POST['invisible-loadedEvent'],$playerName);
+$selectedOption = "";
 
-if(!$validEvent)
-{
-	header("Location: ../ErrorPage.php?Error=IncorrectEvent");
+if(isset($_POST['Option1'])){
+	$selectedOption = "1";
 }
-else
-{
-	$selectedOption = "";
-	if(isset($_POST['Option1'])){
-		$selectedOption = "Option1";
-	}
-	else if(isset($_POST['Option2'])){
-		$selectedOption = "Option2";
-	}
-	else if(isset($_POST['Option3'])){
-		$selectedOption = "Option3";
-	}
-	else{
+else if(isset($_POST['Option2'])){
+	$selectedOption = "2";
+}
+else if(isset($_POST['Option3'])){
+	$selectedOption = "3";
+}
+else{
 	header("Location: ../ErrorPage.php?Error=BadEventOption"); 
-	}	
-	
-	$eventChanges = $database->EventResults($userInfo['Country'],$userInfo['LoadedEvent'],$selectedOption);
-	$paramModifiers = "?MilInfluenceChanges=" . $eventChanges['Military_Gen_Modifier'] . "&EcoInfluenceChanges=" . $eventChanges['Economic_Gen_Modifier'] . "&CultInfluenceChanges=" . $eventChanges['Culture_Gen_Modifier'];
-	$paramModifiers = $paramModifiers . "&EventTitle=" . $eventChanges['Title'] . "&OptionTitle=" . $eventChanges['Option_Description'] . "&AddMil=" . $eventChanges['AddMil'] . "&AddEco=" . $eventChanges['AddEco'] . "&AddCult=" . $eventChanges['AddCult'];
-	header("Location: ../EventResults.php" . $paramModifiers); 
-}
+}	
+
+$curlResponse = json_decode(CurlCustPOSTRequest("Event/" . $_SESSION['APIKEY'] . "/" . $selectedOption),true); 
+
+$paramModifiers = "?MilInfluenceChanges=" . $curlResponse['Military_Gen_Modifier'] . "&EcoInfluenceChanges=" . $curlResponse['Economic_Gen_Modifier'] . "&CultInfluenceChanges=" . $curlResponse['Culture_Gen_Modifier'];
+$paramModifiers = $paramModifiers . "&EventTitle=" . $curlResponse['Event_Title'] . "&OptionTitle=" . $curlResponse['Option_Desc'] . "&AddMil=" . $curlResponse['Added_Military_Influence'] . "&AddEco=" . $curlResponse['Added_Economic_Influence'] . "&AddCult=" . $curlResponse['Added_Culture_Influence'];
+header("Location: ../EventResults.php" . $paramModifiers); 
+
 ?>

@@ -1,18 +1,16 @@
 <?php
-require "../API/APIScripts/NewCountry.php"; //runs API POST script directly.
-require "DBLoader.php";
+require "CallAPICurl.php";
 
+$worldCode = (!ctype_alnum($_POST['WorldCodeInput']) ? "NULL" : $_POST['WorldCodeInput'] );
+$countryName = (!ctype_alnum($_POST['CountryNameInput']) ? "NULL" : $_POST['CountryNameInput'] );
+$countryPass = (!ctype_alnum(['CountryPassInput']) ? "NULL" : $_POST['CountryPassInput'] );
+$countryColour = (!isset($_POST['CountryColour']) ? "NULL" : $_POST['CountryColour'] );
+$governmentType = (!isset($_POST['GovernmentType']) ? "NULL" : $_POST['GovernmentType'] );
 
-$worldCode = (!isset($_POST['WorldCodeInput']) ? "" : $_POST['WorldCodeInput'] );
-$countryName = (!isset($_POST['CountryNameInput']) ? "" : $_POST['CountryNameInput'] );
-$countryPass = (!isset($_POST['CountryPassInput']) ? "" : $_POST['CountryPassInput'] );
-$countryColour = (!isset($_POST['CountryColour']) ? "" : $_POST['CountryColour'] );
-$governmentType = (!isset($_POST['GovernmentType']) ? "" : $_POST['GovernmentType'] );
+$curlResponse = json_decode(CurlCustPOSTRequest("Country/" . $countryName . "/" . $countryPass . "/" . $worldCode . "/" . $governmentType . "/" . $countryColour)); 
 
-$parameters = _CreateNewCountry($worldCode,$countryName,$countryPass,$governmentType,$countryColour);
-
-$errorsOccured = $parameters[0];
-$errorCode = $parameters[1];
+$errorsOccured = $curlResponse[0];
+$errorCode = $curlResponse[1];
 
 if($errorsOccured == True && $errorCode !=  "EtcFail")
 {

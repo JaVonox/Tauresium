@@ -1,16 +1,14 @@
 <?php
-require "../API/APIScripts/NewWorld.php"; //runs API POST script directly.
-require "DBLoader.php";
+require "CallAPICurl.php";
 
+$worldName = (!ctype_alnum($_POST['WorldName']) ? "NULL" : $_POST['WorldName'] );
+$mapType = (!isset($_POST['MapType']) ? "NULL" : $_POST['MapType']);
+$speedType = (!isset($_POST['GameSpeed']) ? "NULL" : $_POST['GameSpeed'] );
 
-$worldName = (!isset($_POST['WorldName']) ? "" : $_POST['WorldName'] );
-$mapType = (!isset($_POST['MapType']) ? "" : $_POST['MapType']);
-$speedType = (!isset($_POST['GameSpeed']) ? "" : $_POST['GameSpeed'] );
+$curlResponse = json_decode(CurlCustPOSTRequest("World/" . $worldName . "/" . $mapType . "/" . $speedType)); 
 
-$parameters = _CreateNewWorld($worldName,$mapType,$speedType);
-
-$errorsOccured = $parameters[0];
-$returnCode = $parameters[1];
+$errorsOccured = $curlResponse[0];
+$returnCode = $curlResponse[1];
 
 if($errorsOccured == True && $returnCode !=  "EtcFail")
 {
@@ -23,6 +21,6 @@ else if($errorsOccured == True && $returnCode == "EtcFail")
 }
 else //TODO reorder to place this condition first and unknown error last.
 {
-	header("Location: ../SessionSuccess.php?Type=World&Code=" . $returnCode); //Errorcode in this context refers to the w	
+	header("Location: ../SessionSuccess.php?Type=World&Code=" . $returnCode); 
 }
 ?>

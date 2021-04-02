@@ -122,6 +122,9 @@ document.getElementById("ProvErrors").textContent = pageErrors;
 BIGetProvViaID(provNameGet).then((value => {
 	ajaxProvInfo = value; //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
 	_loadAjax();
+}))
+.fail((value => {
+	window.location.href = " ErrorPage.php?Error=BadProvince";
 }));
 
 function _loadAjax()

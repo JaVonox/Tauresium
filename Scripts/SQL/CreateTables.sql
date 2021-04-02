@@ -427,6 +427,70 @@ INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 'After the death of a fairly wealthy businessmen, he suprised his associates by naming an estranged son as the sole heir to his unlimited liability company. Very soon after the transferal, the share price of the business plummeted, forcing the heir to file for bankrupcy. The son now claims the inheritance was a revenge plot, intended to ruin him financially, and has asked courts to retroactively revoke his inheritence, and thus responsibility for the company.',
 35,82,83,84);
 
+INSERT INTO options VALUES(85,'Apologise to the representatives and reassure the public this was not an intentional attack',0.04,-0.03,-0.04);
+INSERT INTO options VALUES(86,'Fire the cooks responsible for the meal, diverting the blame from ourselves.',0.02,0.02,0.02);
+INSERT INTO options VALUES(87,'The food poisoning was clearly a product of their weaker immune system. This was in no way our responsibility.',-0.05,-0.05,0.07);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Munch Squad',
+'In a diplomatic mission to our capital, representatives of a foreign nation ate dinner with some of our highest ranking government officials, a symbol of peace between our two countries. Unfortunately, after the dinner, all the representatives fell ill with food poisoning, while our own staff remained fine. Since the incident, rumors have been circulating that the events were an attempt to poison the representatives.',
+45,85,86,87);
+
+INSERT INTO options VALUES(88,'We cant have our citizens living in such squalor. Force the villagers to move back to the village at once.',-0.05,0.02,0.04);
+INSERT INTO options VALUES(89,'This is a quite interesting story, publicising this tale could drive up tourism in the region.',-0.03,0.06,-0.02);
+INSERT INTO options VALUES(90,'The only logical solution is to do something about the sinkhole problem, perhaps then they will return to the village of their own accord.',0.06,-0.02,0);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Strike The Earth',
+'After a recent census revealed that half the population of a small rural village had mysteriously disappeared, investigators were sent to examine the location. It was not long before they discovered the missing villagers had migrated, relocating themselves to a makeshift town inside a nearby abandoned mineshaft. When questioned, the villagers cited the opening of numerous dangerous sinkholes in the town as their reason for moving.',
+30,88,89,90);
+
+INSERT INTO options VALUES(91,'While the stairway has historical value, it is a clear health hazard. We must stop all tourism to the location.',0.03,-0.05,0.03);
+INSERT INTO options VALUES(92,'The victims knew the risk when they visited, we cant shut down a historical site due to a mistake like this.',0,0.03,0.03);
+INSERT INTO options VALUES(93,'The real problem here was the fire itself. Better fire safety regulations are needed to ensure something like this never happens again.',0.02,-0.05,0.03);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('I Warned You About Stairs Bro',
+'A tragedy struck today as two senior citizens were hospitalised while visiting one of our national monuments. The location, a temple ontop of a large mountain, the only entrance to which is a thousand step stairway carved into the mountain, caught alight due to an electrical fault. In the rush to evacuate the building, the victims tripped while descending the stairs, causing them to tumble a fair distance down the mountainside. This incident has brought into question the safety of such monuments.',
+35,91,92,93);
+
+INSERT INTO options VALUES(94,'Investigate the developers and try them for treason.',-0.03,-0.05,0.06);
+INSERT INTO options VALUES(95,'Why was a secure government network using outsourced programs in the first place? This is our own fault.',0.07,-0.05,-0.05);
+INSERT INTO options VALUES(96,'Now that the issue is fixed, there isnt a need to hold anyone accountable.',0.05,-0.05,-0.02);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Groundhog Day',
+'A mistake in our military information system caused the date to incorrectly repeat the same date twice in a row, causing numerous issues across government networks. While the problem was noticed immediately, it took several hours for engineers to find the root of the problem, an outsourced weather report program that had been adjusting server system clock settings due to a programming fault. This issue cost millions in damages in the time it was in effect, and our military branch expects us to hold the developers accountable.',
+45,94,95,96);
+
+INSERT INTO options VALUES(97,'This prank caused serious trauma to the local population. Both culprits need to see jail time for their actions.',0.03,-0.03,0.07);
+INSERT INTO options VALUES(98,'The plot was damaging but the culprits had no intent to harm. They should recieve punishment in the form of fines.',0.05,-0.03,0.04);
+INSERT INTO options VALUES(99,'There is no need for government intervention into this incident, it was a harmless prank that just happened to scare some people',-0.03,0.01,-0.02);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('The Midnight Frequency',
+'Recently, a local town has been in hysteria as rumors spread about a mysterious radio broadcast that occurs at exactly midnight, inwhich a sequence of random numbers are read aloud by a female voice before the transmission ends. After some investigation, the broadcast was traced back to a local patrolman, who had been using old radio equipment to pull the prank with help from his wife. The question remains how to respond to this incident, as though it did cause harm, there was no malicious intent by the offenders.',
+30,97,98,99);
+
+INSERT INTO options VALUES(100,'This is a serious crime that affects all of our society. The businessman must be punished for his actions.',0.05,-0.05,0.06);
+INSERT INTO options VALUES(101,'There is no way that the businessman could have known his money was counterfeit. This was simply an honest mistake.',-0.05,0.08,0.05);
+INSERT INTO options VALUES(102,'Stay entirely silent on the issue.',-0.05,0.05,0.02);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Rosebud',
+'A investigative journalist article recently revealed that the wealth of a popular businessman is likely the result of counterfeiting. The article revealed that the businessman conducted all his monetary transfers through cash, of which atleast one in ten notes were found to be illegitimate. As the businessman was an outspoken supporter of our administration, our response will be heavily scrutinised.',
+45,100,101,102);
+
+INSERT INTO options VALUES(103,'The novel was clearly written by a man who glorifies colonialism, and our government is ashamed to have worked with him.',0.06,-0.03,-0.05);
+INSERT INTO options VALUES(104,'The book is a clear work of fiction and is not intended to represent real world events.',-0.05,0.02,0.02);
+INSERT INTO options VALUES(105,'This situation is an excellent example of understanding writer perspective. It should be taught academically as an example of how an authors personal biases can affect their stories.',0.02,0,-0.02);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Paper, Bird And Sword.',
+'A bestselling book penned by a former government employee has come under heavy criticism. The novel is a fictional retelling of late renaissance history, from the perspective of a young spanish king who attempts to maintain stability in his nation. Critics claim the book glorifies colonial atrocities, as the protagonist is based on the life of a real spanish king involved in the history of spanish colonialism. As the author was a former government employee, we are expected to comment on the criticisms. ',
+35,103,104,105);
+
+INSERT INTO options VALUES(106,'The documents cannot be released, it puts the lives of our soldiers at risk.',-0.04,0.01,0.07);
+INSERT INTO options VALUES(107,'The trial will be reconducted with a jury consisting of government employees, ensuring the information does not leak',-0.06,0.02,0.06);
+INSERT INTO options VALUES(108,'The prosecution is confident this evidence will get a guilty verdict, perhaps we should just grant that verdict without the trial.',-0.1,0,0.1);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Justified Information',
+'A court trial concerning a government employee has had to be put on indefinite recess as the case of the prosecution entirely rests on classified government information as decisive evidence. The board of prosecutors has petitioned our government for the right to release the information, as they believe the evidence is crucial, and must be submitted in full to the jury to ensure a fair trial. The evidence in question is vital military intelligence, and the public release of such documents could be disastrous.',
+45,106,107,108);
+
 INSERT INTO coastalRegions VALUES ("America North",50,5,30,"American Artic Ocean","America West","North Atlantic",NULL,NULL,NULL);
 INSERT INTO coastalRegions VALUES ("America East",70,4,20,"Sargasso Sea","Europe","North Atlantic",NULL,NULL,NULL);
 INSERT INTO coastalRegions VALUES ("America West",50,3,40,"North Pacific Ocean","America North",NULL,NULL,NULL,NULL);
