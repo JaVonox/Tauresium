@@ -429,7 +429,7 @@ INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 
 INSERT INTO options VALUES(85,'Apologise to the representatives and reassure the public this was not an intentional attack',0.04,-0.03,-0.04);
 INSERT INTO options VALUES(86,'Fire the cooks responsible for the meal, diverting the blame from ourselves.',0.02,0.02,0.02);
-INSERT INTO options VALUES(87,'The food poisoning was clearly a product of their weaker immune system. This was in no way our responsibility.',-0.05,-0.05,0.07);
+INSERT INTO options VALUES(87,'The food poisoning was clearly a product of their different palate. This was in no way our responsibility.',-0.05,-0.05,0.07);
 
 INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Munch Squad',
 'In a diplomatic mission to our capital, representatives of a foreign nation ate dinner with some of our highest ranking government officials, a symbol of peace between our two countries. Unfortunately, after the dinner, all the representatives fell ill with food poisoning, while our own staff remained fine. Since the incident, rumors have been circulating that the events were an attempt to poison the representatives.',

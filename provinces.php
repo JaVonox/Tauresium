@@ -53,8 +53,8 @@ $provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 $provCountry = $mapConnect->CheckOwner($selectedProvince);
 ?>
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
-<div id="MainDiv" style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;float:center;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
-<button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;" onclick="document.location='Main.php'">< Back</button>
+<div id="MainDiv" style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
+<button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';" onclick="document.location='Main.php'">< Back</button>
 <table style="width:60%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:5px solid black;">
 <td style="text-align:center;" colspan="2">
@@ -172,8 +172,8 @@ function _loadDetails()
 
 function _loadAnnexButtons()
 {
-	var iconStyle = "width:64px;height:64px;vertical-align:middle;float:center;"
-	var buttonStyle = "color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';float:center;";
+	var iconStyle = "width:64px;height:64px;vertical-align:middle;"
+	var buttonStyle = "color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';";
 		
 	BIGetProvCosts(provNameGet,playerName).then((apiReturn => {
 		document.getElementById("DetailsForm").action = "Scripts/AttemptAnnex.php";

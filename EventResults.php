@@ -36,6 +36,8 @@ else if($milGenChanges >= $cultGenChanges && $milGenChanges >= $ecoGenChanges)
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPICalls.js"></script>
 <title>
 Tauresium - Results
 </title>
@@ -44,17 +46,6 @@ Tauresium - Results
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 <?php include_once "Scripts/CheckLogin.php";?>
-<?php 
-$database = new Database();
-$db = $database->getConnection();
-$newTotals = $database->GetPlayerChanges($_SESSION['Country']);
-$eventsRemaining = False;
-
-if($newTotals['Events_Stacked'] > 1)
-{
-	$eventsRemaining = True;
-}
-?>
 <div style="<?php echo $backgroundParams ?>;width:100%;background-repeat:no-repeat;background-position:center;background-size:cover;">
 <div style="background-color:lightgrey;width:60%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
 	<font style="font-size:72px;color:black;font-family:Romanus;"> <?php echo $eventTitle ?> </font>
@@ -74,41 +65,56 @@ if($newTotals['Events_Stacked'] > 1)
 	<tr>
 		<td> <img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
 		<td style="<?php echo "" . $cultGenChanges>=0?"color:green":"color:red"?>;font-size:24px;" > <?php echo $cultGenChanges * 100 ?>% </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Culture_Generation'] * 100 ?>% </td>
+		<td style="font-size:24px;" id="CultGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newCult ?> </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Culture_Influence'] ?> </td>
+		<td style="font-size:24px;" id="CultInf"> ... </td>
 	</tr>
 	<tr>
 		<td> <img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
 		<td style="<?php echo "" . $ecoGenChanges>=0?"color:green":"color:red"?>;font-size:24px;"> <?php echo $ecoGenChanges * 100 ?>% </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Economic_Generation'] * 100 ?>% </td>
+		<td style="font-size:24px;" id="EcoGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newEco ?> </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Economic_Influence'] ?> </td>
+		<td style="font-size:24px;" id="EcoInf"> ... </td>
 	</tr>
 	<tr>
 		<td> <img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
 		<td style="<?php echo "" . $milGenChanges>=0?"color:green":"color:red"?>;font-size:24px;"> <?php echo $milGenChanges * 100 ?>% </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Military_Generation'] * 100 ?>% </td>
+		<td style="font-size:24px;" id="MilGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newMil ?> </td>
-		<td style="font-size:24px;"> <?php echo $newTotals['Military_Influence'] ?> </td>
+		<td style="font-size:24px;" id="MilInf"> ... </td>
 	</tr>
 	</table>
+	<br><br>
+	
+	<font style="display:none;" id="NextEVHidT"> You still have events remaining, click here to complete your next event<br><br><br> </font>
+	<button class="gameButton" onclick="document.location='LoadEvent.php'" style="font-size:32px;display:none;" id="NextEVHidB">Next Event</button>
+	<font style="display:none;" id="NoEVHid"> You have completed all your events for now - check back later to complete more </font>
 	<br><br><br><br>
+</div>
+</div>
 
-	<?php
-	if($eventsRemaining == True)
+<script>
+BIGetPlayerStats("<?php echo $_SESSION['Country'] ?>").done((value => { 
+	document.getElementById("CultGen").textContent = Math.floor(value.Culture_Generation * 100) + "%";
+	document.getElementById("CultInf").textContent = value.Culture_Influence;
+	document.getElementById("EcoGen").textContent = Math.floor(value.Economic_Generation * 100) + "%";
+	document.getElementById("EcoInf").textContent = value.Economic_Influence;
+	document.getElementById("MilGen").textContent = Math.floor(value.Military_Generation * 100) + "%";
+	document.getElementById("MilInf").textContent = value.Military_Influence;
+	
+	if(value.Events_Stacked > 1)
 	{
-		echo "You still have events remaining, click here to complete your next event<br><br><br>";
-		echo '<button class="gameButton" onclick="' . "document.location='LoadEvent.php'" . '"style="font-size:32px;">Next Event</button>';
+		document.getElementById("NextEVHidT").style.display = "initial";
+		document.getElementById("NextEVHidB").style.display = "initial";
 	}
 	else
 	{
-		echo "You have completed all your events for now - check back later to complete more";
+		document.getElementById("NoEVHid").style.display = "initial";
 	}
-	?>
-	<br><br><br><br>
-</div>
-</div>
+	
+	
+}));
+</script>
 
 <?php include "PageElements/Disclaimer.html" ?>
 </body>
