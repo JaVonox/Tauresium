@@ -304,11 +304,12 @@ class TauresiumRestService extends RestService
 				
 				if($playerCountry != "BAD" && $pointType != 'NULL' && $provinceID != 'NULL')
 				{
-					$this->PostAnnex($provinceID,$playerCountry,$pointType);
+					echo json_encode($this->PostAnnex($provinceID,$playerCountry,$pointType));
 				}
 				else
 				{
 					header("HTTP/1.1 401 Bad Parameters");
+					echo json_encode("INVALID");
 				}
 				
 				break;
@@ -885,14 +886,17 @@ class TauresiumRestService extends RestService
 		if($returnArg == "SUCCESS") //Occurs when errors occured
 		{
 			header("HTTP/1.1 200 Sucessfully annexed location");
+			return "SUCCESS";
 		}
 		else if($returnArg == "INVALID")
 		{
 			header("HTTP/1.1 401 Not enough points or no access to this location"); 
+			return "INVALID";
 		}
 		else if($returnArg == "BAD")
 		{
 			header("HTTP/1.1 400 Bad arguments supplied"); 
+			RETURN "BAD";
 		}
 	}
 	
