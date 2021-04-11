@@ -40,7 +40,7 @@ $worldOccupants = $database->GetSessionPlayers($worldCode);
 	<th><u> Flag </u></th>
 	<th><u> Country Name  <u></th>
 	<th><u> Max Military Strength <u></th>
-	<th><u> Last Online <u></th>
+	<th><u> Last Online (UTC) <u></th>
 	<th><u> Number Of Provinces <u></th>
 	<th><u> Coastal Power <u></th>
 	</table>
