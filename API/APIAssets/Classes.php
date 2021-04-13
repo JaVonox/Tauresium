@@ -60,7 +60,9 @@ class ProvinceHighDetail //Includes Building and Owner - World dependent.
 	public $Coastal;
 	public $Coastal_Region;
 	public $Owner;
+	public $Build1ID;
 	public $Build1;
+	public $Build2ID;
 	public $Build2;
 	public $Base_Culture_Cost;
 	public $Base_Economic_Cost;
@@ -72,8 +74,10 @@ class ProvinceHighDetail //Includes Building and Owner - World dependent.
 	public $MilCap;
 	public $Defensive_Strength;
 	public $Build_Cost;
+	public $Prov_Type;
+	public $Possible_Buildings;
 	
-    public function __construct($Province_ID, $Capital, $Region,$Vert1,$Vert2,$Vert3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Build1,$Build2,$Culture_Cost,$Economic_Cost,$Military_Cost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$MilCap,$Defensive_Strength,$Build_Cost)
+    public function __construct($Province_ID, $Capital, $Region,$Vert1,$Vert2,$Vert3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Build1,$Build2,$Build1ID,$Build2ID,$Culture_Cost,$Economic_Cost,$Military_Cost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$MilCap,$Defensive_Strength,$Build_Cost,$Ptype,$PBuilds)
     {
         $this->Province_ID = $Province_ID;
         $this->Capital = $Capital;
@@ -100,6 +104,10 @@ class ProvinceHighDetail //Includes Building and Owner - World dependent.
 		$this->MilCap = $MilCap;
 		$this->Defensive_Strength = $Defensive_Strength;
 		$this->Build_Cost = $Build_Cost;
+		$this->Prov_Type = $Ptype;
+		$this->Build1ID = $Build1ID;
+		$this->Build2ID = $Build2ID;
+		$this->Possible_Buildings = $PBuilds;
 	}
 }
 

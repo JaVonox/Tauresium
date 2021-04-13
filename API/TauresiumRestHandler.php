@@ -2,7 +2,7 @@
 require "dbinfo.php";
 require "RestService.php";
 require "APIAssets/Classes.php";
-require "Scripts/MapConnections.php"; //MapConnections includes database - therefore this loads database
+require "APIScripts/MapConnections.php"; //MapConnections includes database - therefore this loads database
 require "APIScripts/NewCountry.php";
 require "APIScripts/NewWorld.php";
 require "APIScripts/NewBuild.php";
@@ -618,13 +618,7 @@ class TauresiumRestService extends RestService
 			$ownedProvinces = $result->fetch_all(MYSQLI_NUM);
 
 			$playerWorld = (!empty($ownedProvinces) ? $ownedProvinces[0][1] : "NULL");
-			$provinceDetails = array();
 			$oceanPowersArray = array();
-			
-			for($i=0;$i<count($ownedProvinces);$i++)
-			{
-				array_push($provinceDetails,$this->GetJSONProvinceViaIDandWorld($ownedProvinces[$i][0],$playerWorld)); //Appends the province details of each province this player owns.
-			}
 			
 			$playerOceanPowers = $this->database->GetPlayerAllOceanCount($id);
 			
@@ -637,7 +631,7 @@ class TauresiumRestService extends RestService
 			{
 				$PlayerTitle = $this->database->getPlayerStats($Country_Name)['Title'];
 				$PlayerMilCap = $this->database->GetPlayerMilCap($Country_Name);
-				return new PlayerDetail($Country_Name,$PlayerTitle,$Country_Type,$Colour,$World_Code,$PlayerMilCap,$Military_Influence,$Military_Generation,$Culture_Influence,$Culture_Generation,$Economic_Influence,$Economic_Generation,$Events_Stacked,$Last_Event_Time,$Active_Event_ID,$oceanPowersArray,$provinceDetails);
+				return new PlayerDetail($Country_Name,$PlayerTitle,$Country_Type,$Colour,$World_Code,$PlayerMilCap,$Military_Influence,$Military_Generation,$Culture_Influence,$Culture_Generation,$Economic_Influence,$Economic_Generation,$Events_Stacked,$Last_Event_Time,$Active_Event_ID,$oceanPowersArray,$ownedProvinces);
 			}
 			else
 			{
@@ -660,20 +654,25 @@ class TauresiumRestService extends RestService
 			provinces.City_Population_Total,provinces.National_HDI,provinces.National_Nominal_GDP_per_capita,provinces.Coastal,provinces.Coastal_Region,province_occupation.Country_Name,
 			(SELECT buildings.Building_Name FROM province_occupation,buildings WHERE province_occupation.Building_Column_1 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building1,
 			(SELECT buildings.Building_Name FROM province_occupation,buildings WHERE province_occupation.Building_Column_2 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building2,
+			(SELECT buildings.BuildingID FROM province_occupation,buildings WHERE province_occupation.Building_Column_1 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building1,
+			(SELECT buildings.BuildingID FROM province_occupation,buildings WHERE province_occupation.Building_Column_2 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building2,
 			provinces.Culture_Cost,provinces.Economic_Cost,provinces.Military_Cost,provinces.Description,provinces.Culture_Modifier,provinces.Economic_Enviroment_Modifier,provinces.Military_Enviroment_Modifier
 			FROM provinces,province_occupation WHERE province_occupation.Province_ID = ? AND province_occupation.World_Code = ? AND provinces.Province_ID = ?";
 			
 			$statement = $connection->prepare($provinceQuery);
-			$statement->bind_param('sssssss', $id,$worldCode,$id,$worldCode,$id,$worldCode,$id);
+			$statement->bind_param('sssssssssss', $id,$worldCode,$id,$worldCode,$id,$worldCode,$id,$worldCode,$id,$worldCode,$id);
 			$statement->execute();
 			$statement->store_result();
-			$statement->bind_result($Province_ID, $Capital, $Region,$Vertex_1,$Vertex_2,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier);
+			$statement->bind_result($Province_ID, $Capital, $Region,$Vertex_1,$Vertex_2,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$Build1ID,$Build2ID,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier);
 	
 			$buildParams = $this->database->GetProvBuildBonuses($id,$worldCode);
 			
+			$provinceType = $this->database->GetProvinceType($id)[0];
+			$possibleBuilds = $this->database->GetPossibleBuildings($provinceType);
+			
 			if ($statement->fetch())
 			{
-				return new ProvinceHighDetail($Province_ID, $Capital, $Region,$Vertex_1 ,$Vertex_2 ,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$buildParams['Mil_Cap'],$buildParams['Def_Strength'],$buildParams['Bonus_Build']);
+				return new ProvinceHighDetail($Province_ID, $Capital, $Region,$Vertex_1 ,$Vertex_2 ,$Vertex_3, $Climate, $City_Population_Total,$National_HDI,$National_Nominal_GDP_per_capita,$Coastal,$Coastal_Region,$Owner,$Building1,$Building2,$Build1ID,$Build2ID,$CultCost,$EcoCost,$MilCost,$Description,$Culture_Modifier,$Economic_Enviroment_Modifier,$Military_Enviroment_Modifier,$buildParams['Mil_Cap'],$buildParams['Def_Strength'],$buildParams['Bonus_Build'],$provinceType,$possibleBuilds);
 			}
 			else
 			{

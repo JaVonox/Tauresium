@@ -1,8 +1,18 @@
 ﻿function BIGetProvViaID(provID)
 {
-	//Gets the info for a province for the province page
     return $.ajax({
         url: 'TaurAPI/Province/' + provID,
+        type: 'GET',
+        cache: false,
+        dataType: 'json'
+	});
+}
+
+function BIGetProvViaIDandWorld(provID,worldCode)
+{
+	//Gets the info for a province for the province page
+    return $.ajax({
+        url: 'TaurAPI/Province/' + provID + '/' + worldCode,
         type: 'GET',
         cache: false,
         dataType: 'json'
