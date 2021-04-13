@@ -1,21 +1,11 @@
 <?php
-include_once "Scripts/MapConnections.php"; //This includes databases
-$database = new Database();
-$db = $database->getConnection();
-
 $selectedProvince = $_GET["ProvinceView"]; //Use for API calls.
 
-if($selectedProvince == Null)
+if(!isset($selectedProvince))
 {
 	header("Location: ErrorPage.php?Error=NoSelectedProvince"); //if no variables were passed.
 }
 
-if(empty($database->getProvinceDetail($selectedProvince))) //if the province does not exist. Maybe needs modification. TODO
-{
-	header("Location: ErrorPage.php?Error=ProvinceDoesNotExist"); 
-}
-
-$provinceType = $database->GetProvinceType($selectedProvince)[0];
 $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
 ?>
 
@@ -42,16 +32,7 @@ Tauresium - Province
 
 <?php include_once 'Scripts/PageUpdate.php'?>
 <?php include_once 'Scripts/CheckLogin.php'?>
-<?php
-$mapConnect = new MapConnections();
-$mapConnect->init($_SESSION['Country']);
-$sessionID = session_id();
-$playerCountry = $_SESSION['Country'];
-$playerWorld = $database->ReturnWorld($_SESSION['Country']);
-$provBonuses = $database->GetConstructedBonuses($selectedProvince,$playerWorld);
 
-$provCountry = $mapConnect->CheckOwner($selectedProvince);
-?>
 <div id="BackgroundImage" style=";width:100%;overflow:auto;margin-left:auto;margin-right:auto;background-color:lightgrey;min-height:570px;background-color:white;background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),url('Backgroundimages/Ocean.png');background-repeat: no-repeat;background-position:center;background-size:120%;position:relative;">
 <div id="MainDiv" style="background-color:lightgrey;width:70%;min-height:570px;overflow:auto;border:5px solid lightgrey;;margin-left:auto;margin-right:auto;border-left:5px solid black;border-right:5px solid black;" class="InformationText">
 <button id="BackButton" style="background-color:#c0392b;color: white;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';" onclick="document.location='Main.php'">< Back</button>
@@ -110,28 +91,31 @@ $provCountry = $mapConnect->CheckOwner($selectedProvince);
 
 <script>
 var provNameGet = "<?php echo $selectedProvince; ?>";
-var provType = "<?php echo $provinceType; ?>";
 var pageErrors = "<?php echo $buildError; ?>";
-var buildingModifiers = <?php echo json_encode($provBonuses); ?>;
 
 var ajaxProvInfo;
 var playerName;
+var playerWorld;
 
 document.getElementById("ProvErrors").textContent = pageErrors;
 
-BIGetProvViaID(provNameGet).then((value => {
-	ajaxProvInfo = value; //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
-	_loadAjax();
+BIGetPlayerStats("<?php echo $_SESSION['Country']; ?>").then((Pvalue => { //TODO maybe switch this to use a less detailed player call? this calls all the provinces owned.
+	playerWorld = Pvalue.World_Code;
+	BIGetProvViaIDandWorld(provNameGet,playerWorld).then((value => {
+		ajaxProvInfo = value; //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
+		_loadAjax();
+	}))
+	.fail((value => {
+		window.location.href = " ErrorPage.php?Error=BadProvince";
+	}));
 }))
 .fail((value => {
-	window.location.href = " ErrorPage.php?Error=BadProvince";
+	window.location.href = " ErrorPage.php?Error=LoadError";
 }));
 
 function _loadAjax()
 {
-	playerName = "<?php echo $playerCountry; ?>";
-
-	if(playerName != "<?php echo $provCountry; ?>") //If the player is the owner
+	if(typeof ajaxProvInfo.Owner == "undefined" || ajaxProvInfo.Owner != "<?php echo $_SESSION['Country'];?>") //If the player is not the owner
 	{
 		$(document).ready(function(){
 			$("#DetailsTable").load("PageElements/ProvinceViewTables/Annex.php", function(responseTxt, statusTxt, xhr){
@@ -155,7 +139,7 @@ function _loadAjax()
 function _loadDetails()
 {
 	document.getElementById("ProvCapital").textContent = ajaxProvInfo.Capital;
-	document.getElementById("ProvType").textContent = "Province Focus: " + provType;
+	document.getElementById("ProvType").textContent = "Province Focus: " + ajaxProvInfo.Prov_Type;
 	document.getElementById("ProvRegion").textContent = "," + ajaxProvInfo.Region;
 	document.getElementById("ProvClimate").textContent = ajaxProvInfo.Climate + " - " + (ajaxProvInfo.Coastal == 1 ? "Coastal - " + ajaxProvInfo.Coastal_Region : "Landlocked");
 	document.getElementById("ProvPopulation").textContent = "Population: " + ajaxProvInfo.City_Population_Total;
@@ -163,11 +147,11 @@ function _loadDetails()
 	document.getElementById("ProvGDP").textContent = "Nominal GDP per Capita: " +ajaxProvInfo.National_Nominal_GDP_per_capita;
 	document.getElementById("ProvInfo").textContent = ajaxProvInfo.Description;
 	document.getElementById("BackgroundImage").style.backgroundImage = "linear-gradient(to bottom, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.20)),url('Backgroundimages/" + ajaxProvInfo.Climate + ".png')";
-	document.getElementById("ProvOwner").textContent = "Owned By: " + "<?php echo $provCountry; ?>";
+	document.getElementById("ProvOwner").textContent = "Owned By: " + (typeof ajaxProvInfo.Owner == "undefined" ? "No Owner" : ajaxProvInfo.Owner);
 	
-	document.getElementById("MilCapMod").textContent = "+" + (buildingModifiers.Bonus_Mil_Cap+15) + " Military Capacity";
-	document.getElementById("DefStrMod").textContent = "+" + buildingModifiers.Bonus_Def_Strength + "% Local Defensive Strength";
-	document.getElementById("BuildMod").textContent = "-" + buildingModifiers.Bonus_Build_Cost + "% Local Build Cost";
+	document.getElementById("MilCapMod").textContent = "+" + (typeof ajaxProvInfo.MilCap == "undefined" ? "15" : ajaxProvInfo.MilCap) + " Military Capacity";
+	document.getElementById("DefStrMod").textContent = "+" + (typeof ajaxProvInfo.Defensive_Strength == "undefined" ? "0" : ajaxProvInfo.Defensive_Strength) + "% Local Defensive Strength";
+	document.getElementById("BuildMod").textContent = "-" + (typeof ajaxProvInfo.Build_Cost == "undefined" ? "0" : ajaxProvInfo.Build_Cost) + "% Local Build Cost";
 }
 
 function _loadAnnexButtons()
@@ -175,7 +159,7 @@ function _loadAnnexButtons()
 	var iconStyle = "width:64px;height:64px;vertical-align:middle;"
 	var buttonStyle = "color: black;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';";
 		
-	BIGetProvCosts(provNameGet,playerName).then((apiReturn => {
+	BIGetProvCosts(provNameGet,"<?php echo $_SESSION['Country']; ?>").then((apiReturn => {
 		document.getElementById("DetailsForm").action = "Scripts/AttemptAnnex.php";
 		
 		//Possible property checks if the player has enough points to annex

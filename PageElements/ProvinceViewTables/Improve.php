@@ -1,19 +1,10 @@
 <?php
-include_once "../../Scripts/MapConnections.php"; 
-
 if(!isset($_SESSION)) 
 { 
    session_start(); 
 } 
 
 $selectedProvince = $_GET["selectedProvince"]; //Gets from AJAX load.
-
-$database = new Database();
-$db = $database->getConnection();
-$improvementDetails = $database->GetProvinceType($selectedProvince);
-$buildEffects = $database->GetPossibleBuildings($improvementDetails[0]);
-$playerWorld = $database->ReturnWorld($_SESSION['Country']);
-$currentBuildings = $database->GetCurrentBuilding($selectedProvince,$playerWorld);
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -31,7 +22,7 @@ $currentBuildings = $database->GetCurrentBuilding($selectedProvince,$playerWorld
 </style>
 </head>
 
-<table style="border-collapse:seperate;margin-left:auto;margin-right:auto;width:45%;border-spacing:25px;">
+<table style="border-collapse:separate;margin-left:auto;margin-right:auto;width:45%;border-spacing:25px;">
 <tr style="text-align:center;font-size:36px;font-family:Romanus;">
 <td style="border-bottom:2px solid black;" id="Col1">Buildings</td>
 <td style="border-bottom:2px solid black;" id="Col2">Buildings</td>
@@ -82,10 +73,11 @@ tippy('.BuildingSlot', {
 </script>
 
 <script> //LoadBuildingInfo
-var possibleBuildings = <?php echo json_encode($buildEffects); ?>;
-var currentBuildings = <?php echo json_encode($currentBuildings); ?>;
-var thisProv = "<?php echo $selectedProvince; ?>";
-var thisWorld = "<?php echo $playerWorld; ?>";
+var thisProv = ajaxProvInfo;
+var thisWorld = playerWorld;
+
+var possibleBuildings = thisProv.Possible_Buildings
+var currentBuildings = [thisProv.Build1ID,thisProv.Build2ID];
 
 var refCodeLookup = {"C":"Culture","E":"Economic","M":"Military"}
 
@@ -110,7 +102,7 @@ function _loadBuildings()
 		if(i -1 == parseInt(column1Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
-			document.getElementById("Building" + i).onclick =  function() {_CreateBuild(thisProv,currentBuildings[0][0]);};
+			document.getElementById("Building" + i).onclick =  function() {_CreateBuild(thisProv.Province_ID,currentBuildings[0][0]);};
 		}
 		else if(i - 1< parseInt(column1Tier)) //below build tier
 		{
@@ -130,7 +122,7 @@ function _loadBuildings()
 		if(i - 6 == parseInt(column2Tier)) //can build
 		{
 			document.getElementById("Building" + i).style.border = "5px solid green";
-			document.getElementById("Building" + i).onclick = function(){ _CreateBuild(thisProv,currentBuildings[1][0]);};//Allows player to expend points to construct buildings
+			document.getElementById("Building" + i).onclick = function(){ _CreateBuild(thisProv.Province_ID,currentBuildings[1][0]);};//Allows player to expend points to construct buildings
 		}
 		else if(i - 6< parseInt(column2Tier)) //below build tier
 		{
@@ -153,7 +145,7 @@ function _loadPopupBuilding(evt)
 	
 	document.getElementById("BuildIcon").src = "Assets/Buildings/" +  subjectEntry.Building_Name + ".png";
 	document.getElementById("BuildName").textContent = subjectEntry.Building_Name;
-	document.getElementById("BuildCost").textContent = "Cost: " + Math.ceil(subjectEntry.Base_Cost * (1-(buildingModifiers.Bonus_Build_Cost/100))) + " " + costType + " Influence";
+	document.getElementById("BuildCost").textContent = "Cost: " + Math.ceil(subjectEntry.Base_Cost * (1-(ajaxProvInfo.Build_Cost/100))) + " " + costType + " Influence";
 	document.getElementById("BuildCap").textContent = "+" + subjectEntry.Bonus_Mil_Cap + " Military Capacity";
 	document.getElementById("BuildDef").textContent = "+" + subjectEntry.Bonus_Def_Strength + "% Local Defensive Strength";
 	document.getElementById("BuildCostMod").textContent = "-" + subjectEntry.Bonus_Build_Cost + "% Local Build Cost";

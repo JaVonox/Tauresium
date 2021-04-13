@@ -1,32 +1,8 @@
-<?php include_once "Scripts/DBLoader.php";?>
-
 <?php
-$database = new Database();
-$db = $database->getConnection();
-$player = $_SESSION['Country'];
-
-$playerStats = $database->getPlayerStats($player);
-$divStyle = '"background-color: #' . $playerStats['Colour'] . ';border:5px solid black;border-radius:5px;margin-right:50px;color:black;vertical-align:middle;overflow:auto;"';
-
-$eventSpeed = $database->GetEventSpeed($player);
-$timeFormat = "i:s";
-
-$timeUntilEventAbsolute = abs((($playerStats['Events_Stacked'] - floor($playerStats['Events_Stacked'])) * ($eventSpeed * 60)) - ($eventSpeed * 60));
-
-if(intval(gmdate("h",$timeUntilEventAbsolute)) < 12)
-{
-	$timeFormat = "H:i:s";
-}
-
-//Time until next event - digits of events_stacked * 1200 = time since last event (20secintervals) change with speed.
-if($playerStats['Events_Stacked'] < 5)
-{
-	$timeLeftFormatted = gmdate($timeFormat,$timeUntilEventAbsolute);
-}
-else
-{
-	$timeLeftFormatted = "---";
-}
+if(!isset($_SESSION)) 
+{ 
+   session_start(); 
+} 
 ?>
 
 <div>
@@ -37,18 +13,18 @@ else
 <td style="width:20%">
 </td>
 <td>
-<div style= <?php echo $divStyle ?>>
+<div id="boxDiv" style="background-color: white;border:5px solid black;border-radius:5px;margin-right:50px;color:black;vertical-align:middle;overflow:auto;">
 <div style="width:70%;background-color:white;margin-left:auto;margin-right:auto;height:min-content;width:content;">
-<font style="font-family:Romanus;font-size:18px;"> <?php echo $playerStats['Title']; ?></font>
+<font style="font-family:Romanus;font-size:18px;" id="pTitle"> Loading... </font>
 <br>
-<font style="font-family:Romanus;font-size:18px;text-decoration:underline;"> <?php echo $playerStats['Country_Name']; ?></font>
+<font style="font-family:Romanus;font-size:18px;text-decoration:underline;" id="pName" ></font>
 <br><br>
-<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $playerStats['Culture_Influence'] . " "; ?>
-<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $playerStats['Economic_Influence'] . " "; ?>
-<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font style="<?php echo ($playerStats['Military_Influence']>=$playerStats['MilitaryCapacity']) ? "color:green;" : "color:black;"?>"> <?php echo $playerStats['Military_Influence'] . "/" . $playerStats['MilitaryCapacity']; ?> </font>
+<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pCult"></font>
+<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pEco"></font>
+<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"> <font id="pMil"> </font>
 <br>
-<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <?php echo $timeLeftFormatted . " "; ?>
-<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font style="<?php echo ($playerStats['Events_Stacked']>=5) ? "color:green;" : "color:black;"?>"> <?php echo floor($playerStats['Events_Stacked']); ?>/5
+<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pTime"> Loading... </font>
+<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"> <font id="pEvent"></font>
 <br>	
 </td>
 </tr>
@@ -59,11 +35,83 @@ else
 	<button style="margin-left:20px;" class="menuButton" onclick="document.location='index.php'">Index</button>
 	<button style="float:right;margin-right:20px;text-align: center;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;width:200px;height:30px;border:none;font-family:'Helvetica';" class="backButton" onclick="document.location='Scripts/KillSession.php'">Logout</button>
 	<button class="menuButton" onclick="document.location='Main.php'">World Map</button>
-	<button class="menuButton" onclick="document.location='SessionStats.php'"><?php echo $playerStats['World_Name']; ?></button>
+	<button class="menuButton" onclick="document.location='SessionStats.php'" id="wName">...</button>
 	<button class="apiButton" onclick="document.location='APIuse.php'">API</button>
 	<button class="tutorialButton" onclick="document.location='HowToPlay.php'">View Tutorial</button>
-	<button class="eventsButton" <?php echo (floor($playerStats['Events_Stacked']) >= 1 || $playerStats['Active_Event_ID'] != "") ? "onclick=" . '"' . "document.location='LoadEvent.php'" . '"' : "style='pointer-events:none;visibility:hidden;'" ?> >Events (<?php echo ($playerStats['Active_Event_ID'] != "") ? "Resume Event" : "Left: " . floor($playerStats['Events_Stacked'])?>)</button>
+	<button class="eventsButton" id="wEvents" style="display:none;" onclick="document.location='LoadEvent.php'">...</button>
 </div>
 </div>
 </div>
+
+<script>
+BIGetPlayerStats("<?php echo $_SESSION['Country']; ?>").then((Pvalue => {
+	PopulateData(Pvalue);
+	
+	BIGetWorldStats(Pvalue.World_Code).then((Wvalue => {
+		PopulateWorldData(Pvalue,Wvalue);
+	}));
+}));
+
+function PopulateData(userInfo)
+{
+	document.getElementById("pTitle").innerHTML = userInfo.Title;
+	document.getElementById("pName").innerHTML = userInfo.Country_Name;
+	document.getElementById("pCult").innerHTML = userInfo.Culture_Influence;
+	document.getElementById("pEco").innerHTML = userInfo.Economic_Influence;
+	document.getElementById("pMil").innerHTML = userInfo.Military_Influence + "/" + userInfo.Mil_Cap;
+	
+	if(userInfo.Military_Influence >= userInfo.Mil_Cap)
+	{
+		document.getElementById("pMil").style.color = "green";
+	}
+	
+	document.getElementById("pEvent").innerHTML = Math.floor(userInfo.Events_Stacked) + "/5";
+	
+	if(userInfo.Events_Stacked >= 5)
+	{
+		document.getElementById("pEvent").style.color = "green";
+	}
+	
+	document.getElementById("boxDiv").style.backgroundColor = "#" + userInfo.Colour;
+}
+
+function PopulateWorldData(userInfo,worldInfo)
+{
+
+	var secondsLeft = Math.abs(((userInfo.Events_Stacked - Math.floor(userInfo.Events_Stacked)) * (worldInfo.EventSpeed * 60)) - (worldInfo.EventSpeed * 60));
+	
+	//the following code calculates how much time is left in H:M:S based on the amount of seconds. It appends 0 to the front for the purposes of displaying the value appropriately
+	//The minutes and second values are displayed as the last two digits hence meaning that any values below 10 will automatically include the 0 character at the start.
+	var hourDisplay = "0" + Math.floor(secondsLeft / 3600);
+	var minuteDisplay = "0" + Math.floor((secondsLeft / 60) - (hourDisplay * 60));
+	var secDisplay = "0" + Math.floor(secondsLeft - ((minuteDisplay * 60) + (hourDisplay * 3600)));
+	
+	if(hourDisplay >= 1)
+	{
+		document.getElementById("pTime").innerHTML = hourDisplay + ":" + minuteDisplay.slice(-2) + ":" + secDisplay.slice(-2);
+	}
+	else
+	{
+		document.getElementById("pTime").innerHTML = minuteDisplay.slice(-2) + ":" + secDisplay.slice(-2);
+	}
+	
+	document.getElementById("wName").textContent = worldInfo.World_Name;
+	
+	if(!Number.isInteger(userInfo.Active_Event_ID)) //If there is no active event
+	{
+		if(Math.floor(userInfo.Events_Stacked) >= 1)
+		{
+			document.getElementById("wEvents").innerHTML = "Events (" + Math.floor(userInfo.Events_Stacked) + "/5)";
+			document.getElementById("wEvents").style.display = "initial";
+		}
+	}
+	else
+	{
+		document.getElementById("wEvents").innerHTML = "Events (Resume Event)";
+		document.getElementById("wEvents").style.display = "initial";
+	}
+	
+}
+</script>
+
 <script type="text/javascript" src="Scripts/BackgroundLoader.js"> </script>

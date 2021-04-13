@@ -16,14 +16,6 @@ Tauresium - World View
 <?php include_once 'Scripts/PageUpdate.php'?>
 <?php include_once "Scripts/CheckLogin.php";?>
 
-<?php
-$database = new Database();
-$db = $database->getConnection();
-$player = $_SESSION['Country'];
-$worldCode = $database->ReturnWorld($player);
-$worldOccupants = $database->GetSessionPlayers($worldCode);
-?>
-
 <div style="background-color:lightgrey;width:95%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
 	<font id="WorldName" style="font-size:72px;color:black;text-decoration:underline;"> Loading... </font>
 	<br><br>
@@ -58,23 +50,22 @@ $worldOccupants = $database->GetSessionPlayers($worldCode);
 </template>
 
 <script>
-var players = <?php echo json_encode($worldOccupants); ?>; //gets all players from database
-var worldCode = "<?php echo $worldCode; ?>"; //Pulls world code
-
-for(var i=0;i<players.length;i++)
-{
-	BIGetPlayerStats(players[i].Country_Name).then((value => {
-		_AddRow(value); //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
+BIGetPlayerStats("<?php echo $_SESSION['Country']; ?>").then((Pvalue => { 
+	
+	BIGetWorldStats(Pvalue.World_Code).then((Wvalue => {
+		_FillSessionData(Wvalue); //Loads the World data from the first user and fills out the page
+		
+		for(var i=0;i<Wvalue.Players.length;i++)
+		{
+			BIGetPlayerStats(Wvalue.Players[i].Country_Name).then((value => {
+				_AddRow(value); //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)
+			}));
+		}
 	}));
-}
-
-BIGetWorldStats(worldCode).then((value => {
-	_FillSessionData(value); //Loads the World data from the first user and fills out the page
 }));
 
 function _AddRow(playerStats) 
 {
-	//Code sourced from w3 schools.
 	var table = document.querySelector("#WorldTable");
     var template = document.querySelector('#PlTableRow');
 	
