@@ -557,7 +557,7 @@ class TauresiumRestService extends RestService
 		}
 	}	
 	
-	private function GetJSONWorldInfo($worldParam) //SQL UNSAFE TODO fix this
+	private function GetJSONWorldInfo($worldParam)
     {
 		global $dbserver, $dbusername, $dbpassword, $dbdatabase;
 		
@@ -571,10 +571,14 @@ class TauresiumRestService extends RestService
 			$statement->store_result();
 			$statement->bind_result($World_Code,$World_Name,$MapType,$Speed,$Capacity);
 			
-			$worldQuery = $connection->query("SELECT World_Code FROM worlds WHERE World_Code = '" . $worldParam . "' OR World_Name = '" . $worldParam . "';"); 
-			$worldCode = $worldQuery->fetch_row()[0];
+			$worldQuery = $connection->prepare("SELECT World_Code FROM worlds WHERE World_Code = ? OR World_Name = ?;");
+			$worldQuery->bind_param('ss', $worldParam,$worldParam);
+			$worldQuery->execute();
+			$result = $worldQuery->get_result();
+			$worldCode = $result->fetch_row()[0];
 			
-			$playerQuery = $connection->query("SELECT DISTINCT Country_Name FROM players WHERE World_Code = '" . $worldCode . "';"); //Calls to World_Code multiple times are unneccesary - might be worth changing?
+			$playerQuery = $connection->query("SELECT DISTINCT Country_Name FROM players WHERE World_Code = '" . $worldCode . "';"); //SQL safe since only reads return
+			
 			$ownedPlayers = $playerQuery->fetch_all(MYSQLI_NUM);
 			$playerDetails = array();
 			
@@ -651,13 +655,13 @@ class TauresiumRestService extends RestService
 		if (!$connection->connect_error)
 		{
 			$provinceQuery = "SELECT DISTINCT provinces.Province_ID,provinces.Capital,provinces.Region,provinces.Vertex_1,provinces.Vertex_2,provinces.Vertex_3,provinces.Climate,
-			provinces.City_Population_Total,provinces.National_HDI,provinces.National_Nominal_GDP_per_capita,provinces.Coastal,provinces.Coastal_Region,province_occupation.Country_Name,
-			(SELECT buildings.Building_Name FROM province_occupation,buildings WHERE province_occupation.Building_Column_1 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building1,
-			(SELECT buildings.Building_Name FROM province_occupation,buildings WHERE province_occupation.Building_Column_2 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building2,
-			(SELECT buildings.BuildingID FROM province_occupation,buildings WHERE province_occupation.Building_Column_1 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building1,
-			(SELECT buildings.BuildingID FROM province_occupation,buildings WHERE province_occupation.Building_Column_2 = buildings.BuildingID AND province_occupation.Province_ID = ? AND province_occupation.World_Code = ?) AS Building2,
+			provinces.City_Population_Total,provinces.National_HDI,provinces.National_Nominal_GDP_per_capita,provinces.Coastal,provinces.Coastal_Region,province_Occupation.Country_Name,
+			(SELECT buildings.Building_Name FROM province_Occupation,buildings WHERE province_Occupation.Building_Column_1 = buildings.BuildingID AND province_Occupation.Province_ID = ? AND province_Occupation.World_Code = ?) AS Building1,
+			(SELECT buildings.Building_Name FROM province_Occupation,buildings WHERE province_Occupation.Building_Column_2 = buildings.BuildingID AND province_Occupation.Province_ID = ? AND province_Occupation.World_Code = ?) AS Building2,
+			(SELECT buildings.BuildingID FROM province_Occupation,buildings WHERE province_Occupation.Building_Column_1 = buildings.BuildingID AND province_Occupation.Province_ID = ? AND province_Occupation.World_Code = ?) AS Building1,
+			(SELECT buildings.BuildingID FROM province_Occupation,buildings WHERE province_Occupation.Building_Column_2 = buildings.BuildingID AND province_Occupation.Province_ID = ? AND province_Occupation.World_Code = ?) AS Building2,
 			provinces.Culture_Cost,provinces.Economic_Cost,provinces.Military_Cost,provinces.Description,provinces.Culture_Modifier,provinces.Economic_Enviroment_Modifier,provinces.Military_Enviroment_Modifier
-			FROM provinces,province_occupation WHERE province_occupation.Province_ID = ? AND province_occupation.World_Code = ? AND provinces.Province_ID = ?";
+			FROM provinces,province_Occupation WHERE province_Occupation.Province_ID = ? AND province_Occupation.World_Code = ? AND provinces.Province_ID = ?";
 			
 			$statement = $connection->prepare($provinceQuery);
 			$statement->bind_param('sssssssssss', $id,$worldCode,$id,$worldCode,$id,$worldCode,$id,$worldCode,$id,$worldCode,$id);
@@ -784,7 +788,7 @@ class TauresiumRestService extends RestService
 
 		if($activeEventID['LoadedEvent'] == "")
 		{
-			header("HTTP/1.1 404 Player has no active event"); //TODO - Maybe add verification for this step? like make sure it actually goes through
+			header("HTTP/1.1 404 Player has no active event");
 			return "null";
 		}
 		else
@@ -802,7 +806,7 @@ class TauresiumRestService extends RestService
 		//Responses
 		if($parameters[0]) //Occurs when errors occured
 		{
-			header("HTTP/1.1 400 Error occured. Code: " . $parameters[1]); //TODO - interpret error string.
+			header("HTTP/1.1 400 Error occured. Code: " . $parameters[1]); 
 			return json_encode($parameters);
 		}
 		else
@@ -819,7 +823,7 @@ class TauresiumRestService extends RestService
 		//Responses
 		if($parameters[0]) //Occurs when errors occured
 		{
-			header("HTTP/1.1 400 Error occured. See JSON for details."); //TODO - interpret error string.
+			header("HTTP/1.1 400 Error occured. See JSON for details.");
 			return json_encode($parameters);
 		}
 		else
@@ -869,7 +873,7 @@ class TauresiumRestService extends RestService
 		//Responses
 		if($parameters[0]) //Occurs when errors occured
 		{
-			header("HTTP/1.1 400 " . $parameters[1]); //TODO - interpret error string.
+			header("HTTP/1.1 400 " . $parameters[1]);
 		}
 		else
 		{
@@ -920,7 +924,7 @@ class TauresiumRestService extends RestService
 		
 		if($eventInfo == False)
 		{
-			header("HTTP/1.1 200 Updated last online time. No event could be loaded."); //TODO - Maybe add verification for this step? like make sure it actually goes through
+			header("HTTP/1.1 200 Updated last online time. No event could be loaded."); 
 		}
 		else
 		{

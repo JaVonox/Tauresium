@@ -1,6 +1,6 @@
 <?php
 $dbserver = "localhost";
 $dbusername = "root";
-$dbpassword = "";
-$dbdatabase = "Tauresium";
+$dbpassword = "AppDev@2021";
+$dbdatabase = "tauresium";
 ?>
