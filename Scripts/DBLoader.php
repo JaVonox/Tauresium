@@ -4,7 +4,7 @@ class Database{
 	
 	private $host  = 'localhost';
     private $user  = 'root';
-    private $password   = ""; //AppDev@2021 for VMS
+    private $password   = "AppDev@2021"; //AppDev@2021 for VMS
     private $database  = "tauresium"; 
     private $connectionData;
 	

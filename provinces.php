@@ -15,7 +15,7 @@ $buildError = (!isset($_GET["Errors"]) ? "" : $_GET["Errors"] );
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="API/APIScripts/BuiltInAPICalls.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <style>
 table{
@@ -99,7 +99,7 @@ var playerWorld;
 
 document.getElementById("ProvErrors").textContent = pageErrors;
 
-BIGetPlayerStats("<?php echo $_SESSION['Country']; ?>").then((Pvalue => { //TODO maybe switch this to use a less detailed player call? this calls all the provinces owned.
+BIGetPlayerStats("<?php echo $_SESSION['Country']; ?>").then((Pvalue => {
 	playerWorld = Pvalue.World_Code;
 	BIGetProvViaIDandWorld(provNameGet,playerWorld).then((value => {
 		ajaxProvInfo = value; //Get value from ajax HTTP call and then store value. (as this uses the API it is already in JSON form)

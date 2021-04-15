@@ -30,6 +30,8 @@ ul
 <title>
 Tauresium - Tutorial
 </title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 </head>
 <body style="background-color:white;margin:0px;">
 
@@ -79,9 +81,9 @@ Tauresium - Tutorial
 	<th> Economy </th>
 	<th> Military </th>
 	<tr>
-	<td> <img src="Assets/CultureIcon.png" style="width:64px;height:64px;"/>  </td>
-	<td> <img src="Assets/EconomicIcon.png" style="width:64px;height:64px;"/>  </td>
-	<td> <img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;"/>  </td>
+	<td> <img src="Assets/CultureIcon.png" style="width:64px;height:64px;"  alt="Cultural Influence"/>  </td>
+	<td> <img src="Assets/EconomicIcon.png" style="width:64px;height:64px;"  alt="Economic Influence"/>  </td>
+	<td> <img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;"  alt="Military Influence"/>  </td>
 	</tr>
 	</table>
 	<br>
@@ -91,7 +93,7 @@ Tauresium - Tutorial
 	<br>
 	<font class="subheading"> Events </font>
 	<br>
-	<img src="Assets/Tutorial/EventLoaded.png" style="width:386px;height:200px;float:right; margin-right:50px;margin-top:20px;"/>
+	<img src="Assets/Tutorial/EventLoaded.png" style="width:386px;height:200px;float:right; margin-right:50px;margin-top:20px;" alt="The event screen"/>
 	Events are problems that are occuring in your country that your people wish for you to solve, they are also the main way to gain more influence for your nation. Like the influence values, in the top right, you can see how
 	long until you recieve your next event (Dependent on the game speed that the world creator chose), and how many events you have available to complete.
 	<br>
@@ -102,7 +104,7 @@ Tauresium - Tutorial
 	<br><br>
 	When you have selected how you will respond to the problem, you will see a screen telling you the results of your actions, and recieve influence points in all categories depending on how important the issue was to your citizens.
 	More importantly, you will see how your national focuses have changed. 
-	<img src="Assets/Tutorial/EventResults.png" style="width:585px;margin-left:auto;margin-right:auto;float:right;"/>
+	<img src="Assets/Tutorial/EventResults.png" style="width:585px;margin-left:auto;margin-right:auto;float:right;" alt="The event results screen"/>
 	<br><br><br>
 	Your government is driven by its focuses. The output of influence from each event is determined by how much the government is focusing on that particular aspect, which will be changed by how you acted in other events.
 	<br><br>
@@ -120,7 +122,7 @@ Tauresium - Tutorial
 	location you must take over the major city in the area using the influence you have gathered. You can click on the triangles on this map to search through the different locations, and the cities that best represent that region
 	(Though not always the most geographically accurate). You may also see statistics such as the population of the country, this will be important later.
 	<br><br>
-	<img src="Assets/Tutorial/WorldMapExample.png" style="width:520px;height:308px;margin-left:auto;margin-right:auto;float:right;"/>
+	<img src="Assets/Tutorial/WorldMapExample.png" style="width:520px;height:308px;margin-left:auto;margin-right:auto;float:right;" alt="A world map"/>
 	First, try to find your nation on the map, it will be a triangle within the highlighted area and will be filled with the colour you selected at the start of the game. This is your nation right now, a single region in a vast world,
 	but using the influence you have aquired you will be able to stretch your great empire to the corners of the globe.
 	<br><br>
@@ -131,7 +133,7 @@ Tauresium - Tutorial
 	This value is the influence points you would need to spend to take this land from your current position - in the cases where it says infinite, this means for some reason, your nation cannot take this land with the selected influence type.
 	<br><br>
 	Provinces can be taken one of three ways:
-	<img src="Assets/Tutorial/ViewProvince.png" style="width:218px;height:291px;margin-left:auto;margin-right:20px;float:left;"/>
+	<img src="Assets/Tutorial/ViewProvince.png" style="width:218px;height:291px;margin-left:auto;margin-right:20px;float:left;" alt="View province window"/>
 	<br>
 	<ul>
 	<li> <b>Diplomatically</b> - Your country will attempt to peacefully integrate the location into your empire. This costs a certain amount of culture points, and can only be done in provinces without an owner (another player) that are next to a province you already own.</li>

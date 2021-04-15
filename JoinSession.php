@@ -94,6 +94,8 @@ else
 <title>
 Tauresium - Join Session
 </title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 </head>
 <body style="background-color:white;margin:0px;">
 
@@ -201,9 +203,9 @@ Tauresium - Join Session
 <td> <font id="MilitaryPlus" style="font-size:32px;color:green"> &nbsp </font> </td>
 </tr>
 <tr>
-<td><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
-<td><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
-<td><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
+<td><img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;"  alt="Cultural Influence"/> </td>
+<td><img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;"  alt="Economic Influence"/> </td>
+<td><img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;"  alt="Military Influence"/> </td>
 </tr>
 <tr>
 <td> <font id="CultureMinus" style="font-size:32px;color:red"> &nbsp </font> </td>
@@ -228,7 +230,7 @@ Tauresium - Join Session
 </table>
 <br><br>
 
-<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';float:center;" onclick="document.location='index.php'">Create my nation!</button>
+<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';" onclick="document.location='index.php'">Create my nation!</button>
 </form>
 <br><br>
 </div>

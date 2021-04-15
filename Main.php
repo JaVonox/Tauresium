@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="API/APIScripts/BuiltInAPICalls.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 
 <title>
@@ -27,7 +27,7 @@ $playerCountry = $_SESSION['Country'];
 	<h1 id="ProvCapital" style="font-family: Romanus;font-size:32px;"> Ocean </h1>
 	<i id="ProvRegion" style="font-family: Romanus;font-size:20px;">Ocean</i>
 	<br>
-	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;">
+	<img id="ProvinceImage" src="Assets/Ocean.png" style="border: solid 5px black;margin-left:auto;margin-right:auto;" alt="Province Descriptive Image">
 	<br>
 	<font id="ProvClimate">Marine</font>
 	<br><br>
@@ -137,7 +137,7 @@ function _LoadProvCosts(value) //This script loads the values for the province c
 	
 	if(value.Culture_Cost != "Infinite")
 	{
-		tableString += '<img src="Assets/CultureIcon.png" id="CultureIcon" style="width:24px;height:24px;' + (value.Culture_Possible==false?"filter:grayscale(1);":"") +'"/>'; //These statements grayscale the image if the player does not have enough points
+		tableString += '<img src="Assets/CultureIcon.png" id="CultureIcon"  alt="Cultural Influence" style="width:24px;height:24px;' + (value.Culture_Possible==false?"filter:grayscale(1);":"") +'"/>'; //These statements grayscale the image if the player does not have enough points
 		anyAccess = true;
 	}
 	
@@ -145,7 +145,7 @@ function _LoadProvCosts(value) //This script loads the values for the province c
 	
 	if(value.Economic_Cost != "Infinite")
 	{
-		tableString += '<img src="Assets/EconomicIcon.png" id="EconomicIcon" style="width:24px;height:24px;'+ (value.Economic_Possible==false?"filter:grayscale(1);":"") +'"/>';
+		tableString += '<img src="Assets/EconomicIcon.png" id="EconomicIcon"  alt="Economic Influence" style="width:24px;height:24px;'+ (value.Economic_Possible==false?"filter:grayscale(1);":"") +'"/>';
 		anyAccess = true;
 	}
 
@@ -153,7 +153,7 @@ function _LoadProvCosts(value) //This script loads the values for the province c
 	
 	if(value.Military_Cost != "Infinite")
 	{
-		tableString += '<img src="Assets/MilitaryIcon.png" id="MilitaryIcon" style="width:24px;height:24px;' + (value.Military_Possible==false?"filter:grayscale(1);":"") +'"/>';
+		tableString += '<img src="Assets/MilitaryIcon.png" id="MilitaryIcon"  alt="Military Influence" style="width:24px;height:24px;' + (value.Military_Possible==false?"filter:grayscale(1);":"") +'"/>';
 		anyAccess = true;
 	}
 	

@@ -19,8 +19,12 @@ else if($errorsOccured == True && $returnCode == "EtcFail")
 {
 	header("Location: ../ErrorPage.php?Error=WorldCreateFail"); 
 }
-else //TODO reorder to place this condition first and unknown error last.
+else if($errorsOccured == False)
 {
 	header("Location: ../SessionSuccess.php?Type=World&Code=" . $returnCode); 
+}
+else
+{
+	header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
 }
 ?>

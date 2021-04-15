@@ -28,20 +28,20 @@ $selectedProvince = $_GET["selectedProvince"]; //Gets from AJAX load.
 <td style="border-bottom:2px solid black;" id="Col2">Buildings</td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building1" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 1"/></td>
+<td><img class="BuildingSlot" id="Building6" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 6"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building2" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 2"/></td>
+<td><img class="BuildingSlot" id="Building7" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 7"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building3" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 3"/></td>
+<td><img class="BuildingSlot" id="Building8"src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 8"/></td>
 </tr>
 <tr style="text-align:center;">
-<td><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
-<td><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;"/></td>
+<td><img class="BuildingSlot" id="Building4" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 4"/></td>
+<td><img class="BuildingSlot" id="Building9" src="Assets/PlaceholderBox.png" style="width:96px;height:96px;border: 5px solid black;" alt="Building Slot 9"/></td>
 </tr>
 </table>
 
@@ -213,7 +213,6 @@ function _CreateBuild(provID,type)
 		}
 	}));
 	
-	//TODO - switch this to not use page redirects unless necessary.
 }
 </script>
 </html>

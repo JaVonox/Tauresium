@@ -1,6 +1,4 @@
 <?php
-//Currently unused.
-
 //Usage example:
 //$curlResponse = json_decode(CurlCustGETRequest("Province/" . $selectedProvince)); 
 //echo $curlResponse->_Province_ID;

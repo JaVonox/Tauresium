@@ -7,6 +7,8 @@
 <title>
 Tauresium - Login
 </title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 </head>
 <body style="background-color:white;margin:0px;">
 

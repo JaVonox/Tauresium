@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="API/APIScripts/BuiltInAPICalls.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <title>
 Tauresium - Event
@@ -17,7 +17,7 @@ Tauresium - Event
 
 <div style="background-image:radial-gradient(circle at center, rgba(230, 191, 131, 0.2), rgba(226, 225, 225, 0.2)),url('Backgroundimages/Parliament.png');width:100%;background-repeat:no-repeat;background-position:center;background-size:cover;">
 <div style="background-color:lightgrey;width:60%;min-height:570px;overflow:auto;text-align:center;border:5px solid lightgrey;border-radius:15px;margin-left:auto;margin-right:auto;" class="InformationText">
-	<img src="Assets/WaxSeal.png" style="width:128px;height:96px;vertical-align:top;"/>
+	<img src="Assets/WaxSeal.png" style="width:128px;height:96px;vertical-align:top;" alt="Wax seal"/>
 	<font style="font-size:72px;color:black;font-family:Romanus;"><u id="EventTitle"> Loading... </u></font>
 	<br><br>
 	<div style="width:50%;margin-left:auto;margin-right:auto;font-size:24px;">

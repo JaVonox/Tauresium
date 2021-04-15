@@ -60,6 +60,8 @@ else
 <title>
 Tauresium - New Session
 </title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 </head>
 <body style="background-color:white;margin:0px;">
 
@@ -108,7 +110,7 @@ Tauresium - New Session
 <img style="background-image:url('Assets/WorldMapGreyscale.png');width:256px;height:256px;margin:0px;vertical-align:middle;"/> 
 <font> TBA </font>
 <br>
-<input type="radio" width="100%" style="pointer-events:none;opacity:0.5;" width="100%" name="MapType" value="TBA" <?php echo ($mapValue == "TBA") ? 'checked="checked"' : ''; ?>/> <!-- style="pointer-events:none;opacity:0.5;" -->
+<input type="radio" style="pointer-events:none;opacity:0.5;" width="100%" name="MapType" value="TBA" <?php echo ($mapValue == "TBA") ? 'checked="checked"' : ''; ?>/> <!-- style="pointer-events:none;opacity:0.5;" -->
 </td>
 </tr>
 </table>
@@ -134,7 +136,7 @@ Tauresium - New Session
 </tr>
 </table>
 <br><br>
-<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';float:center;" onclick="document.location='index.php'">Create my World!</button>
+<button type="submit" id="Submit" class="gameButton" style="text-align: center;display: inline-block;font-size: 64px;margin: 4px 2px;cursor: pointer;font-family:'Helvetica';" onclick="document.location='index.php'">Create my World!</button>
 </form>
 <br><br>
 </div>

@@ -3,7 +3,7 @@ require "CallAPICurl.php";
 
 $worldCode = (!ctype_alnum($_POST['WorldCodeInput']) ? "NULL" : $_POST['WorldCodeInput'] );
 $countryName = (!ctype_alnum($_POST['CountryNameInput']) ? "NULL" : $_POST['CountryNameInput'] );
-$countryPass = (!ctype_alnum(['CountryPassInput']) ? "NULL" : $_POST['CountryPassInput'] );
+$countryPass = (!isset($_POST['CountryPassInput']) ? "NULL" : $_POST['CountryPassInput'] );
 $countryColour = (!isset($_POST['CountryColour']) ? "NULL" : $_POST['CountryColour'] );
 $governmentType = (!isset($_POST['GovernmentType']) ? "NULL" : $_POST['GovernmentType'] );
 
@@ -21,8 +21,12 @@ else if($errorsOccured == True && $errorCode == "EtcFail")
 {
 	header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
 }
-else //TODO reorder to place this condition first and unknown error last.
+else if($errorsOccured == False)
 {
 	header("Location: ../SessionSuccess.php?Type=Country"); 	
+}
+else
+{
+	header("Location: ../ErrorPage.php?Error=CountryCreationFail"); 
 }
 ?>

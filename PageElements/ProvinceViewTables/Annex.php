@@ -6,9 +6,9 @@
 <table style="width:25%;margin-left:auto;margin-right:auto;">
 <tr style="border-bottom:1px solid black;">
 <td ></td>
-<td align="center"><img src="Assets/CultureIcon.png" id="CultureIcon" style="display:none;"/> </td>
-<td align="center"><img src="Assets/EconomicIcon.png" id="EconomicIcon" style="display:none;"/> </td>
-<td align="center"><img src="Assets/MilitaryIcon.png" id="MilitaryIcon" style="display:none;"/> </td>
+<td align="center"><img src="Assets/CultureIcon.png" id="CultureIcon" style="display:none;"  alt="Cultural Influence"/> </td>
+<td align="center"><img src="Assets/EconomicIcon.png" id="EconomicIcon" style="display:none;"  alt="Economic Influence"/> </td>
+<td align="center"><img src="Assets/MilitaryIcon.png" id="MilitaryIcon" style="display:none;"  alt="Military Influence"/> </td>
 </tr>
 <tr id="EnviromentalModifier" style="text-align:center;">
 <td>Enviroment:</td>

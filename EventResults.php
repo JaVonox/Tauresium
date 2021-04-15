@@ -37,7 +37,7 @@ else if($milGenChanges >= $cultGenChanges && $milGenChanges >= $ecoGenChanges)
 <meta name="author" content="100505349">
 <link rel="stylesheet" href="MainStyle.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="API/APIScripts/BuiltInAPICalls.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 <title>
 Tauresium - Results
 </title>
@@ -63,21 +63,21 @@ Tauresium - Results
 	<th> New <br> Influence <br> Points </th>
 	<th> Total <br> Influence </th>
 	<tr>
-		<td> <img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
+		<td> <img src="Assets/CultureIcon.png" style="width:64px;height:64px;vertical-align:middle;" alt="Cultural Influence"/> </td>
 		<td style="<?php echo "" . $cultGenChanges>=0?"color:green":"color:red"?>;font-size:24px;" > <?php echo $cultGenChanges * 100 ?>% </td>
 		<td style="font-size:24px;" id="CultGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newCult ?> </td>
 		<td style="font-size:24px;" id="CultInf"> ... </td>
 	</tr>
 	<tr>
-		<td> <img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
+		<td> <img src="Assets/EconomicIcon.png" style="width:64px;height:64px;vertical-align:middle;" alt="Economic Influence"/> </td>
 		<td style="<?php echo "" . $ecoGenChanges>=0?"color:green":"color:red"?>;font-size:24px;"> <?php echo $ecoGenChanges * 100 ?>% </td>
 		<td style="font-size:24px;" id="EcoGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newEco ?> </td>
 		<td style="font-size:24px;" id="EcoInf"> ... </td>
 	</tr>
 	<tr>
-		<td> <img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;"/> </td>
+		<td> <img src="Assets/MilitaryIcon.png" style="width:64px;height:64px;vertical-align:middle;"  alt="Military Influence"/> </td>
 		<td style="<?php echo "" . $milGenChanges>=0?"color:green":"color:red"?>;font-size:24px;"> <?php echo $milGenChanges * 100 ?>% </td>
 		<td style="font-size:24px;" id="MilGen"> ... </td>
 		<td style="font-size:24px;"> <?php echo $newMil ?> </td>

@@ -19,12 +19,11 @@ if(!isset($_SESSION))
 <br>
 <font style="font-family:Romanus;font-size:18px;text-decoration:underline;" id="pName" ></font>
 <br><br>
-<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pCult"></font>
-<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pEco"></font>
-<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"> <font id="pMil"> </font>
+<img src="Assets/CultureIcon.png" style="width:32px;height:32px;vertical-align:middle;"  alt="Cultural Influence"/> <font id="pCult"></font>
+<img src="Assets/EconomicIcon.png" style="width:32px;height:32px;vertical-align:middle;"  alt="Economic Influence"/> <font id="pEco"></font>
+<img src="Assets/MilitaryIcon.png" style="width:32px;height:32px;vertical-align:middle;"  alt="Military Influence"> <font id="pMil"> </font>
 <br>
-<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"/> <font id="pTime"> Loading... </font>
-<img src="Assets/PlaceholderIcon.png" style="width:32px;height:32px;vertical-align:middle;"> <font id="pEvent"></font>
+<font id="pTime"> Loading... </font> <img id="eImage" src="Assets/EventIcon.png" style="width:32px;height:32px;vertical-align:middle;" alt="Event Stacks"> <font id="pEvent"></font>
 <br>	
 </td>
 </tr>
@@ -103,6 +102,10 @@ function PopulateWorldData(userInfo,worldInfo)
 		{
 			document.getElementById("wEvents").innerHTML = "Events (" + Math.floor(userInfo.Events_Stacked) + "/5)";
 			document.getElementById("wEvents").style.display = "initial";
+		}
+		else
+		{
+			document.getElementById("eImage").setAttribute("style","width:32px;height:32px;vertical-align:middle;filter:grayscale(1)");
 		}
 	}
 	else

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="author" content="100505349">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="API/APIScripts/BuiltInAPICalls.js"></script>
+<script src="API/APIScripts/BuiltInAPIcalls.js"></script>
 <link rel="stylesheet" href="MainStyle.css">
 <title>
 Tauresium - World View
@@ -72,7 +72,7 @@ function _AddRow(playerStats)
 	var clone = template.content.cloneNode(true);
     var td = clone.querySelectorAll("td");
 
-    td[0].innerHTML = "<img src='Assets/Flags/" + playerStats.Colour + ".png' alt='Country Flag' width='180px' height='120px'/>";
+    td[0].innerHTML = "<img src='Assets/Flags/" + playerStats.Colour + ".png' alt='Country Flag' width='180px' height='120px' alt='Flag'/>";
 	td[1].textContent = playerStats.Title + " " + playerStats.Country_Name;
     td[2].textContent = playerStats.Mil_Cap;
 	td[3].textContent = playerStats.Last_Event_Time;
