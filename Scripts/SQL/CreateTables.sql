@@ -484,12 +484,108 @@ INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2
 35,103,104,105);
 
 INSERT INTO options VALUES(106,'The documents cannot be released, it puts the lives of our soldiers at risk.',-0.04,0.01,0.07);
-INSERT INTO options VALUES(107,'The trial will be reconducted with a jury consisting of government employees, ensuring the information does not leak',-0.06,0.02,0.06);
+INSERT INTO options VALUES(107,'The trial will be reconducted with a jury consisting of government employees, ensuring the information does not leak.',-0.06,0.02,0.06);
 INSERT INTO options VALUES(108,'The prosecution is confident this evidence will get a guilty verdict, perhaps we should just grant that verdict without the trial.',-0.1,0,0.1);
 
 INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Justified Information',
 'A court trial concerning a government employee has had to be put on indefinite recess as the case of the prosecution entirely rests on classified government information as decisive evidence. The board of prosecutors has petitioned our government for the right to release the information, as they believe the evidence is crucial, and must be submitted in full to the jury to ensure a fair trial. The evidence in question is vital military intelligence, and the public release of such documents could be disastrous.',
 45,106,107,108);
+
+INSERT INTO options VALUES(109,'Lie to the public, accuse Wells of lying for attention.',-0.04,0.03,-0.02);
+INSERT INTO options VALUES(110,'Reveal the spying of the foreign nation, and condemn their activities.',0.03,-0.02,-0.02);
+INSERT INTO options VALUES(111,'Suppress the incident',-0.01,0,0.04);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('The Ross Wells Incident',
+'During an aerial training mission over a rural area, The onboard radar of the craft flown by Major R. Wells detected an unknown signal, in response, the pilot attempted to find the unknown plane, and discovered a strange craft, which immediately fled the area. Wells immediately leaked the story to the press, including a description of the craft, which perfectly matched intellegence we had gathered about a nearby nations new spy plane model. The public immediately latched onto the idea that this was some form of alien conspiracy, and it falls to us to explain the situation.',
+30,109,110,111);
+
+INSERT INTO options VALUES(112,'The public are entirely correct to be angry. The gavel is entirely a formality, and is not essentially to the running of a trial.',0.04,-0.03,0.01);
+INSERT INTO options VALUES(113,'The gavel is traditional and the judge was entirely right to suspend the trial until the object could be found',0.02,0.02,-0.02);
+INSERT INTO options VALUES(114,'This isnt important. Our focus should be on recovering the escaped defendant, who cares what the judge did?',-0.04,-0.02,0.06);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Court Is Adjourned',
+'In an embarrassing incident for our justice system, a judge refused to continue a murder trial after his gavel could not be found. In the interim recess inwhich a disgruntled bailiff attempted to find the gavel, the defendant managed to slip out of the court building and escape. The events immediately caused national uproar, which much criticism directed at the judge for his decision to suspend the trial',
+40,112,113,114);
+
+INSERT INTO options VALUES(115,'Allowing the other nation to get away with this would show weakness. We must declare our anger over this violation of our sovereignty.',0.03,-0.03,0.05);
+INSERT INTO options VALUES(116,'There is no reason to fight over this, they did not hurt anyone and therefore to escalate the issue would cause unnecessary tensions.',-0.03,0.04,-0.03);
+INSERT INTO options VALUES(117,'We cannot be sure if this was an aggressive act. We must spy on the nation to confirm suspicions before making any other move.',-0.02,-0.02,0.04);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Migdal Bavel',
+'In a clear act of disrespect, a nearby nation held a festival yesterday on our shared border. During the events, their air force put on a flight show afterwhich the planes flew away from the crowd into our territory. While the planes were not armed at the time, the flying of military crafts into our airspace is a violation of national sovereignty',
+40,115,116,117);
+
+INSERT INTO options VALUES(118,'We cannot permit the changing of the national language like this, especially in such a crass manner.',-0.04,0.03,0.03);
+INSERT INTO options VALUES(119,'We already have a number of minority languages within our nation, what is one more going to do?',0.05,-0.03,-0.03);
+INSERT INTO options VALUES(120,'This is getting ridiculous. Our people need to be unified in one language.',-0.07,-0.04,0.1);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('The Thorpe Problem',
+'As with most countries, our national language is complicated by the existance of regional dialects and accents, especially in northern regions. This has come to a head when the local governance declared a new letter is to be added to the alphabet, to better represent the spoken language of the northern people. To make matters worse, the symbol chosen to represent this new character is decisive to say the least, with a notable resemblance to vulgar imagery.',
+30,118,119,120);
+
+INSERT INTO options VALUES(121,'The second death was a mistake, not an act of heroism. Revoke the medal from the second family.',-0.06,-0.02,0.07);
+INSERT INTO options VALUES(122,'They both died for their country and deserve their medals, regardless of intent.',0.05,-0.01,-0.02);
+INSERT INTO options VALUES(123,'Try and compromise, the first soldier will keep his original medal, and the second will recieve a lower honour.',-0.03,0.02,-0.03);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Criss Cross',
+'In a recent military exercise, things took a turn for the worse as two grenades were mistakenly activated in an enclosed space with a number of high ranking military personnel. Immediately, a heroic recruit at the scene dove ontop of one of the grenades in a bid to protect the others, in the meantime, another recruit picked up the other grenade and attempted to throw it out of a nearby window, only for it to detonate in his hand. Both men died, and were rewarded with a medal for their bravery. However, the family of the first recruit has filed a complaint, stating that because their family member knowingly gave his life, he is more entitled to the award than the other soldier.',
+35,121,122,123);
+
+INSERT INTO options VALUES(124,'He can have his extra security, at the very least it will give him more comfort while delivering his speech.',-0.06,0.04,0.03);
+INSERT INTO options VALUES(125,'You arent some kind of psychic. The event will continue with the level of security it currently has.',0.05,-0.05,-0.03);
+INSERT INTO options VALUES(126,'Maybe we could all do with some extra security...',-0.08,0.05,0.05);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Dream Catcher',
+'One of our high ranking advisors has requested additional security after having a dream that he was assassinated after giving an upcoming speech. While we do have the resources available to complete his request, doing so may shake faith in our nation, if we were to base important security decisions on dreams.',
+30,124,125,126);
+
+INSERT INTO options VALUES(127,'The advisor in question was sleep deprived and could not properly answer the question at the time.',-0.03,0.05,-0.03);
+INSERT INTO options VALUES(128,'We have fired the advisor due to his mistake, his failure to answer the question demonstrated his lack of knowledge.',0.06,-0.05,0.03);
+INSERT INTO options VALUES(129,'Censor the issue heavily.',-0.08,0.06,0.07);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Two Dimensional Politics',
+'During a speech by one of our top scientific advisors, a crowd member began to shout flat earth rhetoric at the official. Instead of ignoring the heckler, the advisor attempted to debate the issue, and after the audience member brought up a complex physics question, the sleep deprived official was unable to answer. This has been taken as a sign of stupidity by our critics, and it rests on us to respond to the incident.',
+35,127,128,129);
+
+INSERT INTO options VALUES(130,'The people have to know that the king was not a perfect man.',-0.1,0.06,-0.05);
+INSERT INTO options VALUES(131,'What harm is there in keeping this information secret? The tales make good stories after all.',0.07,-0.05,0.06);
+INSERT INTO options VALUES(132,'Perhaps we can spin this as proof that the old ways were wrong, and the new administration is a vast improvement?',-0.12,0.07,0.08);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Ahistorical Moment',
+'In the history of our national lands, the name of a certain king is revered. Tales of this king talk of his intellegence, fairness and divinity, and said tales have been passed down around these lands for centuries. However, recent evidence has emerged proving the tales to be fabricated, and the real king was a dishonourable greedy and feared man. To publicly disclose this information would be to kill centuries of culture, but is it really right to hide the truth of this monarch from the people?',
+25,130,131,132);
+
+INSERT INTO options VALUES(133,'Does his education matter if he is consistently performing well? Lets just slide this issue under the rug.',-0.04,-0.03,0.06);
+INSERT INTO options VALUES(134,'His skill doesnt change the fact that his promoting was blantantly corrupt. We must remove him from his office and crack down on corruption.',0.04,0,-0.05);
+INSERT INTO options VALUES(135,'Family professions allow people to specialise in their field from an early age. Perhaps we should make nepotism an official policy.',0.04,-0.07,0.04);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Nepotism',
+'A recent examination into the state of our police force has revealed a certain chief superintendent has none of the necessary qualifications for his position, and seems to have been promoted due to the presence of other family members in the force. This would be a definite cause for termination, but the officer is unmistakably gifted at his job, performing better in his role than many others with the same rank.',
+40,133,134,135);
+
+INSERT INTO options VALUES(136,'Does this company think we are so easily corruptable that they can just say a few kind words to get what they want?',0.04,-0.08,-0.02);
+INSERT INTO options VALUES(137,'They certainly are helping our ratings, perhaps one little favour wont hurt?',-0.05,0.06,0.02);
+INSERT INTO options VALUES(138,'We cant allow this kind of thing to happen. Companies should be forced to keep a neutral political position to cull their influence.',0.06,-0.1,0.05);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Good Company',
+'A large and influential tech firm has started publicly declaring their support for our policies, even in the most controversial of situations. While the support has helped to sway public opinion towards us, the companies motives are clear: they intend to influence the government to strike down proposed legislation that would give citizens the right to warranty on devices they had attempted to fix themselves.',
+30,136,137,138);
+
+INSERT INTO options VALUES(139,'This so called monument is a national embarrassment, regardless of its beauty. We need to work to clean the lake rather than preserve it.',-0.04,-0.04,0.06);
+INSERT INTO options VALUES(140,'As long as it is safe, why not keep it open?',0.01,0.07,-0.06);
+INSERT INTO options VALUES(141,'We still dont know what caused this change to occur. This site needs to be researched, not opened to the public.',0.03,-0.06,0.03);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('The White Lake',
+'Continued illegal dumping into a certain lake has caused an odd effect, the lake has been stained a pleasant white. The anomaly has gathered national attention due to the beauty of the site, which has been proven safe by scientists in the area. Despite its illegal origins, this site holds the potential to become a national monument, but should it?',
+30,139,140,141);
+
+INSERT INTO options VALUES(142,'Brush off the complaints. It isnt worth weakening relationships with the nation.',0.04,-0.06,-0.03);
+INSERT INTO options VALUES(143,'Demand action be taken by the country to preserve our national honour.',0.01,-0.07,0.06);
+INSERT INTO options VALUES(144,'Write our own slander about their nation.',-0.06,-0.06,0.1);
+
+INSERT INTO events (Title,Description,Base_Influence_Reward,Option_1_ID,Option_2_ID,Option_3_ID) VALUES ('Harassment Campaign',
+'News has reached us that the newspapers of a nearby friendly nation have been reporting on our recent policy changes quite harshly, often even lying about conditions in the country to sell their story. Despite the fact that the papers are verifiably lying, the country refuses to take any action, and so we must decide how to respond to this slander.',
+45,142,143,144);
 
 INSERT INTO coastalRegions VALUES ("America North",50,5,30,"American Artic Ocean","America West","North Atlantic",NULL,NULL,NULL);
 INSERT INTO coastalRegions VALUES ("America East",70,4,20,"Sargasso Sea","Europe","North Atlantic",NULL,NULL,NULL);
@@ -523,22 +619,22 @@ INSERT INTO governmentTypes VALUES('Anarchy','The Free Communities of',0.9,0.9,0
 INSERT INTO governmentTypes VALUES('Tribe','The Tribe of',0.8,0.8,0.8,0,0,0);
 
 INSERT INTO buildings VALUES('C0','Administration','0','0','0','0');
-INSERT INTO buildings VALUES('C1','Cathedral','0','20','10','50');
-INSERT INTO buildings VALUES('C2','Train Station','10','0','0','100');
-INSERT INTO buildings VALUES('C3','University','0','80','25','200');
-INSERT INTO buildings VALUES('C4','Airport','15','0','0','400');
+INSERT INTO buildings VALUES('C1','Cathedral','0','20','10','20');
+INSERT INTO buildings VALUES('C2','Train Station','10','0','0','50');
+INSERT INTO buildings VALUES('C3','University','0','80','25','100');
+INSERT INTO buildings VALUES('C4','Airport','15','0','0','200');
 
 INSERT INTO buildings VALUES('E0','Administration','0','0','0','0');
-INSERT INTO buildings VALUES('E1','Bank','0','40','0','50');
-INSERT INTO buildings VALUES('E2','Factory','0','0','15','100');
-INSERT INTO buildings VALUES('E3','Stock Exchange','0','100','0','200');
-INSERT INTO buildings VALUES('E4','International Headquaters','0','60','10','400');
+INSERT INTO buildings VALUES('E1','Bank','0','40','0','20');
+INSERT INTO buildings VALUES('E2','Factory','0','0','15','50');
+INSERT INTO buildings VALUES('E3','Stock Exchange','0','100','0','100');
+INSERT INTO buildings VALUES('E4','International Headquaters','0','60','10','200');
 
 INSERT INTO buildings VALUES('M0','Administration','0','0','0','0');
-INSERT INTO buildings VALUES('M1','Military Base','10','0','0','50');
-INSERT INTO buildings VALUES('M2','Airfield','10','100','0','100');
-INSERT INTO buildings VALUES('M3','Logistics Office','15','0','15','200');
-INSERT INTO buildings VALUES('M4','Command Center','0','200','0','400');
+INSERT INTO buildings VALUES('M1','Military Base','10','0','0','20');
+INSERT INTO buildings VALUES('M2','Airfield','10','100','0','50');
+INSERT INTO buildings VALUES('M3','Logistics Office','15','0','15','100');
+INSERT INTO buildings VALUES('M4','Command Center','0','200','0','200');
 
 INSERT INTO provinces  VALUES ('Alaska_BristolBay','5,100','31,68','43,87',TRUE,'Bethel','Tundra','Alaska','America North','>No Information Currently Available','6000','0.926','63051','0','-0.1','0','55.56','588.93226','32.72107637','0.4166','9.2361','1.2962','56','75','57');
 INSERT INTO provinces  VALUES ('Alaska_Calista','31,68','56,67','52,50',TRUE,'Kotzebue','Tundra','Alaska','America North','>No Information Currently Available','3200','0.926','63051','0','-0.1','0','29.632','613.22826','18.1711798','0.2546','9.5601','0.7638','56','75','57');

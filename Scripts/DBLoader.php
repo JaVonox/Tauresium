@@ -272,14 +272,14 @@ class Database{
 	
 	public function getDuplicateplayers($countryName)
 	{
-		$stmt = $this->connectionData->prepare("SELECT players.Country_Name FROM players WHERE players.Country_Name = ?;");
+		$stmt = $this->connectionData->prepare("SELECT 1 FROM players WHERE players.Country_Name = ?;");
 		$stmt->bind_param('s', $countryName);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$dataSet = $result->fetch_row();
 		$stmt->close();
 		
-		if($dataSet[0] == $countryName && $dataSet[0] != "")
+		if($dataSet[0] == "1")
 		{
 			return True;
 		}
@@ -296,10 +296,17 @@ class Database{
 		$stmt->bind_param('s', $worldCode);
 		$stmt->execute();
 		$result = $stmt->get_result();
-		$dataSet = $result->fetch_row();
+		$dataSet = $result->fetch_all(MYSQLI_NUM);
 		$stmt->close();
 		
-		return $dataSet;
+		$coloursArray = array("DUMMY","DUMMY","DUMMY","DUMMY","DUMMY");
+		
+		for($i=0;$i<count($dataSet);$i++)
+		{
+			$coloursArray[$i] = $dataSet[$i][0];
+		}
+		
+		return $coloursArray;
 	}
 	
 	public function addNewCountry($countryName,$passwordPreHash,$government,$colour,$world_Code)
