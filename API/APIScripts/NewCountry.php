@@ -33,7 +33,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 			//Check if world code is valid
 			$validWorldCode = $newAccountDB->getValidWorldCode($worldCode);
 			
-			if(!$validWorldCode) //add checksum here to stop breakin attempts
+			if(!$validWorldCode)
 			{
 				$errorCode = $errorCode . "WorldCodeInput=OCCUPIED" . $worldCode  . "&";
 				$errorsOccured = True;
@@ -64,8 +64,8 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		}
 		else 
 		{
-			
-			if(!$newAccountDB->getDuplicatePlayers($countryName))
+			$duplicateReturn = $newAccountDB->getDuplicatePlayers($countryName);
+			if($duplicateReturn != True)
 			{
 				$errorCode = $errorCode . "NationName=" . $countryName  . "&";
 			}
@@ -142,6 +142,7 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		else
 		{
 			$errorCode = $errorCode . "CountryColour=" . $countryColour  . "&";
+			$errorsOccured = True;
 		}
 		
 	}
@@ -151,24 +152,18 @@ function _CreateNewCountry($_worldCode,$_countryName,$_password,$_governmentType
 		$errorsOccured = True;
 	}
 
-	//Return array = parameter - True/False (Success/Failure) - None/ErrorParams
+	//Return array = parameter - True/False (Failure/Success) - None/ErrorParams
 	
 	if($errorsOccured == True)
 	{
 		$errorCode = rtrim($errorCode,"&"); 
-		return(array(True,$errorCode));
+		return(array("True",$errorCode));
 	}
 	else
 	{
 		$accountSuccess = $newAccountDB->addNewCountry($countryName,$countryPass,$governmentType,$countryColour,$worldCode);
-		if($accountSuccess)
-		{
-			return(array(False,"null"));
-		}
-		else
-		{
-			return(array(True,"EtcFail"));
-		}
+		
+		return(array("False","null"));
 		
 	}
 }

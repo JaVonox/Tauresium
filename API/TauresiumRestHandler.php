@@ -799,12 +799,12 @@ class TauresiumRestService extends RestService
 
 	}
 	
-	private function PostNewCountry($username,$password,$worldCode,$governmentType,$colour) //Creates new country via POST request. Might be insecure due to sending of password.
+	private function PostNewCountry($username,$password,$worldCode,$governmentType,$colour)
 	{
 		$parameters = _CreateNewCountry($worldCode,$username,$password,$governmentType,$colour);
 		
 		//Responses
-		if($parameters[0]) //Occurs when errors occured
+		if($parameters[0] == "True") //Occurs when errors occured
 		{
 			header("HTTP/1.1 400 Error occured. Code: " . $parameters[1]); 
 			return json_encode($parameters);
