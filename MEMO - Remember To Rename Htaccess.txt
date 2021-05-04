@@ -1,0 +1,1 @@
+htaccess needs to be .htaccess or the API wont work
